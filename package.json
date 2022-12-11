@@ -1,0 +1,49 @@
+{
+  "name": "note-mac-virtual-dsiplay",
+  "version": "1.0.0",
+  "description": "A Native module to create and handle virtual display on macOS",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "gypfile": true,
+  "scripts": {
+    "build": "node-gyp rebuild",
+    "clean": "node-gyp clean",
+    "lint": "clang-format --dry-run -Werror ./src/virtual_dsiplay.mm && prettier --check index.js",
+    "format": "clang-format -i ./src/virtual_dsiplay.mm && prettier --write index.js",
+    "test": "./node_modules/.bin/mocha --reporter spec",
+    "prepare": "husky install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ENFP-Dev-Studio/node-mac-virtual-dsiplay"
+  },
+  "author": "ENFP-Dev-Studio",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "clang-format": "^1.8.0",
+    "husky": "^8.0.2",
+    "lint-staged": "^13.1.0",
+    "mocha": "^10.1.0",
+    "node-gyp": "^9.3.0",
+    "prettier": "^2.8.1"
+  },
+  "dependencies": {
+    "bindings": "^1.5.0",
+    "node-addon-api": "^5.0.0"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write"
+    ],
+    "*.mm": [
+      "clang-format -i"
+    ]
+  },
+  "os": [
+    "darwin"
+  ],
+  "publishConfig": {
+    "@enfpdev:registry": "https://npm.pkg.github.com"
+  }
+}

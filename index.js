@@ -4,13 +4,16 @@ const { VDisplay } = require("bindings")("virtual_display.node");
 // const addon = require('../build/Release/object-wrap-demo-native');
 
 function VirtualDisplay(name) {
+  const _addonInstance = new VDisplay();
+
   this.getDisplayId = function () {
     return _addonInstance.displayId;
   };
 
-  this.createVDisplay = _addonInstance.CreateVDisplay;
-  var _addonInstance = new VDisplay();
-  return _addonInstance;
+  this.createVDisplay = () => {
+    return _addonInstance.CreateVDisplay();
+  };
+  // return _addonInstance;
 }
 
 // const vdisplay = new VDisplay();

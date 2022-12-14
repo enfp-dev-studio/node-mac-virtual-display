@@ -8,11 +8,9 @@ function VirtualDisplay(name) {
     return _addonInstance.displayId;
   };
 
-  this.createVDisplay = function () {
-    return _addonInstance.CreateVDisplay();
-  };
-
+  this.createVDisplay = _addonInstance.CreateVDisplay;
   var _addonInstance = new VDisplay();
+  return _addonInstance;
 }
 
 // const vdisplay = new VDisplay();

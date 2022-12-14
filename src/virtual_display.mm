@@ -84,51 +84,37 @@ NS_ASSUME_NONNULL_BEGIN
 
 class VDisplay : public Napi::ObjectWrap<VDisplay> {
 public:
-  static Napi::Object Init(Napi::Env env, Napi::Object exports);
+  //   static Napi::Object Init(Napi::Env env, Napi::Object exports);
+  static Napi::Function GetClass(Napi::Env);
   VDisplay(const Napi::CallbackInfo &info);
+  Napi::Value GetDisplayId(const Napi::CallbackInfo &info);
+  Napi::Value CreateVDisplay(const Napi::CallbackInfo &info);
 
 private:
   // double _value;
   CGVirtualDisplay *_display;
   CGVirtualDisplayDescriptor *_descriptor;
   CGVirtualDisplaySettings *_settings;
-  // Napi::Value GetValue(const Napi::CallbackInfo &info);
-  Napi::Value GetDisplayId(const Napi::CallbackInfo &info);
-  Napi::Value CreateVDisplay(const Napi::CallbackInfo &info);
-
-  //   void SetValue(const Napi::CallbackInfo &info, const Napi::Value &value);
 };
 
-Napi::Object VDisplay::Init(Napi::Env env, Napi::Object exports) {
-  Napi::Function func = DefineClass(
-      env, "VDisplay",
-      {// Register a class instance accessor with getter and setter
-       // functions.
-       // InstanceAccessor<&VDisplay::GetValue,
-       // &VDisplay::SetValue>("value"),
-       //   InstanceAccessor<&VDisplay::GetValue,
-       //   &VDisplay::SetValue>("value"),
-       InstanceAccessor<&VDisplay::GetDisplayId>("displayId"),
-       InstanceAccessor<&VDisplay::CreateVDisplay>("createVirtualDisplay")});
-
-  Napi::FunctionReference *constructor = new Napi::FunctionReference();
-  *constructor = Napi::Persistent(func);
-  env.SetInstanceData(constructor);
-  exports.Set("VDisplay", func);
-
-  return exports;
+VDisplay::VDisplay(const Napi::CallbackInfo &info) : ObjectWrap(info) {
+  Napi::Env env = info.Env();
 }
 
-VDisplay::VDisplay(const Napi::CallbackInfo &info)
-    : Napi::ObjectWrap<VDisplay>(info) {
-  Napi::Env env = info.Env();
-  // ...
-  // Napi::Number value = info[0].As<Napi::Number>();
-  // this->_value = value.DoubleValue();
-  // this->_display.terminationHandler = ^(id display, CGVirtualDisplay *error)
-  // {
-  //   NSLog(@"Termination handler called");
-  // };
+Napi::Function VDisplay::GetClass(Napi::Env env) {
+  return DefineClass(
+      env, "VDisplay",
+      {
+          VDisplay::InstanceMethod("getDisplayId", &VDisplay::GetDisplayId),
+          VDisplay::InstanceMethod("createVirtualDisplay",
+                                   &VDisplay::CreateVDisplay),
+      });
+}
+
+Napi::Object Init(Napi::Env env, Napi::Object exports) {
+  Napi::String name = Napi::String::New(env, "VDisplay");
+  exports.Set(name, VDisplay::GetClass(env));
+  return exports;
 }
 
 Napi::Value VDisplay::CreateVDisplay(const Napi::CallbackInfo &info) {
@@ -165,25 +151,6 @@ Napi::Value VDisplay::CreateVDisplay(const Napi::CallbackInfo &info) {
 Napi::Value VDisplay::GetDisplayId(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
   return Napi::Number::New(env, this->_display.displayID);
-}
-
-// Napi::Value VDisplay::GetValue(const Napi::CallbackInfo &info) {
-//   Napi::Env env = info.Env();
-//   return Napi::Number::New(env, this->_display.displayID);
-// }
-
-// void VDisplay::SetValue(const Napi::CallbackInfo &info,
-//                         const Napi::Value &value) {
-//   Napi::Env env = info.Env();
-//   // ...
-//   Napi::Number arg = value.As<Napi::Number>();
-//   this->_value = arg.DoubleValue();
-// }
-
-// Initialize native add-on
-Napi::Object Init(Napi::Env env, Napi::Object exports) {
-  VDisplay::Init(env, exports);
-  return exports;
 }
 
 NS_ASSUME_NONNULL_END

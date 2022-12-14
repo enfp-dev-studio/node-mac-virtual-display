@@ -102,18 +102,14 @@ private:
 Napi::Object VDisplay::Init(Napi::Env env, Napi::Object exports) {
   Napi::Function func = DefineClass(
       env, "VDisplay",
-      {
-          // Register a class instance accessor with getter and setter
-          // functions.
-          // InstanceAccessor<&VDisplay::GetValue,
-          // &VDisplay::SetValue>("value"),
-          //   InstanceAccessor<&VDisplay::GetValue,
-          //   &VDisplay::SetValue>("value"),
-          InstanceAccessor<&VDisplay::GetDisplayId>("displayId"),
-          InstanceAccessor<&VDisplay::CreateVDisplay>("displayId")
-
-          // We can also register a readonly accessor by omitting the setter.
-      });
+      {// Register a class instance accessor with getter and setter
+       // functions.
+       // InstanceAccessor<&VDisplay::GetValue,
+       // &VDisplay::SetValue>("value"),
+       //   InstanceAccessor<&VDisplay::GetValue,
+       //   &VDisplay::SetValue>("value"),
+       InstanceAccessor<&VDisplay::GetDisplayId>("displayId"),
+       InstanceAccessor<&VDisplay::CreateVDisplay>("createVirtualDisplay")});
 
   Napi::FunctionReference *constructor = new Napi::FunctionReference();
   *constructor = Napi::Persistent(func);

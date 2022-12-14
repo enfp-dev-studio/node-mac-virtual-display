@@ -11,10 +11,13 @@ function VirtualDisplay(name) {
   };
 
   this.createVDisplay = () => {
-    return _addonInstance.CreateVDisplay();
+    return _addonInstance.createVirtualDisplay;
   };
   // return _addonInstance;
 }
+
+// const vdisplay = new VirtualDisplay();
+// vdisplay.createVDisplay();
 
 // const vdisplay = new VDisplay();
 // console.log(vdisplay.displayId);

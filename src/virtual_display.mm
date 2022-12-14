@@ -94,8 +94,9 @@ private:
   CGVirtualDisplaySettings *_settings;
   // Napi::Value GetValue(const Napi::CallbackInfo &info);
   Napi::Value GetDisplayId(const Napi::CallbackInfo &info);
+  Napi::Value CreateVDisplay(const Napi::CallbackInfo &info);
 
-  void SetValue(const Napi::CallbackInfo &info, const Napi::Value &value);
+  //   void SetValue(const Napi::CallbackInfo &info, const Napi::Value &value);
 };
 
 Napi::Object VDisplay::Init(Napi::Env env, Napi::Object exports) {
@@ -106,9 +107,10 @@ Napi::Object VDisplay::Init(Napi::Env env, Napi::Object exports) {
           // functions.
           // InstanceAccessor<&VDisplay::GetValue,
           // &VDisplay::SetValue>("value"),
-          // InstanceAccessor<&VDisplay::GetValue,
-          // &VDisplay::SetValue>("value"),
-          InstanceAccessor<&VDisplay::GetDisplayId>("displayId")
+          //   InstanceAccessor<&VDisplay::GetValue,
+          //   &VDisplay::SetValue>("value"),
+          InstanceAccessor<&VDisplay::GetDisplayId>("displayId"),
+          InstanceAccessor<&VDisplay::CreateVDisplay>("displayId")
 
           // We can also register a readonly accessor by omitting the setter.
       });
@@ -127,32 +129,41 @@ VDisplay::VDisplay(const Napi::CallbackInfo &info)
   // ...
   // Napi::Number value = info[0].As<Napi::Number>();
   // this->_value = value.DoubleValue();
-  this->_descriptor = [[CGVirtualDisplayDescriptor alloc] init];
-  this->_descriptor.name = @"Virtual Display";
-  // this->_descriptor.name = "Test Display";
-  this->_descriptor.maxPixelsWide = 1920;
-  this->_descriptor.maxPixelsHigh = 1080;
-  this->_descriptor.sizeInMillimeters = CGSizeMake(1800, 1012.5);
-  this->_descriptor.productID = 0x1234;
-  this->_descriptor.vendorID = 0x3456;
-  this->_descriptor.serialNum = 0x0001;
-  this->_display =
-      [[CGVirtualDisplay alloc] initWithDescriptor:this->_descriptor];
-  this->_settings = [[CGVirtualDisplaySettings alloc] init];
-  this->_settings.hiDPI = 2;
-  this->_settings.modes = @[
-    [[CGVirtualDisplayMode alloc] initWithWidth:1920
-                                         height:1080
-                                    refreshRate:60],
-    [[CGVirtualDisplayMode alloc] initWithWidth:1920
-                                         height:1080
-                                    refreshRate:30],
-  ];
-  [this->_display applySettings:this->_settings];
   // this->_display.terminationHandler = ^(id display, CGVirtualDisplay *error)
   // {
   //   NSLog(@"Termination handler called");
   // };
+}
+
+Napi::Value VDisplay::CreateVDisplay(const Napi::CallbackInfo &info) {
+  if (this->_display == nil) {
+
+    this->_descriptor = [[CGVirtualDisplayDescriptor alloc] init];
+    this->_descriptor.name = @"Virtual Display";
+    // this->_descriptor.name = "Test Display";
+    this->_descriptor.maxPixelsWide = 1920;
+    this->_descriptor.maxPixelsHigh = 1080;
+    this->_descriptor.sizeInMillimeters = CGSizeMake(1800, 1012.5);
+    this->_descriptor.productID = 0x1234;
+    this->_descriptor.vendorID = 0x3456;
+    this->_descriptor.serialNum = 0x0001;
+    this->_display =
+        [[CGVirtualDisplay alloc] initWithDescriptor:this->_descriptor];
+    this->_settings = [[CGVirtualDisplaySettings alloc] init];
+    this->_settings.hiDPI = 2;
+    this->_settings.modes = @[
+      [[CGVirtualDisplayMode alloc] initWithWidth:1920
+                                           height:1080
+                                      refreshRate:60],
+      [[CGVirtualDisplayMode alloc] initWithWidth:1920
+                                           height:1080
+                                      refreshRate:30],
+    ];
+    [this->_display applySettings:this->_settings];
+  }
+
+  Napi::Env env = info.Env();
+  return Napi::Number::New(env, this->_display.displayID);
 }
 
 Napi::Value VDisplay::GetDisplayId(const Napi::CallbackInfo &info) {

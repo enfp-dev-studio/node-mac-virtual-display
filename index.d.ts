@@ -2,4 +2,4 @@
 // Project: note-mac-virtual-dsiplay
 
 export function getDisplayId(): number;
-export function createVDisplay(): number;
+export function createVirtualDisplay(): number;

@@ -6,7 +6,7 @@ describe("request-review", () => {
     it("should not throw", () => {
       expect(() => {
         const vdisplay = new VirtualDisplay();
-        console.log("Virtual Display ID: ", vdisplay.getDisplayId());
+        console.log("Virtual Display ID: ", vdisplay.createVirtualDisplay());
       }).to.not.throw(/is valid func/);
     });
   });

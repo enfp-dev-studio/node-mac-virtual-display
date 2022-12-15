@@ -13,7 +13,4 @@ function VirtualDisplay() {
   var _addonInstance = new addon.VDisplay();
 }
 
-const vdisplay = new VirtualDisplay();
-console.log(vdisplay.createVirtualDisplay());
-
 module.exports = VirtualDisplay;

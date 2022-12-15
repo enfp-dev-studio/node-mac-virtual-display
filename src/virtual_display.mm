@@ -121,8 +121,8 @@ Napi::Value VDisplay::CreateVDisplay(const Napi::CallbackInfo &info) {
   this->_descriptor = [[CGVirtualDisplayDescriptor alloc] init];
   this->_descriptor.name = @"Virtual Display";
   // this->_descriptor.name = "Test Display";
-  this->_descriptor.maxPixelsWide = 1920;
-  this->_descriptor.maxPixelsHigh = 1080;
+  this->_descriptor.maxPixelsWide = 2880;
+  this->_descriptor.maxPixelsHigh = 1800;
   this->_descriptor.sizeInMillimeters = CGSizeMake(1800, 1012.5);
   this->_descriptor.productID = 0x1234;
   this->_descriptor.vendorID = 0x3456;
@@ -132,11 +132,11 @@ Napi::Value VDisplay::CreateVDisplay(const Napi::CallbackInfo &info) {
   this->_settings = [[CGVirtualDisplaySettings alloc] init];
   this->_settings.hiDPI = 2;
   this->_settings.modes = @[
-    [[CGVirtualDisplayMode alloc] initWithWidth:1920
-                                         height:1080
+    [[CGVirtualDisplayMode alloc] initWithWidth:2880
+                                         height:1800
                                     refreshRate:60],
-    [[CGVirtualDisplayMode alloc] initWithWidth:1920
-                                         height:1080
+    [[CGVirtualDisplayMode alloc] initWithWidth:2880
+                                         height:1800
                                     refreshRate:30],
   ];
   [this->_display applySettings:this->_settings];

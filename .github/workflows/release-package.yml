@@ -1,4 +1,4 @@
-name: note-mac-virtual-dsiplay Package
+name: node-mac-virtual-dsiplay Package
 
 on:
   release:

@@ -1,5 +1,5 @@
 {
-  "name": "note-mac-virtual-dsiplay",
+  "name": "node-mac-virtual-dsiplay",
   "version": "1.0.0",
   "description": "A Native module to create and handle virtual display on macOS",
   "main": "index.js",

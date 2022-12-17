@@ -1,4 +1,4 @@
-name: node-mac-virtual-dsiplay Package
+name: node-mac-virtual-display Package
 
 on:
   release:

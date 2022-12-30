@@ -10,7 +10,11 @@ function VirtualDisplay() {
     return _addonInstance.createVirtualDisplay();
   };
 
+  this.destroyVirtualDisplay = function () {
+    return _addonInstance.destroyVirtualDisplay();
+  };
+
   var _addonInstance = new addon.VDisplay();
 }
 
-module.exports = VirtualDisplay;
+module.exports = addon;

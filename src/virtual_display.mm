@@ -89,6 +89,7 @@ public:
   VDisplay(const Napi::CallbackInfo &info);
   //   Napi::Value GetDisplayId(const Napi::CallbackInfo &info);
   Napi::Value CreateVDisplay(const Napi::CallbackInfo &info);
+  Napi::Value DestroyVirtualDisplay(const Napi::CallbackInfo &info);
 
 private:
   // double _value;
@@ -102,13 +103,17 @@ VDisplay::VDisplay(const Napi::CallbackInfo &info) : ObjectWrap(info) {
 }
 
 Napi::Function VDisplay::GetClass(Napi::Env env) {
-  return DefineClass(env, "VDisplay",
-                     {
-                         //   VDisplay::InstanceMethod("getDisplayId",
-                         //   &VDisplay::GetDisplayId),
-                         VDisplay::InstanceMethod("createVirtualDisplay",
-                                                  &VDisplay::CreateVDisplay),
-                     });
+  return DefineClass(
+      env, "VDisplay",
+      {
+          //   VDisplay::InstanceMethod("getDisplayId",
+          //   &VDisplay::GetDisplayId),
+          VDisplay::InstanceMethod("createVirtualDisplay",
+                                   &VDisplay::CreateVDisplay),
+          VDisplay::InstanceMethod("destoryVirtualDisplay",
+                                   &VDisplay::DestroyVirtualDisplay),
+
+      });
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
@@ -120,6 +125,9 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
 // https://github.com/w0lfschild/macOS_headers/blob/master/macOS/Frameworks/CoreGraphics/1251.8.4.2/CGVirtualDisplayDescriptor.h
 
 Napi::Value VDisplay::CreateVDisplay(const Napi::CallbackInfo &info) {
+  if (this->_display) {
+    return Napi::Number::New(info.Env(), this->_display.displayID);
+  }
   this->_descriptor = [[CGVirtualDisplayDescriptor alloc] init];
   this->_descriptor.name = @"Virtual Display";
   // this->_descriptor.name = "Test Display";
@@ -141,6 +149,15 @@ Napi::Value VDisplay::CreateVDisplay(const Napi::CallbackInfo &info) {
 
   Napi::Env env = info.Env();
   return Napi::Number::New(env, this->_display.displayID);
+}
+
+Napi::Value VDisplay::DestroyVirtualDisplay(const Napi::CallbackInfo &info) {
+  if (this->_display) {
+    [this->_display release];
+    return Napi::Boolean::New(info.Env(), true);
+  } else {
+    return Napi::Boolean::New(info.Env(), false);
+  }
 }
 
 // Napi::Value VDisplay::GetDisplayId(const Napi::CallbackInfo &info) {

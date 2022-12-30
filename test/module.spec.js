@@ -1,12 +1,15 @@
 const { expect } = require("chai");
 const VirtualDisplay = require("../index");
 
-describe("request-review", () => {
-  describe("requestReview()", () => {
+describe("virtual_display", () => {
+  describe("virtual_display", () => {
     it("should not throw", () => {
       expect(() => {
         const vdisplay = new VirtualDisplay();
-        console.log("Virtual Display ID: ", vdisplay.createVirtualDisplay());
+        vdisplay.createVirtualDisplay();
+        setTimeout(() => {
+          vdisplay.destoryVirtualDisplay();
+        }, 3000);
       }).to.not.throw(/is valid func/);
     });
   });

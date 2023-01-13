@@ -110,7 +110,7 @@ Napi::Function VDisplay::GetClass(Napi::Env env) {
           //   &VDisplay::GetDisplayId),
           VDisplay::InstanceMethod("createVirtualDisplay",
                                    &VDisplay::CreateVDisplay),
-          VDisplay::InstanceMethod("destoryVirtualDisplay",
+          VDisplay::InstanceMethod("destroyVirtualDisplay",
                                    &VDisplay::DestroyVirtualDisplay),
 
       });

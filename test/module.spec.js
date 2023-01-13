@@ -8,7 +8,7 @@ describe("virtual_display", () => {
         const vdisplay = new VirtualDisplay();
         vdisplay.createVirtualDisplay();
         setTimeout(() => {
-          vdisplay.destoryVirtualDisplay();
+          vdisplay.destroyVirtualDisplay();
         }, 3000);
       }).to.not.throw(/is valid func/);
     });

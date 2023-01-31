@@ -8,8 +8,21 @@ describe("virtual_display", () => {
         const vdisplay = new VirtualDisplay();
         vdisplay.createVirtualDisplay();
         setTimeout(() => {
-          vdisplay.destroyVirtualDisplay();
+          try {
+            const ret = vdisplay.destroyVirtualDisplay();
+            console.log("destroy: ", ret);
+          } catch (error) {
+            console.log(error);
+          }
         }, 3000);
+        setTimeout(() => {
+          try {
+            const ret = vdisplay.createVirtualDisplay();
+            console.log("destroy: ", ret);
+          } catch (error) {
+            console.log(error);
+          }
+        }, 10000);
       }).to.not.throw(/is valid func/);
     });
   });

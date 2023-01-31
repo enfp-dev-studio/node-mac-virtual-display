@@ -153,7 +153,12 @@ Napi::Value VDisplay::CreateVDisplay(const Napi::CallbackInfo &info) {
 
 Napi::Value VDisplay::DestroyVirtualDisplay(const Napi::CallbackInfo &info) {
   if (this->_display) {
+    [this->_descriptor release];
+    this->_descriptor = nil;
+    [this->_settings release];
+    this->_settings = nil;
     [this->_display release];
+    this->_display = nil;
     return Napi::Boolean::New(info.Env(), true);
   } else {
     return Napi::Boolean::New(info.Env(), false);

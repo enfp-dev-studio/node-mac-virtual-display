@@ -130,7 +130,6 @@ Napi::Value VDisplay::CreateVDisplay(const Napi::CallbackInfo &info) {
   }
   this->_descriptor = [[CGVirtualDisplayDescriptor alloc] init];
   this->_descriptor.name = @"Virtual Display";
-  // this->_descriptor.name = "Test Display";
   this->_descriptor.maxPixelsWide = 1280;
   this->_descriptor.maxPixelsHigh = 720;
   this->_descriptor.sizeInMillimeters = CGSizeMake(1200, 675);

@@ -22,7 +22,7 @@ describe("virtual_display", () => {
           } catch (error) {
             console.log(error);
           }
-        }, 10000);
+        }, 6000);
       }).to.not.throw(/is valid func/);
     });
   });

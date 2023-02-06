@@ -2,9 +2,7 @@
 const addon = require("bindings")("virtual_display.node");
 
 function VirtualDisplay() {
-  this.createVirtualDisplay = function ({
-    
-  }) {
+  this.createVirtualDisplay = function () {
     return _addonInstance.createVirtualDisplay();
   };
 

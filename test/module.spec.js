@@ -5,7 +5,7 @@ describe("virtual_display", () => {
   it("should not throw", () => {
     expect(() => {
       const vdisplay = new VirtualDisplay();
-      vdisplay.createVirtualDisplay();
+      vdisplay.createVirtualDisplay({ width: 2800, height: 1752, ppi: 340 });
       setTimeout(() => {
         try {
           const ret = vdisplay.destroyVirtualDisplay();
@@ -16,7 +16,11 @@ describe("virtual_display", () => {
       }, 2000);
       setTimeout(() => {
         try {
-          const ret = vdisplay.createVirtualDisplay();
+          const ret = vdisplay.createVirtualDisplay({
+            width: 1280,
+            height: 720,
+            ppi: 96,
+          });
           console.log("destroy: ", ret);
         } catch (error) {
           console.log(error);

@@ -128,11 +128,26 @@ Napi::Value VDisplay::CreateVDisplay(const Napi::CallbackInfo &info) {
   if (this->_display) {
     return Napi::Number::New(info.Env(), this->_display.displayID);
   }
+  Napi::Env env = info.Env();
+
+  if (info.Length() < 3) {
+    Napi::TypeError::New(env, "Wrong number of arguments")
+        .ThrowAsJavaScriptException();
+    return env.Null();
+  }
+  int width = info[0].As<Napi::Number>().Int32Value();
+  int height = info[2].As<Napi::Number>().Int32Value();
+  int ppi = info[1].As<Napi::Number>().Int32Value();
+
   this->_descriptor = [[CGVirtualDisplayDescriptor alloc] init];
   this->_descriptor.name = @"Virtual Display";
-  this->_descriptor.maxPixelsWide = 1920;
-  this->_descriptor.maxPixelsHigh = 1080;
-  this->_descriptor.sizeInMillimeters = CGSizeMake(1800, 1012.5);
+  this->_descriptor.maxPixelsWide = width;
+  this->_descriptor.maxPixelsHigh = height;
+  double inchToPixel = 25.4;
+  this->_descriptor.sizeInMillimeters =
+      CGSizeMake(width / ppi * inchToPixel, height / ppi * inchToPixel);
+
+  // this->_descriptor.sizeInMillimeters = CGSizeMake(1800, 1012.5);
   // this->_descriptor.maxPixelsWide = 1280;
   // this->_descriptor.maxPixelsHigh = 720;
   // this->_descriptor.sizeInMillimeters = CGSizeMake(1200, 675);
@@ -148,16 +163,15 @@ Napi::Value VDisplay::CreateVDisplay(const Napi::CallbackInfo &info) {
     // refreshRate:60],
     // [[CGVirtualDisplayMode alloc] initWithWidth:1280 height:720
     // refreshRate:30],
-    [[CGVirtualDisplayMode alloc] initWithWidth:1920
-                                         height:1080
+    [[CGVirtualDisplayMode alloc] initWithWidth:width
+                                         height:height
                                     refreshRate:60],
-    [[CGVirtualDisplayMode alloc] initWithWidth:1920
-                                         height:1080
+    [[CGVirtualDisplayMode alloc] initWithWidth:width
+                                         height:height
                                     refreshRate:30],
   ];
   [this->_display applySettings:this->_settings];
 
-  Napi::Env env = info.Env();
   return Napi::Number::New(env, this->_display.displayID);
 }
 

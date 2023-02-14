@@ -1,6 +1,12 @@
 // Type definitions for node-mac-virtual-display
 // Project: node-mac-virtual-display
 
+export type DisplayInfo = {
+  id: number;
+  width: number;
+  height: number;
+};
+
 export function getDisplayId(): number;
 export function createVirtualDisplay({
   width,
@@ -10,6 +16,6 @@ export function createVirtualDisplay({
   width: number;
   height: number;
   ppi: number;
-}): number;
-export function cloneVirtualDisplay(): number;
+}): DisplayInfo;
+export function cloneVirtualDisplay(): DisplayInfo;
 export function destroyVirtualDisplay(): boolean;

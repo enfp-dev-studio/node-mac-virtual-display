@@ -5,7 +5,12 @@ describe("virtual_display", () => {
   it("should not throw", () => {
     expect(() => {
       const vdisplay = new VirtualDisplay();
-      vdisplay.createVirtualDisplay({ width: 2800, height: 1752, ppi: 340 });
+      const result = vdisplay.createVirtualDisplay({
+        width: 2800,
+        height: 1752,
+        ppi: 340,
+      });
+      console.log(result);
       setTimeout(() => {
         try {
           const ret = vdisplay.destroyVirtualDisplay();

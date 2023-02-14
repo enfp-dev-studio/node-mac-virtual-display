@@ -177,7 +177,13 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
   ];
   [this->_display applySettings:this->_settings];
 
-  return Napi::Number::New(env, this->_display.displayID);
+  Napi::Object obj = Napi::Object::New(env);
+  obj.Set(Napi::String::New(env, "id"),
+          Napi::Number::New(env, this->_display.displayID));
+  obj.Set(Napi::String::New(env, "width"), Napi::Number::New(env, width));
+  obj.Set(Napi::String::New(env, "height"), Napi::Number::New(env, height));
+
+  return obj;
 }
 
 Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
@@ -230,7 +236,12 @@ Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
   ];
   [this->_display applySettings:this->_settings];
 
-  return Napi::Number::New(env, this->_display.displayID);
+  Napi::Object obj = Napi::Object::New(env);
+  obj.Set(Napi::String::New(env, "id"),
+          Napi::Number::New(env, this->_display.displayID));
+  obj.Set(Napi::String::New(env, "width"), Napi::Number::New(env, width));
+  obj.Set(Napi::String::New(env, "height"), Napi::Number::New(env, height));
+  return obj;
 }
 
 Napi::Value VDisplay::DestroyVirtualDisplay(const Napi::CallbackInfo &info) {

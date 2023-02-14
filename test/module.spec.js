@@ -16,11 +16,7 @@ describe("virtual_display", () => {
       }, 2000);
       setTimeout(() => {
         try {
-          const ret = vdisplay.createVirtualDisplay({
-            width: 1280,
-            height: 720,
-            ppi: 96,
-          });
+          const ret = vdisplay.cloneVirtualDisplay();
           console.log("destroy: ", ret);
         } catch (error) {
           console.log(error);

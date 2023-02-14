@@ -11,4 +11,5 @@ export function createVirtualDisplay({
   height: number;
   ppi: number;
 }): number;
+export function cloneVirtualDisplay(): number;
 export function destroyVirtualDisplay(): boolean;

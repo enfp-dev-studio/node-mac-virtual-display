@@ -10,6 +10,10 @@ function VirtualDisplay() {
     return _addonInstance.destroyVirtualDisplay();
   };
 
+  this.cloneVirtualDisplay = function () {
+    return _addonInstance.cloneVirtualDisplay();
+  };
+
   var _addonInstance = new addon.VDisplay();
 }
 

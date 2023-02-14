@@ -88,7 +88,8 @@ public:
   static Napi::Function GetClass(Napi::Env);
   VDisplay(const Napi::CallbackInfo &info);
   //   Napi::Value GetDisplayId(const Napi::CallbackInfo &info);
-  Napi::Value CreateVDisplay(const Napi::CallbackInfo &info);
+  Napi::Value CreateVirtualDisplay(const Napi::CallbackInfo &info);
+  Napi::Value CloneVirtualDisplay(const Napi::CallbackInfo &info);
   Napi::Value DestroyVirtualDisplay(const Napi::CallbackInfo &info);
 
 private:
@@ -109,7 +110,10 @@ Napi::Function VDisplay::GetClass(Napi::Env env) {
           //   VDisplay::InstanceMethod("getDisplayId",
           //   &VDisplay::GetDisplayId),
           VDisplay::InstanceMethod("createVirtualDisplay",
-                                   &VDisplay::CreateVDisplay),
+                                   &VDisplay::CreateVirtualDisplay),
+          VDisplay::InstanceMethod("cloneVirtualDisplay",
+                                   &VDisplay::CloneVirtualDisplay),
+
           VDisplay::InstanceMethod("destroyVirtualDisplay",
                                    &VDisplay::DestroyVirtualDisplay),
 
@@ -124,7 +128,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
 
 // https://github.com/w0lfschild/macOS_headers/blob/master/macOS/Frameworks/CoreGraphics/1251.8.4.2/CGVirtualDisplayDescriptor.h
 
-Napi::Value VDisplay::CreateVDisplay(const Napi::CallbackInfo &info) {
+Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
   if (this->_display) {
     return Napi::Number::New(info.Env(), this->_display.displayID);
   }
@@ -135,6 +139,7 @@ Napi::Value VDisplay::CreateVDisplay(const Napi::CallbackInfo &info) {
         .ThrowAsJavaScriptException();
     return env.Null();
   }
+
   int width = info[0].As<Napi::Number>().Int32Value();
   int height = info[2].As<Napi::Number>().Int32Value();
   int ppi = info[1].As<Napi::Number>().Int32Value();
@@ -154,6 +159,59 @@ Napi::Value VDisplay::CreateVDisplay(const Napi::CallbackInfo &info) {
   this->_descriptor.productID = 0x1234;
   this->_descriptor.vendorID = 0x3456;
   this->_descriptor.serialNum = 0x0001;
+  this->_display =
+      [[CGVirtualDisplay alloc] initWithDescriptor:this->_descriptor];
+  this->_settings = [[CGVirtualDisplaySettings alloc] init];
+  this->_settings.hiDPI = 2;
+  this->_settings.modes = @[
+    // [[CGVirtualDisplayMode alloc] initWithWidth:1280 height:720
+    // refreshRate:60],
+    // [[CGVirtualDisplayMode alloc] initWithWidth:1280 height:720
+    // refreshRate:30],
+    [[CGVirtualDisplayMode alloc] initWithWidth:width
+                                         height:height
+                                    refreshRate:60],
+    [[CGVirtualDisplayMode alloc] initWithWidth:width
+                                         height:height
+                                    refreshRate:30],
+  ];
+  [this->_display applySettings:this->_settings];
+
+  return Napi::Number::New(env, this->_display.displayID);
+}
+
+Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
+  if (this->_display) {
+    return Napi::Number::New(info.Env(), this->_display.displayID);
+  }
+  Napi::Env env = info.Env();
+
+  // Get the main display
+  CGDirectDisplayID display = kCGDirectMainDisplay;
+
+  // Get the current display mode
+  CGDisplayModeRef displayMode = CGDisplayCopyDisplayMode(display);
+
+  // Get the physical size of the display in millimeters
+  unsigned int width = CGDisplayModeGetPixelWidth(displayMode);
+  unsigned int height = CGDisplayModeGetPixelHeight(displayMode);
+
+  // Release resources
+  CFRelease(displayMode);
+
+  this->_descriptor = [[CGVirtualDisplayDescriptor alloc] init];
+  this->_descriptor.name = @"Clone Display";
+  this->_descriptor.maxPixelsWide = width;
+  this->_descriptor.maxPixelsHigh = height;
+  this->_descriptor.sizeInMillimeters = CGDisplayScreenSize(display);
+
+  // this->_descriptor.sizeInMillimeters = CGSizeMake(1800, 1012.5);
+  // this->_descriptor.maxPixelsWide = 1280;
+  // this->_descriptor.maxPixelsHigh = 720;
+  // this->_descriptor.sizeInMillimeters = CGSizeMake(1200, 675);
+  this->_descriptor.productID = 0x4321;
+  this->_descriptor.vendorID = 0x6543;
+  this->_descriptor.serialNum = 0x0002;
   this->_display =
       [[CGVirtualDisplay alloc] initWithDescriptor:this->_descriptor];
   this->_settings = [[CGVirtualDisplaySettings alloc] init];

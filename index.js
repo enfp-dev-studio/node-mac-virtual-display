@@ -2,8 +2,8 @@
 const addon = require("bindings")("virtual_display.node");
 
 function VirtualDisplay() {
-  this.createVirtualDisplay = function ({ width, height, ppi }) {
-    const ret = _addonInstance.createVirtualDisplay(width, height, ppi);
+  this.createVirtualDisplay = function ({ width, height }) {
+    const ret = _addonInstance.createVirtualDisplay(width, height);
     return {
       id: ret.id,
       width: ret.width,

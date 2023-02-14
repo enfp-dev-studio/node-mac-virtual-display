@@ -11,11 +11,9 @@ export function getDisplayId(): number;
 export function createVirtualDisplay({
   width,
   height,
-  ppi,
 }: {
   width: number;
   height: number;
-  ppi: number;
 }): DisplayInfo;
 export function cloneVirtualDisplay(): DisplayInfo;
 export function destroyVirtualDisplay(): boolean;

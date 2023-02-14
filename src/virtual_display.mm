@@ -199,8 +199,8 @@ Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
   CGDisplayModeRef displayMode = CGDisplayCopyDisplayMode(display);
 
   // Get the physical size of the display in millimeters
-  unsigned int width = CGDisplayModeGetPixelWidth(displayMode);
-  unsigned int height = CGDisplayModeGetPixelHeight(displayMode);
+  unsigned int width = CGDisplayModeGetPixelWidth(displayMode) / 2;
+  unsigned int height = CGDisplayModeGetPixelHeight(displayMode) / 2;
 
   // Release resources
   CFRelease(displayMode);

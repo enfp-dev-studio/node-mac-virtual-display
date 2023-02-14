@@ -134,27 +134,30 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
   }
   Napi::Env env = info.Env();
 
-  if (info.Length() < 2) {
+  if (info.Length() < 3) {
     Napi::TypeError::New(env, "Wrong number of arguments")
         .ThrowAsJavaScriptException();
     return env.Null();
   }
 
   int width = info[0].As<Napi::Number>().Int32Value();
-  int height = info[2].As<Napi::Number>().Int32Value();
-  // int ppi = info[1].As<Napi::Number>().Int32Value();
+  int height = info[1].As<Napi::Number>().Int32Value();
+  int ppi = info[2].As<Napi::Number>().Int32Value();
 
   this->_descriptor = [[CGVirtualDisplayDescriptor alloc] init];
   this->_descriptor.name = @"Virtual Display";
   this->_descriptor.maxPixelsWide = width;
   this->_descriptor.maxPixelsHigh = height;
-  double ratio = 1.066666666666667;
-  this->_descriptor.sizeInMillimeters =
-      CGSizeMake(width / ratio, height / ratio);
 
-  // double inchToPixel = 25.4;
-  // this->_descriptor.sizeInMillimeters =
-  //     CGSizeMake(width / ppi * inchToPixel, height / ppi * inchToPixel);
+  if (ppi == 0) {
+    double ratio = 1.066666666666667;
+    this->_descriptor.sizeInMillimeters =
+        CGSizeMake(width / ratio, height / ratio);
+  } else {
+    double inchToPixel = 25.4;
+    this->_descriptor.sizeInMillimeters =
+        CGSizeMake(width / ppi * inchToPixel, height / ppi * inchToPixel);
+  }
 
   // this->_descriptor.sizeInMillimeters = CGSizeMake(1800, 1012.5);
   // this->_descriptor.maxPixelsWide = 1280;

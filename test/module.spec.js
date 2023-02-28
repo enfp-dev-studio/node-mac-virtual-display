@@ -9,7 +9,7 @@ describe("virtual_display", () => {
         width: 2800,
         height: 1752,
         frameRate: 30,
-        hiDPI: 2,
+        hiDPI: true,
         // ppi: 340,
       });
       console.log(result);

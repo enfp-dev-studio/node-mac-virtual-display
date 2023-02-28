@@ -148,11 +148,11 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
   } else if (frameRate > 60) {
     frameRate = 60;
   }
-  int hiDPI = info[3].As<Napi::Number>().Int32Value();
-  if (hiDPI < 1) {
-    hiDPI = 1;
-  } else if (hiDPI > 2) {
+  int hiDPI = info[3].As<Napi::Boolean>().Value();
+  if (hiDPI) {
     hiDPI = 2;
+  } else {
+    hiDPI = 1;
   }
 
   int ppi = info[4].As<Napi::Number>().Int32Value();

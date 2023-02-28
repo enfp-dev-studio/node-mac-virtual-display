@@ -13,7 +13,7 @@ function VirtualDisplay() {
       width,
       height,
       frameRate,
-      hiDPI ? hiDPI : 1,
+      hiDPI,
       ppi ? ppi : 0
     );
     return {

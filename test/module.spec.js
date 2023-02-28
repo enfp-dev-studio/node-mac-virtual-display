@@ -8,6 +8,8 @@ describe("virtual_display", () => {
       const result = vdisplay.createVirtualDisplay({
         width: 2800,
         height: 1752,
+        frameRate: 30,
+        hiDPI: 2,
         // ppi: 340,
       });
       console.log(result);

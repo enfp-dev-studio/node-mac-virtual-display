@@ -134,7 +134,7 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
   }
   Napi::Env env = info.Env();
 
-  if (info.Length() < 3) {
+  if (info.Length() < 5) {
     Napi::TypeError::New(env, "Wrong number of arguments")
         .ThrowAsJavaScriptException();
     return env.Null();
@@ -142,7 +142,20 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
 
   int width = info[0].As<Napi::Number>().Int32Value();
   int height = info[1].As<Napi::Number>().Int32Value();
-  int ppi = info[2].As<Napi::Number>().Int32Value();
+  int frameRate = info[2].As<Napi::Number>().Int32Value();
+  if (frameRate < 10) {
+    frameRate = 10;
+  } else if (frameRate > 60) {
+    frameRate = 60;
+  }
+  int hiDPI = info[3].As<Napi::Number>().Int32Value();
+  if (hiDPI < 1) {
+    hiDPI = 1;
+  } else if (hiDPI > 2) {
+    hiDPI = 2;
+  }
+
+  int ppi = info[4].As<Napi::Number>().Int32Value();
 
   this->_descriptor = [[CGVirtualDisplayDescriptor alloc] init];
   this->_descriptor.name = @"Virtual Display";
@@ -169,7 +182,7 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
   this->_display =
       [[CGVirtualDisplay alloc] initWithDescriptor:this->_descriptor];
   this->_settings = [[CGVirtualDisplaySettings alloc] init];
-  this->_settings.hiDPI = 2;
+  this->_settings.hiDPI = hiDPI;
   this->_settings.modes = @[
     // [[CGVirtualDisplayMode alloc] initWithWidth:1280 height:720
     // refreshRate:60],
@@ -177,10 +190,10 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
     // refreshRate:30],
     [[CGVirtualDisplayMode alloc] initWithWidth:width
                                          height:height
-                                    refreshRate:60],
-    [[CGVirtualDisplayMode alloc] initWithWidth:width
-                                         height:height
-                                    refreshRate:30],
+                                    refreshRate:frameRate],
+    // [[CGVirtualDisplayMode alloc] initWithWidth:width
+    //                                      height:height
+    //                                 refreshRate:30],
   ];
   [this->_display applySettings:this->_settings];
 

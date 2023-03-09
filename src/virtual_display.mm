@@ -134,7 +134,7 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
   }
   Napi::Env env = info.Env();
 
-  if (info.Length() < 5) {
+  if (info.Length() < 4) {
     Napi::TypeError::New(env, "Wrong number of arguments")
         .ThrowAsJavaScriptException();
     return env.Null();
@@ -155,22 +155,23 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
     hiDPI = 1;
   }
 
-  int ppi = info[4].As<Napi::Number>().Int32Value();
-
   this->_descriptor = [[CGVirtualDisplayDescriptor alloc] init];
   this->_descriptor.name = @"Virtual Display";
   this->_descriptor.maxPixelsWide = width;
   this->_descriptor.maxPixelsHigh = height;
 
-  if (ppi == 0) {
-    double ratio = 1.066666666666667;
-    this->_descriptor.sizeInMillimeters =
-        CGSizeMake(width / ratio, height / ratio);
-  } else {
-    double inchToPixel = 25.4;
-    this->_descriptor.sizeInMillimeters =
-        CGSizeMake(width / ppi * inchToPixel, height / ppi * inchToPixel);
-  }
+  double ratio = 1.066666666666667;
+  this->_descriptor.sizeInMillimeters =
+      CGSizeMake(width / ratio, height / ratio);
+  // if (ppi == 0) {
+  //   double ratio = 1.066666666666667;
+  //   this->_descriptor.sizeInMillimeters =
+  //       CGSizeMake(width / ratio, height / ratio);
+  // } else {
+  //   double inchToPixel = 25.4;
+  //   this->_descriptor.sizeInMillimeters =
+  //       CGSizeMake(width / ppi * inchToPixel, height / ppi * inchToPixel);
+  // }
 
   // this->_descriptor.sizeInMillimeters = CGSizeMake(1800, 1012.5);
   // this->_descriptor.maxPixelsWide = 1280;
@@ -221,12 +222,13 @@ Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
   // Get the physical size of the display in millimeters
   unsigned int width = CGDisplayModeGetPixelWidth(displayMode) / 2;
   unsigned int height = CGDisplayModeGetPixelHeight(displayMode) / 2;
+  double refreshRate = CGDisplayModeGetRefreshRate(displayMode);
 
   // Release resources
   CFRelease(displayMode);
 
   this->_descriptor = [[CGVirtualDisplayDescriptor alloc] init];
-  this->_descriptor.name = @"Clone Display";
+  this->_descriptor.name = @"Virtual Display";
   this->_descriptor.maxPixelsWide = width;
   this->_descriptor.maxPixelsHigh = height;
   this->_descriptor.sizeInMillimeters = CGDisplayScreenSize(display);
@@ -235,9 +237,9 @@ Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
   // this->_descriptor.maxPixelsWide = 1280;
   // this->_descriptor.maxPixelsHigh = 720;
   // this->_descriptor.sizeInMillimeters = CGSizeMake(1200, 675);
-  this->_descriptor.productID = 0x4321;
-  this->_descriptor.vendorID = 0x6543;
-  this->_descriptor.serialNum = 0x0002;
+  this->_descriptor.productID = 0x1234;
+  this->_descriptor.vendorID = 0x3456;
+  this->_descriptor.serialNum = 0x0001;
   this->_display =
       [[CGVirtualDisplay alloc] initWithDescriptor:this->_descriptor];
   this->_settings = [[CGVirtualDisplaySettings alloc] init];
@@ -247,12 +249,7 @@ Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
     // refreshRate:60],
     // [[CGVirtualDisplayMode alloc] initWithWidth:1280 height:720
     // refreshRate:30],
-    [[CGVirtualDisplayMode alloc] initWithWidth:width
-                                         height:height
-                                    refreshRate:60],
-    [[CGVirtualDisplayMode alloc] initWithWidth:width
-                                         height:height
-                                    refreshRate:30],
+    [[CGVirtualDisplayMode alloc] initWithWidth:width height:height refreshRate:refreshRate]
   ];
   [this->_display applySettings:this->_settings];
 

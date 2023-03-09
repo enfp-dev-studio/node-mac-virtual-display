@@ -2,6 +2,17 @@
 
 A native library for macOS to create virtual displays for your applications using Node.js. This library uses CoreGraphics and CoreDisplay APIs to provide an interface for creating and managing virtual displays on macOS.
 
+## Note
+
+This module was created specifically for Tab Display to generate virtual displays. Tab Display can seamlessly transform your Android tablet into a wireless external display for your MacBook. If you're enjoying this library, we recommend giving Tab Display a try as well.
+
+<br />
+ <p align="center">
+  <a href="https://tab-display.enfpdev.com" target="_blank"><img width="196" alt="image" src="https://user-images.githubusercontent.com/57121116/224042438-ce511784-28fd-42b8-b90a-bb01230983c0.png"></a>
+</p>
+
+
+
 ## Features
 
 - [x] Create and Destroy single virtual displays on macOS.
@@ -35,7 +46,6 @@ vdisplay.createVirtualDisplay()
 vdisplay.destroyVirtualDisplay()
 
 ```
-
 ## Contribute
 
 Coffee fuels coding ☕️

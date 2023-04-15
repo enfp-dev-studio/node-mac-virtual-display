@@ -5,7 +5,7 @@ A native library for macOS to create virtual displays for your applications usin
 ## Features
 
 - [x] Create and Destroy single virtual displays on macOS.
-- [ ] Configurable display resolution and refresh rate.
+- [x] Configurable display resolution and refresh rate.
 - [ ] Support for multiple virtual displays.
 
 ## Requirements

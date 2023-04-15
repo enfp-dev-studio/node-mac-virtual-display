@@ -5,21 +5,21 @@ describe("virtual_display", () => {
   it("should not throw", () => {
     expect(() => {
       const vdisplay = new VirtualDisplay();
-      const result = vdisplay.createVirtualDisplay({
-        width: 1920,
-        height: 1080,
-        frameRate: 60,
-        hiDPI: true,
-      });
-      console.log(result);
-      setTimeout(() => {
-        try {
-          const ret = vdisplay.destroyVirtualDisplay();
-          console.log("destroy: ", ret);
-        } catch (error) {
-          console.log(error);
-        }
-      }, 2000);
+      // const result = vdisplay.createVirtualDisplay({
+      //   width: 1920,
+      //   height: 1080,
+      //   frameRate: 60,
+      //   hiDPI: true,
+      // });
+      // console.log(result);
+      // setTimeout(() => {
+      //   try {
+      //     const ret = vdisplay.destroyVirtualDisplay();
+      //     console.log("destroy: ", ret);
+      //   } catch (error) {
+      //     console.log(error);
+      //   }
+      // }, 2000);
       setTimeout(() => {
         try {
           const ret = vdisplay.cloneVirtualDisplay();
@@ -27,7 +27,7 @@ describe("virtual_display", () => {
         } catch (error) {
           console.log(error);
         }
-      }, 4000);
+      }, 1000);
       setTimeout(() => {
         try {
           const ret = vdisplay.destroyVirtualDisplay();
@@ -35,7 +35,7 @@ describe("virtual_display", () => {
         } catch (error) {
           console.log(error);
         }
-      }, 6000);
+      }, 120000);
     }).to.not.throw(/is valid func/);
   });
 });

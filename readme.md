@@ -29,7 +29,13 @@ const VirtualDisplay = require('node-mac-virtual-display')
 const vdisplay = new VirtualDisplay()
 
 // To create a virtual display:
-vdisplay.createVirtualDisplay()
+vdisplay.createVirtualDisplay({
+  width: 1920,
+  height: 1080,
+  frameRate: 60,
+  hiDPI: true,
+  displayName: "Virtual Display"
+})
 
 //To destroy a virtual display:
 vdisplay.destroyVirtualDisplay()

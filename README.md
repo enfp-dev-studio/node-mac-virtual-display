@@ -34,6 +34,7 @@ vdisplay.createVirtualDisplay({
   height: 1080,
   frameRate: 60,
   hiDPI: true,
+  displayName: "Virtual Display"
 })
 
 //To destroy a virtual display:

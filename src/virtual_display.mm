@@ -134,7 +134,7 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
   }
   Napi::Env env = info.Env();
 
-  if (info.Length() < 4) {
+  if (info.Length() < 5) {
     Napi::TypeError::New(env, "Wrong number of arguments")
         .ThrowAsJavaScriptException();
     return env.Null();
@@ -155,8 +155,13 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
     hiDPI = 1;
   }
 
+  NSString *displayName = [NSString stringWithUTF8String:info[4].As<Napi::String>().Utf8Value().c_str()];
+  if (!displayName || displayName.length == 0) {
+    displayName = @"Virtual Display";
+  }
+
   this->_descriptor = [[CGVirtualDisplayDescriptor alloc] init];
-  this->_descriptor.name = @"Virtual Display";
+  this->_descriptor.name = displayName;
   this->_descriptor.maxPixelsWide = width;
   this->_descriptor.maxPixelsHigh = height;
 
@@ -213,6 +218,17 @@ Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
   }
   Napi::Env env = info.Env();
 
+  if (info.Length() < 1) {
+    Napi::TypeError::New(env, "Wrong number of arguments")
+        .ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
+  NSString *displayName = [NSString stringWithUTF8String:info[0].As<Napi::String>().Utf8Value().c_str()];
+  if (!displayName || displayName.length == 0) {
+    displayName = @"Virtual Display";
+  }
+
   // Get the main display
   CGDirectDisplayID display = kCGDirectMainDisplay;
 
@@ -220,15 +236,15 @@ Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
   CGDisplayModeRef displayMode = CGDisplayCopyDisplayMode(display);
 
   // Get the physical size of the display in millimeters
-  unsigned int width = CGDisplayModeGetPixelWidth(displayMode);
-  unsigned int height = CGDisplayModeGetPixelHeight(displayMode);
+  unsigned int width = CGDisplayModeGetPixelWidth(displayMode) / 2; // required
+  unsigned int height = CGDisplayModeGetPixelHeight(displayMode) / 2; // required
   double refreshRate = CGDisplayModeGetRefreshRate(displayMode);
 
   // Release resources
   CFRelease(displayMode);
 
   this->_descriptor = [[CGVirtualDisplayDescriptor alloc] init];
-  this->_descriptor.name = @"Virtual Display";
+  this->_descriptor.name = displayName;
   this->_descriptor.maxPixelsWide = width;
   this->_descriptor.maxPixelsHigh = height;
   this->_descriptor.sizeInMillimeters = CGDisplayScreenSize(display);

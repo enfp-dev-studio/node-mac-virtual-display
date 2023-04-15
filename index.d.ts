@@ -12,12 +12,16 @@ export function createVirtualDisplay({
   width,
   height,
   frameRate,
-  hiDPI = false,
+  hiDPI,
+  displayName: string,
 }: {
   width: number;
   height: number;
   frameRate: number;
-  hiDPI?: boolean;
+  hiDPI: boolean;
+  displayName: string;
 }): DisplayInfo;
-export function cloneVirtualDisplay(): DisplayInfo;
+export function cloneVirtualDisplay({
+  displayName: string,
+}): DisplayInfo;
 export function destroyVirtualDisplay(): boolean;

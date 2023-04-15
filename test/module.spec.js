@@ -10,6 +10,7 @@ describe("virtual_display", () => {
       //   height: 1080,
       //   frameRate: 60,
       //   hiDPI: true,
+      //   displayName: "Create Display",
       // });
       // console.log(result);
       // setTimeout(() => {
@@ -19,15 +20,15 @@ describe("virtual_display", () => {
       //   } catch (error) {
       //     console.log(error);
       //   }
-      // }, 2000);
-      setTimeout(() => {
-        try {
-          const ret = vdisplay.cloneVirtualDisplay();
-          console.log("destroy: ", ret);
-        } catch (error) {
-          console.log(error);
-        }
-      }, 1000);
+      // }, 10000);
+      try {
+        const ret = vdisplay.cloneVirtualDisplay({
+          displayName: "Clone Display",
+        });
+        console.log("destroy: ", ret);
+      } catch (error) {
+        console.log(error);
+      }
       setTimeout(() => {
         try {
           const ret = vdisplay.destroyVirtualDisplay();
@@ -35,7 +36,7 @@ describe("virtual_display", () => {
         } catch (error) {
           console.log(error);
         }
-      }, 120000);
+      }, 10000);
     }).to.not.throw(/is valid func/);
   });
 });

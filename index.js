@@ -7,14 +7,14 @@ function VirtualDisplay() {
     height,
     frameRate,
     hiDPI,
-    ppi,
+    displayName
   }) {
     const ret = _addonInstance.createVirtualDisplay(
       width,
       height,
       frameRate,
       hiDPI,
-      ppi ? ppi : 0
+      displayName
     );
     return {
       id: ret.id,
@@ -27,8 +27,10 @@ function VirtualDisplay() {
     return _addonInstance.destroyVirtualDisplay();
   };
 
-  this.cloneVirtualDisplay = function () {
-    const ret = _addonInstance.cloneVirtualDisplay();
+  this.cloneVirtualDisplay = function ({
+    displayName
+  }) {
+    const ret = _addonInstance.cloneVirtualDisplay(displayName);
     return {
       id: ret.id,
       width: ret.width,

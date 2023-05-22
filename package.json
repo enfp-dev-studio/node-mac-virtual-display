@@ -1,6 +1,6 @@
 {
   "name": "node-mac-virtual-display",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A Native module to create and handle virtual display on macOS",
   "main": "index.js",
   "types": "index.d.ts",

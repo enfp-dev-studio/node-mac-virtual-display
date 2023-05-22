@@ -4,6 +4,7 @@
 #import <Cocoa/Cocoa.h>
 #import <CoreGraphics/CoreGraphics.h>
 #import <Foundation/Foundation.h>
+#include <AppKit/AppKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -235,9 +236,11 @@ Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
   // Get the current display mode
   CGDisplayModeRef displayMode = CGDisplayCopyDisplayMode(display);
 
+  NSArray<NSScreen *> *screens = [NSScreen screens];
+  CGFloat backingScaleFactor = [[screens objectAtIndex:0] backingScaleFactor];
   // Get the physical size of the display in millimeters
-  unsigned int width = CGDisplayModeGetPixelWidth(displayMode) / 2; // required
-  unsigned int height = CGDisplayModeGetPixelHeight(displayMode) / 2; // required
+  unsigned int width = CGDisplayModeGetPixelWidth(displayMode) / backingScaleFactor; // required
+  unsigned int height = CGDisplayModeGetPixelHeight(displayMode) / backingScaleFactor; // required
   double refreshRate = CGDisplayModeGetRefreshRate(displayMode);
 
   // Release resources

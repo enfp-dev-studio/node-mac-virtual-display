@@ -6,6 +6,7 @@ A native library for macOS to create virtual displays for your applications usin
 
 - [x] Create and Destroy single virtual displays on macOS.
 - [x] Configurable display resolution and refresh rate.
+- [x] Create a virtual display by cloning the main display.
 - [ ] Support for multiple virtual displays.
 
 ## Requirements
@@ -27,7 +28,9 @@ To create/destroy a virtual display:
 ```javascript
 const VirtualDisplay = require('node-mac-virtual-display')
 const vdisplay = new VirtualDisplay()
-
+// Clone primary display
+vdisplay.cloneVirtualDisplay()
+// OR
 // To create a virtual display:
 vdisplay.createVirtualDisplay({
   width: 1920,

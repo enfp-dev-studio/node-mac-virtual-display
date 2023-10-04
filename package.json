@@ -44,6 +44,6 @@
     "darwin"
   ],
   "publishConfig": {
-    "@enfpdev:registry": "https://npm.pkg.github.com"
+    "@enfp-dev-studio:registry": "https://npm.pkg.github.com"
   }
 }

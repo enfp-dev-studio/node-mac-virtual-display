@@ -7,14 +7,16 @@ function VirtualDisplay() {
     height,
     frameRate,
     hiDPI,
-    displayName
+    displayName,
+    ppi
   }) {
     const ret = _addonInstance.createVirtualDisplay(
       width,
       height,
       frameRate,
       hiDPI,
-      displayName
+      displayName,
+      ppi || 81 // FHD Monitor
     );
     return {
       id: ret.id,

@@ -144,8 +144,9 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
   int width = info[0].As<Napi::Number>().Int32Value();
   int height = info[1].As<Napi::Number>().Int32Value();
   int frameRate = info[2].As<Napi::Number>().Int32Value();
-  if (frameRate < 10) {
-    frameRate = 10;
+  
+  if (frameRate < 30) {
+    frameRate = 30;
   } else if (frameRate > 60) {
     frameRate = 60;
   }
@@ -166,25 +167,20 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
   this->_descriptor.maxPixelsWide = width;
   this->_descriptor.maxPixelsHigh = height;
 
-  double ratio = 1.066666666666667;
-  this->_descriptor.sizeInMillimeters =
-      CGSizeMake(width / ratio, height / ratio);
-  // if (ppi == 0) {
-  //   double ratio = 1.066666666666667;
-  //   this->_descriptor.sizeInMillimeters =
-  //       CGSizeMake(width / ratio, height / ratio);
-  // } else {
-  //   double inchToPixel = 25.4;
-  //   this->_descriptor.sizeInMillimeters =
-  //       CGSizeMake(width / ppi * inchToPixel, height / ppi * inchToPixel);
-  // }
+  int ppi = info[5].As<Napi::Number>().Int32Value();
 
-  // this->_descriptor.sizeInMillimeters = CGSizeMake(1800, 1012.5);
-  // this->_descriptor.maxPixelsWide = 1280;
-  // this->_descriptor.maxPixelsHigh = 720;
-  // this->_descriptor.sizeInMillimeters = CGSizeMake(1200, 675);
-  this->_descriptor.productID = 0x1234;
-  this->_descriptor.vendorID = 0x3456;
+  if (ppi > 300) {
+    ppi = 300;
+  } else if (ppi < 72) {
+    ppi = 72;
+  }
+
+  double ratio = 25.4 / ppi;
+
+  this->_descriptor.sizeInMillimeters =
+      CGSizeMake(width * ratio, height * ratio);
+  this->_descriptor.productID = 0xeeee + width + height + ppi;
+  this->_descriptor.vendorID = 0xeeee;
   this->_descriptor.serialNum = 0x0001;
   this->_display =
       [[CGVirtualDisplay alloc] initWithDescriptor:this->_descriptor];
@@ -198,6 +194,7 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
     [[CGVirtualDisplayMode alloc] initWithWidth:width
                                          height:height
                                     refreshRate:frameRate],
+
     // [[CGVirtualDisplayMode alloc] initWithWidth:width
     //                                      height:height
     //                                 refreshRate:30],
@@ -251,18 +248,39 @@ Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
   this->_descriptor.maxPixelsWide = width;
   this->_descriptor.maxPixelsHigh = height;
   this->_descriptor.sizeInMillimeters = CGDisplayScreenSize(display);
+  unsigned int pixelWidth = CGDisplayPixelsWide(display);
+  // unsigned int pixelHeight = CGDisplayPixelsHigh(display);
+  CGSize screenSize = CGDisplayScreenSize(display);
+  float dpi = pixelWidth / (screenSize.width / 25.4); // converting mm to inches
 
+  // NSLog(@"CGDisplayScreenSize width: %f", screenSize.width);
+  // NSLog(@"CGDisplayPixelsWide width: %d", pixelWidth);
+  // NSLog(@"CGDisplayModeGetPixelWidth(displayMode): %d", width);
+  // NSLog(@"DPI - pixelWidth / (CGDisplayModeGetPixelWidth / 25.4): %f", dpi);
+
+  int hiDPI = 1;
+  if (dpi > 150) {
+    hiDPI = 2;
+    NSLog(@"This is likely a HiDPI display. DPI: %f", dpi);
+  } else {
+    NSLog(@"This is likely not a HiDPI display. DPI: %f", dpi);
+  }
+
+  uint32_t vendorID = CGDisplayVendorNumber(display);
+  uint32_t modelID = CGDisplayModelNumber(display);        
+  NSLog(@"Vendor ID: %u", vendorID);
+  NSLog(@"Model ID: %u", modelID);
   // this->_descriptor.sizeInMillimeters = CGSizeMake(1800, 1012.5);
   // this->_descriptor.maxPixelsWide = 1280;
   // this->_descriptor.maxPixelsHigh = 720;
   // this->_descriptor.sizeInMillimeters = CGSizeMake(1200, 675);
-  this->_descriptor.productID = 0x1234;
-  this->_descriptor.vendorID = 0x3456;
+  this->_descriptor.productID = modelID + 1;
+  this->_descriptor.vendorID = vendorID;
   this->_descriptor.serialNum = 0x0001;
   this->_display =
       [[CGVirtualDisplay alloc] initWithDescriptor:this->_descriptor];
   this->_settings = [[CGVirtualDisplaySettings alloc] init];
-  this->_settings.hiDPI = 2;
+  this->_settings.hiDPI = hiDPI;
   this->_settings.modes = @[
     // [[CGVirtualDisplayMode alloc] initWithWidth:1280 height:720
     // refreshRate:60],

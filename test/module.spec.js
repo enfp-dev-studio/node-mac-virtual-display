@@ -6,12 +6,14 @@ describe("virtual_display", () => {
     expect(() => {
       const vdisplay = new VirtualDisplay();
       const result = vdisplay.createVirtualDisplay({
-        width: 2800,
-        height: 1752,
+        // width: 2800,
+        // height: 1752,
+        width: 3840,
+        height: 2400,
         frameRate: 60,
-        hiDPI: false,
+        hiDPI: true,
         displayName: "Test Display",
-        ppi: 340,
+        ppi: 266,
       });
       console.log(result);
       setTimeout(() => {

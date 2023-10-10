@@ -150,12 +150,7 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
   } else if (frameRate > 60) {
     frameRate = 60;
   }
-  int hiDPI = info[3].As<Napi::Boolean>().Value();
-  if (hiDPI) {
-    hiDPI = 2;
-  } else {
-    hiDPI = 1;
-  }
+  unsigned int hiDPI = info[3].As<Napi::Boolean>().Value();
 
   NSString *displayName = [NSString stringWithUTF8String:info[4].As<Napi::String>().Utf8Value().c_str()];
   if (!displayName || displayName.length == 0) {
@@ -186,19 +181,14 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
       [[CGVirtualDisplay alloc] initWithDescriptor:this->_descriptor];
   this->_settings = [[CGVirtualDisplaySettings alloc] init];
   this->_settings.hiDPI = hiDPI;
-  this->_settings.modes = @[
-    // [[CGVirtualDisplayMode alloc] initWithWidth:1280 height:720
-    // refreshRate:60],
-    // [[CGVirtualDisplayMode alloc] initWithWidth:1280 height:720
-    // refreshRate:30],
-    [[CGVirtualDisplayMode alloc] initWithWidth:width
-                                         height:height
-                                    refreshRate:frameRate],
 
-    // [[CGVirtualDisplayMode alloc] initWithWidth:width
-    //                                      height:height
-    //                                 refreshRate:30],
-  ];
+  if (hiDPI) {
+    this->_settings.modes = @[[[CGVirtualDisplayMode alloc] initWithWidth:width height:height refreshRate:frameRate], 
+    [[CGVirtualDisplayMode alloc] initWithWidth:width / 2 height:height / 2 refreshRate:frameRate]];
+  } 
+  else {
+    this->_settings.modes = @[[[CGVirtualDisplayMode alloc] initWithWidth:width height:height refreshRate:frameRate]];
+  }
   [this->_display applySettings:this->_settings];
 
   Napi::Object obj = Napi::Object::New(env);

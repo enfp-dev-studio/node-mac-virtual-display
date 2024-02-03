@@ -7,7 +7,14 @@
                 "sources": [
                     "src/virtual_display.mm"
                 ],
-            }]
+            }],
+            ['OS=="win"', {
+                    "sources": [
+                        "src/virtual_display_win.cc"
+                    ],
+                    
+                }
+            ]
         ],
         'include_dirs': [
             "<!@(node -p \"require('node-addon-api').include\")"

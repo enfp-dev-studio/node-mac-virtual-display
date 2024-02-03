@@ -41,7 +41,7 @@
     ]
   },
   "os": [
-    "darwin"
+    "darwin", "win32"
   ],
   "publishConfig": {
     "@enfp-dev-studio:registry": "https://npm.pkg.github.com"

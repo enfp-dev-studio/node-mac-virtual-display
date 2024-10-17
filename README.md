@@ -1,6 +1,6 @@
 # node-mac-virtual-display: Native Library for Virtual Display on macOS
 
-A native library for macOS to create virtual displays for your applications using Node.js. This library uses CoreGraphics and CoreDisplay APIs to provide an interface for creating and managing virtual displays on macOS.
+A native library for macOS to create virtual displays for your applications using Node.js. This library uses CoreGraphics and CoreDisplay APIs to provide an interface for creating and managing virtual displays on macOS. This library is used in [Tab Display](https://tab-display.enfpdev.com), a service that allows iPads and Android tablets to be used as portable monitors.
 
 ## Features
 

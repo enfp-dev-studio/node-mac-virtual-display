@@ -31,7 +31,7 @@ const VirtualDisplay = require('node-mac-virtual-display')
 const vdisplay = new VirtualDisplay()
 // Clone primary display
 vdisplay.cloneVirtualDisplay({
-  displayName: "Clone Display"
+  displayName: "Clone Display",
   mirror: true
 })
 // OR
@@ -41,7 +41,7 @@ vdisplay.createVirtualDisplay({
   height: 1080,
   frameRate: 60,
   hiDPI: true,
-  displayName: "Virtual Display"
+  displayName: "Virtual Display",
   mirror: false
 })
 

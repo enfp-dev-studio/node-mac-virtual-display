@@ -2,7 +2,6 @@
 #import <Cocoa/Cocoa.h>
 #import <CoreGraphics/CoreGraphics.h>
 
-// 원래 헤더 파일의 선언을 사용합니다.
 @class CGVirtualDisplayDescriptor;
 @interface CGVirtualDisplayMode : NSObject
 @property(readonly, nonatomic) CGFloat refreshRate;
@@ -107,10 +106,12 @@ Napi::Value VDisplay::CreateDisplayObject(Napi::Env env, unsigned int width, uns
 Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
     
-    if (info.Length() < 6) {
+    if (info.Length() < 7) {
         Napi::TypeError::New(env, "Wrong number of arguments").ThrowAsJavaScriptException();
         return env.Null();
     }
+
+    // Params [width, height, refreshRate, hiDPI, displayName, ppi, useMirror]
 
     unsigned int width = info[0].As<Napi::Number>().Uint32Value();
     unsigned int height = info[1].As<Napi::Number>().Uint32Value();
@@ -118,6 +119,7 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
     bool hiDPI = info[3].As<Napi::Boolean>().Value();
     std::string displayNameStr = info[4].As<Napi::String>().Utf8Value();
     int ppi = Clamp(info[5].As<Napi::Number>().Int32Value(), 72, 300);
+    bool useMirror = info[6].As<Napi::Boolean>().Value();
 
     NSString *displayName = [NSString stringWithUTF8String:displayNameStr.c_str()];
     if (!displayName) {
@@ -139,6 +141,28 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
     InitializeSettings(width, height, refreshRate, hiDPI);
     [_display applySettings:_settings];
 
+    // miiror mode check
+    bool isMirrorMode = CGDisplayIsInMirrorSet(_display.displayID);
+
+    // if mirror options is different, change mirror mode 
+    if (useMirror) {
+        if (!isMirrorMode) {
+            // change mirror mode
+            CGDisplayConfigRef config;
+            CGBeginDisplayConfiguration(&config);
+            CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, kCGDirectMainDisplay);
+            CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
+        }
+    } else {
+        if (isMirrorMode) {
+            // if already in mirror mode, disable mirror mode
+            CGDisplayConfigRef config;
+            CGBeginDisplayConfiguration(&config);
+            CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, kCGNullDirectDisplay);
+            CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
+        }
+    }
+
     NSLog(@"Virtual display created with ID: %d", _display.displayID);
     return CreateDisplayObject(env, width, height);
 }
@@ -146,15 +170,18 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
 Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
 
-    if (info.Length() < 1) {
+    if (info.Length() < 2) {
         Napi::TypeError::New(env, "Wrong number of arguments").ThrowAsJavaScriptException();
         return env.Null();
     }
 
+    // Params [displayName, useMirror]
     NSString *displayName = [NSString stringWithUTF8String:info[0].As<Napi::String>().Utf8Value().c_str()];
     if (!displayName || displayName.length == 0) {
         displayName = @"Virtual Display";
     }
+
+    bool useMirror = info[1].As<Napi::Boolean>().Value();
 
     CGDirectDisplayID mainDisplay = CGMainDisplayID();
     CGDisplayModeRef displayMode = CGDisplayCopyDisplayMode(mainDisplay);
@@ -179,6 +206,28 @@ Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
     [_display applySettings:_settings];
 
     CFRelease(displayMode);
+
+    // miiror mode check
+    bool isMirrorMode = CGDisplayIsInMirrorSet(_display.displayID);
+
+    // if mirror options is different, change mirror mode 
+    if (useMirror) {
+        if (!isMirrorMode) {
+            // change mirror mode
+            CGDisplayConfigRef config;
+            CGBeginDisplayConfiguration(&config);
+            CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, kCGDirectMainDisplay);
+            CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
+        }
+    } else {
+        if (isMirrorMode) {
+            // if already in mirror mode, disable mirror mode
+            CGDisplayConfigRef config;
+            CGBeginDisplayConfiguration(&config);
+            CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, kCGNullDirectDisplay);
+            CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
+        }
+    }
 
     return CreateDisplayObject(env, width, height);
 }

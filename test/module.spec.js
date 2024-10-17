@@ -6,14 +6,13 @@ describe("virtual_display", () => {
     expect(() => {
       const vdisplay = new VirtualDisplay();
       const result = vdisplay.createVirtualDisplay({
-        // width: 2800,
-        // height: 1752,
         width: 3840,
         height: 2400,
         frameRate: 60,
         hiDPI: true,
         displayName: "Test Display",
         ppi: 266,
+        mirror: false,
       });
       console.log(result);
       setTimeout(() => {
@@ -24,14 +23,11 @@ describe("virtual_display", () => {
           console.log(error);
         }
       }, 600000);
-      // try {
-      //   const ret = vdisplay.cloneVirtualDisplay({
-      //     displayName: "Clone Display",
-      //   });
-      //   console.log("destroy: ", ret);
-      // } catch (error) {
-      //   console.log(error);
-      // }
+      // const result2 = vdisplay.cloneVirtualDisplay({
+      //   displayName: "Clone Display",
+      //   mirror: false,
+      // });
+      // console.log(result2);
       // setTimeout(() => {
       //   try {
       //     const ret = vdisplay.destroyVirtualDisplay();

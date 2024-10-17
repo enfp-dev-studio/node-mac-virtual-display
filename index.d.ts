@@ -15,6 +15,7 @@ export function createVirtualDisplay({
   hiDPI,
   displayName,
   ppi,
+  mirror,
 }: {
   width: number;
   height: number;
@@ -22,8 +23,10 @@ export function createVirtualDisplay({
   hiDPI: boolean;
   displayName: string;
   ppi: number | undefined;
+  mirror: boolean;
 }): DisplayInfo;
 export function cloneVirtualDisplay({
   displayName: string,
+  mirror: boolean,
 }): DisplayInfo;
 export function destroyVirtualDisplay(): boolean;

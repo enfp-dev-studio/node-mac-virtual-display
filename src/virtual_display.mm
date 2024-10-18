@@ -126,6 +126,11 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
         displayName = @"Virtual Display";
     }
 
+    // store current main display id and bounds
+    // CGRect mainBounds = CGDisplayBounds(CGMainDisplayID());
+    uint32_t mainDisplay = CGMainDisplayID();
+    NSLog(@"Previous Main display ID: %d", mainDisplay);
+
     InitializeDescriptor(displayName, width, height, ppi);
     if (!_descriptor) {
         Napi::Error::New(env, "Failed to create display descriptor").ThrowAsJavaScriptException();
@@ -141,27 +146,49 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
     InitializeSettings(width, height, refreshRate, hiDPI);
     [_display applySettings:_settings];
 
-    // miiror mode check
-    bool isMirrorMode = CGDisplayIsInMirrorSet(_display.displayID);
-
-    // if mirror options is different, change mirror mode 
+    // postprocess for arrangement and mirror mode
+    uint32_t newMainDisplayID = CGMainDisplayID();
+    NSLog(@"Current Main display ID: %d", newMainDisplayID);
+    
+    CGDisplayConfigRef config;
+    CGBeginDisplayConfiguration(&config);
+    if (newMainDisplayID == _display.displayID && newMainDisplayID != mainDisplay) {
+        // if virtual display is main display, set previous main display to main display
+        // this is to avoid the issue of main display being virtual display
+        NSLog(@"Virtual display is main display, restore previous main display");
+        CGConfigureDisplayOrigin(config, mainDisplay, 0, 0);
+    }
+    bool isMirror = CGDisplayIsInMirrorSet(_display.displayID);
+    NSLog(@"Virtual display is in mirror mode: %d", isMirror);
     if (useMirror) {
-        if (!isMirrorMode) {
-            // change mirror mode
-            CGDisplayConfigRef config;
-            CGBeginDisplayConfiguration(&config);
-            CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, kCGDirectMainDisplay);
-            CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
+        if (!isMirror) {
+            NSLog(@"Mirror mode enabled");
+            // change created display to mirror mode
+            CGError err = CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, mainDisplay);
+            if (err != kCGErrorSuccess) {
+                NSLog(@"Failed to enable mirror mode: %d", err);
+            }
+        } else {
+            // is mirror mode, check primary display
+            uint32_t primaryIdInMirror = CGDisplayMirrorsDisplay(_display.displayID);
+            NSLog(@"Virtual display is primary display: %d", primaryIdInMirror);
+            if (primaryIdInMirror == 0) {
+                NSLog(@"Virtual display is primary display");
+                // already in mirror mode, but not primary, change primary display
+                CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, mainDisplay);
+            }
         }
     } else {
-        if (isMirrorMode) {
+        if (isMirror) {
+            NSLog(@"Mirror mode disabled");
             // if already in mirror mode, disable mirror mode
-            CGDisplayConfigRef config;
-            CGBeginDisplayConfiguration(&config);
-            CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, kCGNullDirectDisplay);
-            CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
+            CGError err = CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, kCGNullDirectDisplay);
+            if (err != kCGErrorSuccess) {
+                NSLog(@"Failed to disable mirror mode: %d", err);
+            }
         }
     }
+    CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
 
     NSLog(@"Virtual display created with ID: %d", _display.displayID);
     return CreateDisplayObject(env, width, height);
@@ -195,7 +222,8 @@ Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
 
     CGSize screenSize = CGDisplayScreenSize(mainDisplay);
     float dpi = CGDisplayPixelsWide(mainDisplay) / (screenSize.width / 25.4);
-    bool isHiDPI = (dpi > 150);
+    // increase DPI for retina display
+    bool isHiDPI = (dpi > 200);
 
     InitializeDescriptor(displayName, width, height, dpi);
     _descriptor.productID = CGDisplayModelNumber(mainDisplay) + 1;
@@ -207,27 +235,49 @@ Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
 
     CFRelease(displayMode);
 
-    // miiror mode check
-    bool isMirrorMode = CGDisplayIsInMirrorSet(_display.displayID);
-
-    // if mirror options is different, change mirror mode 
+    // postprocess for arrangement and mirror mode
+    uint32_t newMainDisplayID = CGMainDisplayID();
+    NSLog(@"Current Main display ID: %d", newMainDisplayID);
+    
+    CGDisplayConfigRef config;
+    CGBeginDisplayConfiguration(&config);
+    if (newMainDisplayID == _display.displayID && newMainDisplayID != mainDisplay) {
+        // if virtual display is main display, set previous main display as main display
+        // this is to avoid the issue of main display being virtual display
+        NSLog(@"Virtual display is main display, restore previous main display");
+        CGConfigureDisplayOrigin(config, mainDisplay, 0, 0);
+    }
+    bool isMirror = CGDisplayIsInMirrorSet(_display.displayID);
+    NSLog(@"Virtual display is in mirror mode: %d", isMirror);
     if (useMirror) {
-        if (!isMirrorMode) {
+        if (!isMirror) {
+            NSLog(@"Mirror mode enabled");
             // change mirror mode
-            CGDisplayConfigRef config;
-            CGBeginDisplayConfiguration(&config);
-            CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, kCGDirectMainDisplay);
-            CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
+            CGError err = CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, mainDisplay);
+            if (err != kCGErrorSuccess) {
+                NSLog(@"Failed to enable mirror mode: %d", err);
+            }
+        } else {
+            // is mirror mode, check primary display
+            uint32_t primaryIdInMirror = CGDisplayMirrorsDisplay(_display.displayID);
+            NSLog(@"Virtual display is primary display: %d", primaryIdInMirror);
+            if (primaryIdInMirror == 0) {
+                NSLog(@"Virtual display is primary display");
+                // already in mirror mode, but not primary, change primary display
+                CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, mainDisplay);
+            }
         }
     } else {
-        if (isMirrorMode) {
+        if (isMirror) {
+            NSLog(@"Mirror mode disabled");
             // if already in mirror mode, disable mirror mode
-            CGDisplayConfigRef config;
-            CGBeginDisplayConfiguration(&config);
-            CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, kCGNullDirectDisplay);
-            CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
+            CGError err = CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, kCGNullDirectDisplay);
+            if (err != kCGErrorSuccess) {
+                NSLog(@"Failed to disable mirror mode: %d", err);
+            }
         }
     }
+    CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
 
     return CreateDisplayObject(env, width, height);
 }

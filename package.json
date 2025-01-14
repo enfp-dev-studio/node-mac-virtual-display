@@ -6,6 +6,7 @@
   "types": "index.d.ts",
   "gypfile": true,
   "scripts": {
+    "install": "node-gyp rebuild",
     "build": "node-gyp rebuild",
     "clean": "node-gyp clean",
     "lint": "clang-format --dry-run -Werror ./src/virtual_display.mm && prettier --check index.js",
@@ -20,17 +21,17 @@
   "author": "ENFP-Dev-Studio",
   "license": "MIT",
   "devDependencies": {
-    "chai": "^4.3.7",
+    "chai": "^5.1.2",
     "clang-format": "^1.8.0",
-    "husky": "^8.0.2",
-    "lint-staged": "^13.1.0",
-    "mocha": "^10.1.0",
-    "node-gyp": "^10.2.0",
-    "prettier": "^2.8.1"
+    "husky": "^9.1.7",
+    "lint-staged": "^15.3.0",
+    "mocha": "11.0.1",
+    "node-gyp": "^11.0.0",
+    "prettier": "^3.4.2"
   },
   "dependencies": {
     "bindings": "^1.5.0",
-    "node-addon-api": "^8.2.1"
+    "node-addon-api": "^8.3.0"
   },
   "lint-staged": {
     "*.js": [

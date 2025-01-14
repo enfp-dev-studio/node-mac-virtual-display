@@ -1,46 +1,86 @@
 "use strict";
-const addon = require("bindings")("virtual_display.node");
 
-function VirtualDisplay() {
-  this.createVirtualDisplay = function ({
+const addon = require("bindings")("virtual_display.node");
+console.log(require("bindings")("virtual_display.node"));
+
+class VirtualDisplayManager {
+  constructor() {
+    this._manager = new addon.VDisplayManager();
+    this._displays = new Map();
+  }
+
+  createVirtualDisplay({
     width,
     height,
     frameRate,
     hiDPI,
     displayName,
-    ppi,
-    mirror
+    ppi = 81, // FHD Monitor default
+    mirror = false,
   }) {
-    const ret = _addonInstance.createVirtualDisplay(
+    // console.log(this._manager ? "Manager is not null" : "Manager is null");
+    const ret = this._manager.createVirtualDisplay(
       width,
       height,
       frameRate,
       hiDPI,
       displayName,
-      ppi || 81, // FHD Monitor
+      ppi,
       mirror
     );
-    return {
-      id: ret.id,
-      width: ret.width,
-      height: ret.height,
-    };
-  };
 
-  this.destroyVirtualDisplay = function () {
-    return _addonInstance.destroyVirtualDisplay();
-  };
+    if (ret) {
+      this._displays.set(ret.id, {
+        id: ret.id,
+        width: ret.width,
+        height: ret.height,
+        name: displayName,
+      });
+      return this._displays.get(ret.id);
+    }
+    return null;
+  }
 
-  this.cloneVirtualDisplay = function ({ displayName, mirror }) {
-    const ret = _addonInstance.cloneVirtualDisplay(displayName, mirror);
-    return {
-      id: ret.id,
-      width: ret.width,
-      height: ret.height,
-    };
-  };
+  destroyVirtualDisplay(displayId) {
+    const success = this._manager.destroyVirtualDisplay(displayId);
+    if (success) {
+      this._displays.delete(displayId);
+    }
+    return success;
+  }
 
-  var _addonInstance = new addon.VDisplay();
+  destroyAllDisplays() {
+    const displayIds = Array.from(this._displays.keys());
+    const results = displayIds.map((id) => this.destroyVirtualDisplay(id));
+    return results.every((result) => result === true);
+  }
+
+  cloneVirtualDisplay({ displayName, mirror = false }) {
+    const ret = this._manager.cloneVirtualDisplay(displayName, mirror);
+
+    if (ret) {
+      this._displays.set(ret.id, {
+        id: ret.id,
+        width: ret.width,
+        height: ret.height,
+        name: displayName,
+      });
+      return this._displays.get(ret.id);
+    }
+    return null;
+  }
+
+  getDisplay(displayId) {
+    return this._manager.getDisplayByID(displayId);
+  }
+
+  getAllDisplays() {
+    return this._manager.getAllDisplays();
+  }
+
+  updateDisplaySettings(displayId, settings) {
+    return this._manager.updateDisplaySettings(displayId, settings);
+  }
 }
 
-module.exports = VirtualDisplay;
+module.exports = VirtualDisplayManager;

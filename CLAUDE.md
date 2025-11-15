@@ -1,459 +1,349 @@
 # CLAUDE.md - AI Assistant Guide for node-mac-virtual-display
 
-This document provides comprehensive guidance for AI assistants working with the `node-mac-virtual-display` codebase.
-
 ## Project Overview
 
-**node-mac-virtual-display** is a native Node.js addon that enables programmatic creation and management of virtual displays on macOS. It uses private CoreGraphics and CoreDisplay APIs to provide virtual display functionality, primarily used in [Tab Display](https://tab-display.enfpdev.com) to turn iPads and Android tablets into portable monitors.
+**node-mac-virtual-display** is a Native Node.js addon for macOS that enables creation and management of virtual displays. The library interfaces with macOS CoreGraphics and CoreDisplay APIs to provide programmatic control over virtual displays.
 
-### Key Facts
-- **Language**: Objective-C++ (.mm), JavaScript (Node.js)
-- **Platform**: macOS 10.14+ only (darwin)
-- **Version**: 1.0.9
-- **License**: MIT
-- **Repository**: https://github.com/ENFP-Dev-Studio/node-mac-virtual-display
+**Key Information:**
+- **Language:** Objective-C++ (`.mm`), JavaScript, TypeScript definitions
+- **Platform:** macOS 10.14+ only
+- **Node.js:** v12+
+- **License:** MIT
+- **Version:** 1.0.9
+- **Primary Use Case:** Used in [Tab Display](https://tab-display.enfpdev.com) for tablet-as-monitor functionality
 
-## Repository Structure
+## Codebase Structure
 
 ```
 node-mac-virtual-display/
 ├── src/
-│   └── virtual_display.mm      # Native C++ implementation using CoreGraphics APIs
+│   └── virtual_display.mm       # Main C++ native addon implementation
 ├── test/
-│   └── module.spec.js          # Mocha/Chai test suite
+│   └── module.spec.js           # Mocha test suite
 ├── .github/
-│   └── workflows/
-│       └── release-package.yml # CI/CD for releases
-├── index.js                    # JavaScript wrapper/entry point
-├── index.d.ts                  # TypeScript type definitions
-├── binding.gyp                 # node-gyp build configuration
-├── package.json                # NPM package configuration
-└── README.md                   # User-facing documentation
+│   ├── workflows/
+│   │   └── release-package.yml  # CI/CD for package publishing
+│   └── FUNDING.yml              # Funding configuration
+├── index.js                     # JavaScript wrapper/entry point
+├── index.d.ts                   # TypeScript type definitions
+├── binding.gyp                  # Node-gyp build configuration
+├── package.json                 # NPM package configuration
+├── README.md                    # User-facing documentation
+└── LICENSE                      # MIT License
 ```
 
-### Critical Files
+## Architecture & Design
 
-1. **src/virtual_display.mm** (300 lines)
-   - Core native implementation
-   - Defines private CoreGraphics interfaces (@interface declarations)
-   - Implements VDisplay class with N-API bindings
-   - Handles display creation, cloning, and destruction
-   - Contains display configuration logic to prevent unintended display behaviors
+### Core Components
 
-2. **index.js** (47 lines)
-   - JavaScript wrapper around native addon
-   - Exports VirtualDisplay constructor
-   - Provides high-level API methods
-   - Sets default PPI value (81 for FHD monitors)
+1. **Native C++ Layer** (`src/virtual_display.mm`)
+   - Implements `VDisplay` class using N-API (Node Addon API)
+   - Interfaces with private macOS frameworks:
+     - `CGVirtualDisplay` - Main virtual display controller
+     - `CGVirtualDisplayDescriptor` - Display hardware descriptor
+     - `CGVirtualDisplaySettings` - Display mode settings
+     - `CGVirtualDisplayMode` - Resolution/refresh rate configuration
 
-3. **index.d.ts** (33 lines)
-   - TypeScript definitions for public API
-   - Defines DisplayInfo return type
-   - Documents function signatures
+2. **JavaScript Wrapper** (`index.js`)
+   - Exports `VirtualDisplay` constructor
+   - Provides clean API over native addon
+   - Three main methods:
+     - `createVirtualDisplay()` - Create custom display
+     - `cloneVirtualDisplay()` - Clone main display
+     - `destroyVirtualDisplay()` - Remove virtual display
 
-4. **binding.gyp** (30 lines)
-   - node-gyp configuration
-   - macOS-specific build settings
-   - Links StoreKit framework
-   - Sets C++14 standard and macOS deployment target 10.14
+3. **TypeScript Definitions** (`index.d.ts`)
+   - Type-safe interface definitions
+   - Exports `DisplayInfo` type
 
-## Architecture & Implementation Details
+### Key Design Patterns
 
-### Native API Architecture
+- **Object-Oriented Wrapper:** JavaScript class wraps native addon instance
+- **Resource Management:** Manual memory management in C++ with explicit cleanup
+- **Configuration Objects:** Options passed as JavaScript objects with destructuring
+- **Mirror Mode Handling:** Post-processing logic to prevent unintended main display changes
 
-The module uses **N-API (Node-API)** for native bindings, ensuring ABI stability across Node.js versions.
+## Critical Implementation Details
 
-**Class Structure:**
-```cpp
-VDisplay : public Napi::ObjectWrap<VDisplay>
-├── CreateVirtualDisplay()     // Custom display with specified parameters
-├── CloneVirtualDisplay()      // Clone main display configuration
-├── DestroyVirtualDisplay()    // Cleanup and remove display
-└── Helper Methods:
-    ├── InitializeDescriptor() // Setup display metadata
-    ├── InitializeSettings()   // Configure display modes
-    └── CreateDisplayObject()  // Return JS object with display info
-```
+### Display Creation Logic
 
-### Private CoreGraphics APIs
+When creating a virtual display, the code performs critical post-processing (lines 149-192 in `virtual_display.mm`):
 
-The code uses **undocumented Apple private APIs**:
+1. **Main Display Restoration:** If virtual display becomes main display unintentionally, restore original
+2. **Mirror Prevention:** Prevent primary display from mirroring virtual display
+3. **Mirror Mode Configuration:** Apply user's mirror preference (extend vs mirror mode)
 
-```objective-c
-@interface CGVirtualDisplayDescriptor
-@interface CGVirtualDisplaySettings
-@interface CGVirtualDisplayMode
-@interface CGVirtualDisplay
-```
+**IMPORTANT:** This post-processing logic is essential and should NOT be removed or modified without deep understanding of macOS display behavior.
 
-**Important**: These APIs are private and not officially supported by Apple. They may change or break in future macOS versions without notice.
+### Parameter Constraints
 
-### Display Configuration Post-Processing
+- **Refresh Rate:** Clamped to 30-60 Hz range
+- **PPI:** Clamped to 72-300 range
+- **HiDPI Mode:** When enabled, creates both full-res and half-res modes
 
-Both `CreateVirtualDisplay` and `CloneVirtualDisplay` implement critical post-processing logic (lines 149-192 and 239-282):
+### Memory Management
 
-1. **Prevent Virtual Display as Main Display**
-   - Checks if newly created virtual display became the main display
-   - Restores original main display using `CGConfigureDisplayOrigin`
-   - Logged as "Unintended case 1"
-
-2. **Prevent Primary Display Mirroring Virtual Display**
-   - Checks if primary display is mirroring the virtual display
-   - Disables incorrect mirror configuration
-   - Logged as "Unintended case 2"
-
-3. **Configure Requested Mirror Mode**
-   - Sets mirror mode based on `useMirror` parameter
-   - Uses `CGConfigureDisplayMirrorOfDisplay` API
-   - Applies configuration with `kCGConfigureForAppOnly` flag
-
-### HiDPI Support
-
-When `hiDPI` is enabled (lines 85-96):
-- Creates two display modes: full resolution and half resolution
-- Half resolution mode enables HiDPI scaling (2x pixel density)
-- Example: 3840x2400 display also supports 1920x1200 @ 2x scaling
-
-### Parameter Validation
-
-The code implements clamping for certain parameters (lines 57-59, 118, 121):
-- **Refresh Rate**: Clamped to 30-60 Hz
-- **PPI**: Clamped to 72-300 DPI
-
-## Public API
-
-### Constructor
-```javascript
-const VirtualDisplay = require('node-mac-virtual-display')
-const vdisplay = new VirtualDisplay()
-```
-
-### Methods
-
-#### createVirtualDisplay(options)
-Creates a virtual display with custom parameters.
-
-**Parameters:**
-- `width` (number): Display width in pixels
-- `height` (number): Display height in pixels
-- `frameRate` (number): Refresh rate (30-60 Hz, clamped)
-- `hiDPI` (boolean): Enable HiDPI/Retina support
-- `displayName` (string): Display name shown in System Preferences
-- `ppi` (number, optional): Pixels per inch (72-300, default: 81)
-- `mirror` (boolean): Enable mirror mode
-
-**Returns:** `DisplayInfo` object
-```javascript
-{
-  id: number,      // CGDirectDisplayID
-  width: number,   // Display width
-  height: number   // Display height
-}
-```
-
-#### cloneVirtualDisplay(options)
-Creates a virtual display matching the main display's configuration.
-
-**Parameters:**
-- `displayName` (string): Display name
-- `mirror` (boolean): Enable mirror mode
-
-**Returns:** `DisplayInfo` object
-
-**Implementation Notes:**
-- Automatically detects main display resolution, refresh rate, and DPI
-- Calculates DPI from physical screen size
-- Enables HiDPI if detected DPI > 200
-- Inherits product/vendor IDs from main display (with offset)
-
-#### destroyVirtualDisplay()
-Destroys the current virtual display and releases resources.
-
-**Returns:** `boolean` (true if display was destroyed, false if none existed)
-
-**Memory Management:** Properly releases Objective-C objects using manual reference counting.
+The native addon uses manual memory management:
+- Objects allocated with `[[Class alloc] init]`
+- Must be released with `[object release]` in `DestroyVirtualDisplay`
+- Potential memory leak if display not properly destroyed
 
 ## Development Workflow
 
-### Prerequisites
-- macOS 10.14 or later
-- Node.js 12 or later
-- Xcode Command Line Tools (for clang)
-- node-gyp globally installed (recommended)
+### Build System
 
-### Setup
-```bash
-# Install dependencies
-yarn install
-
-# Build native addon
-yarn build
-# or
-node-gyp rebuild
-
-# Run tests
-yarn test
-```
-
-### Code Formatting
-
-The project uses **automated code formatting** enforced via git hooks:
-
-- **JavaScript**: Prettier (`.js` files)
-- **Objective-C++**: clang-format (`.mm` files)
+**Technology:** node-gyp (native addon build tool)
 
 **Commands:**
 ```bash
-# Check formatting (dry-run)
-yarn lint
-
-# Apply formatting
-yarn format
+npm run build      # Rebuild native addon (node-gyp rebuild)
+npm run clean      # Clean build artifacts (node-gyp clean)
 ```
 
-### Git Hooks (Husky + lint-staged)
-
-**Pre-commit hook** automatically formats staged files:
-- Runs `prettier --write` on `*.js` files
-- Runs `clang-format -i` on `*.mm` files
-
-**Setup:** `yarn prepare` (runs `husky install`)
+**Build Configuration** (`binding.gyp`):
+- Target: `virtual_display.node`
+- Compiler: Clang with C++14 standard
+- macOS Deployment Target: 10.14
+- Framework Dependencies: StoreKit
+- Compiler Flags: `-std=c++14 -stdlib=libc++`
+- N-API Exception Mode: `NAPI_DISABLE_CPP_EXCEPTIONS`
 
 ### Testing
 
-**Framework**: Mocha + Chai
+**Framework:** Mocha + Chai
 
-**Test file**: `test/module.spec.js`
-
-**Current test**: Creates a 3840x2400 virtual display, waits 10 minutes, then destroys it.
-
-**Note**: Test has a 600-second (10-minute) timeout for manual verification.
-
-### Building
-
-The native addon is built using **node-gyp**:
-
+**Command:**
 ```bash
-# Clean build artifacts
-yarn clean
-
-# Build addon
-yarn build
+npm test           # Run test suite
 ```
 
-**Build output**: `build/Release/virtual_display.node` (gitignored)
+**Test Characteristics:**
+- Located in `test/module.spec.js`
+- Tests create display and wait 10 minutes before cleanup (600000ms timeout)
+- Only basic smoke test - verifies module doesn't throw on initialization
+- Clone test commented out by default
 
-**Build configuration** (binding.gyp):
-- Target: virtual_display
-- Sources: src/virtual_display.mm (macOS only)
-- Framework: StoreKit
-- C++ Standard: C++14 with libc++
-- Deployment target: macOS 10.14
-- N-API: CPP exceptions disabled
+**IMPORTANT:** Tests create real virtual displays - must run on macOS with proper permissions.
 
-## CI/CD Pipeline
+### Code Quality & Formatting
 
-**GitHub Actions workflow**: `.github/workflows/release-package.yml`
+**Linting:**
+```bash
+npm run lint       # Check formatting (dry-run)
+npm run format     # Apply formatting
+```
 
-**Trigger**: On GitHub release creation
+**Tools:**
+- **JavaScript:** Prettier (`.js` files)
+- **Objective-C++:** clang-format (`.mm` files)
+
+**Git Hooks:**
+- Husky configured for pre-commit hooks
+- lint-staged runs formatters automatically:
+  - `*.js` → prettier
+  - `*.mm` → clang-format
+
+### CI/CD Pipeline
+
+**Workflow:** `.github/workflows/release-package.yml`
+
+**Triggers:** On GitHub release creation
 
 **Jobs:**
-1. **build** (macos-latest)
+1. **Build** (macOS runner)
    - Checkout code
    - Setup Node.js 16
    - Run `npm build`
    - Run `npm test`
 
-2. **publish-gpr** (macos-latest, after build)
+2. **Publish** (macOS runner, requires build success)
    - Checkout code
-   - Setup Node.js 16 with GitHub Packages registry
+   - Setup Node.js 16 with GitHub Package Registry
    - Run `npm build`
-   - Publish to GitHub Packages (@enfp-dev-studio scope)
+   - Run `npm publish` to GitHub Packages
 
-**Important**: The workflow uses `npm build` and `npm test`, but the project uses yarn. This may need correction.
+**Registry:** GitHub Packages (`https://npm.pkg.github.com`)
 
-## Key Conventions for AI Assistants
+## Key Conventions
+
+### Naming Conventions
+
+- **Variables:** camelCase (`displayName`, `refreshRate`)
+- **Classes:** PascalCase (`VirtualDisplay`, `VDisplay`)
+- **Constants:** Regular case (no SCREAMING_SNAKE_CASE used)
+- **Private Members:** Underscore prefix (`_display`, `_descriptor`, `_settings`)
 
 ### Code Style
 
-1. **Objective-C++ (.mm files)**
-   - Use clang-format (runs automatically via git hooks)
-   - Follow Apple naming conventions for Objective-C classes
-   - Use NSLog for debugging output
-   - Manual reference counting: `alloc/init`, `release`, set to `nil`
+**JavaScript:**
+- Double quotes for strings
+- Semicolons required
+- 2-space indentation
+- CommonJS modules (`require`/`module.exports`)
 
-2. **JavaScript (.js files)**
-   - Use Prettier formatting
-   - Strict mode: `"use strict";`
-   - Use function constructors (ES5 style, not ES6 classes)
-   - Use CommonJS modules (`require`/`module.exports`)
-
-3. **TypeScript Definitions (.d.ts)**
-   - Export types and functions at top level
-   - Use object destructuring notation for parameters
-   - Keep in sync with actual implementation
+**Objective-C++:**
+- Follows standard Objective-C conventions
+- Uses ARC-style manual memory management
+- NSLog for debugging output
 
 ### Error Handling
 
-- **Native code**: Throw N-API JavaScript exceptions
-  ```cpp
-  Napi::TypeError::New(env, "Error message").ThrowAsJavaScriptException();
-  return env.Null();
-  ```
-- **JavaScript wrapper**: Let native exceptions propagate
-- **Always check**: NULL/nil pointers before use
+- **JavaScript Layer:** Returns results directly, no explicit error handling
+- **Native Layer:** Throws JavaScript exceptions via N-API:
+  - `Napi::TypeError` for wrong argument count
+  - `Napi::Error` for runtime failures
+- Returns `null`/`false` on errors
 
-### Memory Management
+### API Design Philosophy
 
-**Critical**: The native code uses manual reference counting (not ARC).
+- **Destructured Parameters:** Methods accept single config object
+- **Sensible Defaults:** PPI defaults to 81 (FHD monitor standard)
+- **Return Values:** Always return `DisplayInfo` object with `{id, width, height}`
 
-**Pattern:**
-```objective-c
-_descriptor = [[CGVirtualDisplayDescriptor alloc] init];  // +1 retain
-// ... use descriptor ...
-[_descriptor release];  // -1 retain
-_descriptor = nil;      // Clear pointer
-```
+## Common Development Tasks
 
-**When modifying**: Ensure all `alloc/init` calls have corresponding `release` calls in `DestroyVirtualDisplay`.
+### Adding a New Feature
 
-### Testing Approach
+1. Modify native code in `src/virtual_display.mm`
+2. Update JavaScript wrapper in `index.js` if needed
+3. Update TypeScript definitions in `index.d.ts`
+4. Add tests in `test/module.spec.js`
+5. Run `npm run format` to format code
+6. Run `npm run build` to compile
+7. Run `npm test` to verify
 
-- **Manual testing recommended**: Virtual displays affect system state
-- **Long-running tests**: Current test waits 10 minutes for manual verification
-- **Test on real macOS**: Cannot be tested in CI on Linux/Windows
-- **Check System Preferences**: Verify display appears in macOS settings
+### Modifying Display Configuration
 
-### Display Configuration Safety
+When adding new display parameters:
 
-**Always preserve** the post-processing logic in both create/clone methods:
-1. Check and restore main display position
-2. Check and fix mirror configuration
-3. Apply requested mirror mode
-
-**Removing this logic** will cause unpredictable display behavior and user confusion.
-
-### Platform Constraints
-
-- **macOS only**: Code will not compile or run on Linux/Windows
-- **package.json** enforces: `"os": ["darwin"]`
-- **binding.gyp** uses conditions: `'OS=="mac"'`
-- **Always check**: OS-specific code paths
-
-### Breaking Changes to Avoid
-
-1. **Do not modify** private CoreGraphics interface definitions without testing on multiple macOS versions
-2. **Do not remove** display configuration post-processing (unintended cases 1 & 2)
-3. **Do not change** N-API signatures without updating TypeScript definitions
-4. **Do not break** backward compatibility in public API (createVirtualDisplay, cloneVirtualDisplay, destroyVirtualDisplay)
-
-### Version Management
-
-- Update version in `package.json` before release
-- Follow semantic versioning (currently 1.0.9)
-- Create GitHub release to trigger publish workflow
-- Recent versions: 1.0.9 (current), 1.0.8, earlier versions
-
-### Documentation Updates
-
-When modifying the API or adding features:
-1. Update `README.md` with usage examples
-2. Update `index.d.ts` with TypeScript definitions
-3. Update this `CLAUDE.md` with implementation details
-4. Add/update tests in `test/module.spec.js`
-
-## Common Tasks
-
-### Adding a New Display Parameter
-
-1. Add parameter to `createVirtualDisplay` in `index.js`
-2. Pass parameter to `_addonInstance.createVirtualDisplay()`
-3. Update `CreateVirtualDisplay` in `virtual_display.mm` to accept new parameter
-4. Use parameter in `InitializeDescriptor` or `InitializeSettings`
-5. Update TypeScript definitions in `index.d.ts`
-6. Update README.md usage examples
-7. Add test coverage
+1. **Update native method signature** in `VDisplay` class
+2. **Update descriptor/settings initialization** in `InitializeDescriptor`/`InitializeSettings`
+3. **Update JavaScript wrapper** parameter destructuring
+4. **Update TypeScript types** in `index.d.ts`
+5. **Maintain parameter order** consistency across layers
 
 ### Debugging Native Code
 
-**NSLog output** appears in Console.app:
-1. Open Console.app on macOS
-2. Filter by process name (your Node.js process)
-3. Look for logs like "Virtual display created with ID: XXX"
+- Use `NSLog()` for console output (visible in terminal)
+- Logs include:
+  - Display IDs during creation
+  - Mirror mode state changes
+  - Configuration errors
+- Check macOS Console app for additional system logs
 
-**Common log messages:**
-- "Previous Main display ID: X"
-- "Current Main Display after virtual display creation: X"
-- "Unintended case 1: Virtual display set as main display"
-- "Unintended case 2: Primary display is mirroring virtual display"
-- "Virtual Display is in mirror set: X"
-- "Enable/Disable Virtual Display mirror mode"
-- "Failed to enable/disable mirror mode: X"
-- "Virtual display created with ID: X"
+## Important Notes for AI Assistants
 
-### Troubleshooting Build Issues
+### Platform Constraints
 
-**Common problems:**
-1. **Missing Xcode tools**: Install with `xcode-select --install`
-2. **Wrong Node.js version**: Use Node.js 12+
-3. **node-gyp not found**: Install globally with `npm install -g node-gyp`
-4. **Framework not found**: Ensure Xcode Command Line Tools are properly installed
+1. **macOS Only:** This code CANNOT run on Windows/Linux - uses macOS-private APIs
+2. **Requires macOS 10.14+:** Older versions lack `CGVirtualDisplay` APIs
+3. **Architecture-Specific:** x86_64 and arm64 (Apple Silicon) support via node-gyp
 
-**Clean rebuild:**
+### Critical Code Sections
+
+**DO NOT MODIFY** without explicit user request:
+
+1. **Post-processing logic** (lines 149-192, 239-282 in `virtual_display.mm`)
+   - Prevents macOS display configuration bugs
+   - Essential for maintaining primary display as main
+
+2. **Memory management** in `DestroyVirtualDisplay`
+   - Release order: descriptor → settings → display
+   - Setting to nil prevents dangling pointers
+
+3. **Mirror mode logic**
+   - Complex interplay with macOS display management
+   - Wrong configuration can cause display issues
+
+### Security Considerations
+
+- **No input validation on dimensions:** Width/height not validated beyond type checking
+- **Extreme values:** Could cause system issues (very large displays, extreme PPI)
+- **Resource limits:** No check for maximum displays or system resources
+
+**AI Assistant Action:** When adding features, validate user inputs for reasonableness.
+
+### Breaking Changes to Avoid
+
+1. **Changing parameter order** in native methods breaks JavaScript wrapper
+2. **Modifying return object structure** breaks TypeScript definitions
+3. **Changing N-API exception handling** can crash Node.js process
+4. **Removing memory cleanup** causes memory leaks
+
+### Building on Non-macOS
+
+- Repository can be cloned anywhere
+- `npm install` will fail on non-macOS (node-gyp compilation requires macOS frameworks)
+- Package.json specifies `"os": ["darwin"]` to prevent installation on wrong platforms
+
+### Testing Considerations
+
+- Tests create **real virtual displays**
+- Requires **Screen Recording permission** on macOS 10.15+
+- May affect active displays during development
+- 10-minute timeout allows manual inspection of created display
+
+### Documentation Updates
+
+When modifying APIs, update:
+1. `README.md` - User-facing documentation
+2. `index.d.ts` - TypeScript definitions
+3. `CLAUDE.md` - This file (AI assistant guide)
+4. Inline code comments for complex logic
+
+## Common Pitfalls
+
+1. **Forgetting to destroy displays:** Memory leaks and orphaned displays
+2. **Modifying mirror logic:** Can break display configuration on user's Mac
+3. **Not testing on real macOS:** Code must be tested on actual macOS hardware
+4. **Ignoring clang-format:** Pre-commit hooks will fail
+5. **Breaking API compatibility:** This is a library - semver matters
+
+## Development Environment Setup
+
 ```bash
-yarn clean
-rm -rf build/
-yarn build
+# Clone repository
+git clone https://github.com/ENFP-Dev-Studio/node-mac-virtual-display.git
+cd node-mac-virtual-display
+
+# Install dependencies (macOS only)
+yarn install
+
+# Build native addon
+npm run build
+
+# Run tests (creates real display - be prepared!)
+npm test
+
+# Format code
+npm run format
+
+# Check formatting
+npm run lint
 ```
 
-## Known Limitations
+## Version History Context
 
-1. **Single virtual display**: Only one virtual display can exist at a time (multiple displays support is planned)
-2. **macOS only**: Will never support Windows or Linux (requires macOS-specific APIs)
-3. **Private APIs**: May break in future macOS versions
-4. **No official Apple support**: Uses undocumented APIs
-5. **Requires elevated permissions**: May require screen recording permissions in System Preferences
-
-## Future Enhancements
-
-From README.md features checklist:
-- [ ] Support for multiple virtual displays (currently limited to one)
+- **v1.0.9:** Current version
+- Recent changes focused on:
+  - Virtual display as main display handling
+  - HiDPI scaling adjustments
+  - Bug fixes for display configuration
 
 ## Related Resources
 
-- **Tab Display**: https://tab-display.enfpdev.com (main use case)
-- **Node-API docs**: https://nodejs.org/api/n-api.html
-- **node-gyp docs**: https://github.com/nodejs/node-gyp
-- **CoreGraphics**: https://developer.apple.com/documentation/coregraphics (official APIs only)
+- **Tab Display:** https://tab-display.enfpdev.com
+- **N-API Documentation:** https://nodejs.org/api/n-api.html
+- **node-gyp Guide:** https://github.com/nodejs/node-gyp
+- **macOS CoreGraphics:** Apple Developer Documentation (private APIs used)
 
-## Questions to Consider When Making Changes
+## Support & Contribution
 
-1. Does this change affect display configuration logic? (Test for unintended cases 1 & 2)
-2. Does this change affect memory management? (Check for leaks)
-3. Does this change break the public API? (Maintain backward compatibility)
-4. Does this change work across different macOS versions? (Test on multiple versions)
-5. Does this change affect TypeScript definitions? (Update index.d.ts)
-6. Does this change require documentation updates? (Update README.md)
-7. Can this change be tested automatically? (Add/update tests)
-8. Does this change affect the build process? (Test clean build)
-
-## Working with AI Assistants - Best Practices
-
-When working with this codebase:
-
-1. **Always read the native code** before suggesting changes to display logic
-2. **Preserve memory management patterns** - use the same alloc/release patterns
-3. **Test on actual macOS** - virtual displays cannot be fully simulated
-4. **Maintain backward compatibility** - this is a published npm package
-5. **Update all related files** - JS, TS definitions, docs, tests
-6. **Follow existing code style** - let formatters handle styling
-7. **Understand the post-processing logic** - critical for correct display behavior
-8. **Document changes thoroughly** - explain why, not just what
-9. **Consider macOS version compatibility** - private APIs may change
-10. **Be cautious with private APIs** - we're relying on undocumented behavior
+- **Issues:** GitHub Issues
+- **Funding:** Buy Me a Coffee, Patreon (see FUNDING.yml)
+- **Author:** ENFP-Dev-Studio (Jake Roh)
 
 ---
 
-**Last Updated**: 2025-11-15
-**Document Version**: 1.0
-**For**: node-mac-virtual-display v1.0.9
+**Last Updated:** 2025-11-15 (Auto-generated by Claude)
+**Repository Version:** 1.0.9

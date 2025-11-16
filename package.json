@@ -45,5 +45,15 @@
   ],
   "publishConfig": {
     "@enfp-dev-studio:registry": "https://npm.pkg.github.com"
+  },
+  "resolutions": {
+    "braces": "^3.0.3",
+    "cross-spawn": "^7.0.5",
+    "micromatch": "^4.0.8",
+    "js-yaml": "^4.1.1",
+    "serialize-javascript": "^6.0.2",
+    "nanoid": "^3.3.8",
+    "tar": "^6.2.1",
+    "brace-expansion": "^2.0.2"
   }
 }

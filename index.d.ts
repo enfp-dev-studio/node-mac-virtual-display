@@ -7,26 +7,25 @@ export type DisplayInfo = {
   height: number;
 };
 
-export function getDisplayId(): number;
-export function createVirtualDisplay({
-  width,
-  height,
-  frameRate,
-  hiDPI,
-  displayName,
-  ppi,
-  mirror,
-}: {
-  width: number;
-  height: number;
-  frameRate: number;
-  hiDPI: boolean;
-  displayName: string;
-  ppi: number | undefined;
-  mirror: boolean;
-}): DisplayInfo;
-export function cloneVirtualDisplay({
-  displayName: string,
-  mirror: boolean,
-}): DisplayInfo;
-export function destroyVirtualDisplay(): boolean;
+export class VirtualDisplay {
+  constructor();
+
+  createVirtualDisplay(options: {
+    width: number;
+    height: number;
+    frameRate: number;
+    hiDPI: boolean;
+    displayName: string;
+    ppi?: number;
+    mirror: boolean;
+  }): DisplayInfo;
+
+  cloneVirtualDisplay(options: {
+    displayName: string;
+    mirror: boolean;
+  }): DisplayInfo;
+
+  destroyVirtualDisplay(): boolean;
+}
+
+export = VirtualDisplay;

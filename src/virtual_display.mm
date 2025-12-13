@@ -85,13 +85,16 @@ void VDisplay::InitializeDescriptor(NSString *displayName, unsigned int width, u
 void VDisplay::InitializeSettings(unsigned int width, unsigned int height, CGFloat refreshRate, bool hiDPI) {
     _settings = [[CGVirtualDisplaySettings alloc] init];
     _settings.hiDPI = hiDPI ? 1 : 0;
-    
+
     CGVirtualDisplayMode *mode = [[CGVirtualDisplayMode alloc] initWithWidth:width height:height refreshRate:refreshRate];
     if (hiDPI) {
         CGVirtualDisplayMode *lowResMode = [[CGVirtualDisplayMode alloc] initWithWidth:width/2 height:height/2 refreshRate:refreshRate];
         _settings.modes = @[mode, lowResMode];
+        [mode release];
+        [lowResMode release];
     } else {
         _settings.modes = @[mode];
+        [mode release];
     }
 }
 
@@ -109,6 +112,16 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
     if (info.Length() < 7) {
         Napi::TypeError::New(env, "Wrong number of arguments").ThrowAsJavaScriptException();
         return env.Null();
+    }
+
+    // Clean up existing display if any
+    if (_display) {
+        [_descriptor release];
+        _descriptor = nil;
+        [_settings release];
+        _settings = nil;
+        [_display release];
+        _display = nil;
     }
 
     // Params [width, height, refreshRate, hiDPI, displayName, ppi, useMirror]
@@ -179,7 +192,7 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
             }
         }
     } else {
-        if (isMirror == 0) {
+        if (isMirror == 1) {
             NSLog(@"Disable Virtual Display mirror mode");
             // if already in mirror mode, disable mirror mode
             CGError err = CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, kCGNullDirectDisplay);
@@ -201,6 +214,16 @@ Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
     if (info.Length() < 2) {
         Napi::TypeError::New(env, "Wrong number of arguments").ThrowAsJavaScriptException();
         return env.Null();
+    }
+
+    // Clean up existing display if any
+    if (_display) {
+        [_descriptor release];
+        _descriptor = nil;
+        [_settings release];
+        _settings = nil;
+        [_display release];
+        _display = nil;
     }
 
     // Params [displayName, useMirror]
@@ -269,7 +292,7 @@ Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
             }
         }
     } else {
-        if (isMirror == 0) {
+        if (isMirror == 1) {
             NSLog(@"Disable Virtual Display mirror mode");
             // if already in mirror mode, disable mirror mode
             CGError err = CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, kCGNullDirectDisplay);

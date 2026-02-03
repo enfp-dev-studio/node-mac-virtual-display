@@ -4,6 +4,9 @@
   "description": "A Native module to create and handle virtual display on macOS",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">=20"
+  },
   "gypfile": true,
   "scripts": {
     "build": "npm run build:ts && node-gyp rebuild",

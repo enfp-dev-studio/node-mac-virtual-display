@@ -1,8 +1,9 @@
 name: node-mac-virtual-display Package
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   build:

@@ -47,6 +47,7 @@ vdisplay.createVirtualDisplay({
 
 //To destroy a virtual display:
 vdisplay.destroyVirtualDisplay()
+```
 
 ## Persistent Display Identity
 

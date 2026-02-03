@@ -46,9 +46,9 @@ private:
     Napi::Value CloneVirtualDisplay(const Napi::CallbackInfo &info);
     Napi::Value DestroyVirtualDisplay(const Napi::CallbackInfo &info);
     
-    CGVirtualDisplay *_display;
-    CGVirtualDisplayDescriptor *_descriptor;
-    CGVirtualDisplaySettings *_settings;
+    CGVirtualDisplay *_display = nil;
+    CGVirtualDisplayDescriptor *_descriptor = nil;
+    CGVirtualDisplaySettings *_settings = nil;
 
     void InitializeDescriptor(NSString *displayName, unsigned int width, unsigned int height, int ppi);
     void InitializeSettings(unsigned int width, unsigned int height, CGFloat refreshRate, bool hiDPI);
@@ -77,9 +77,12 @@ void VDisplay::InitializeDescriptor(NSString *displayName, unsigned int width, u
     
     double ratio = 25.4 / ppi;
     _descriptor.sizeInMillimeters = CGSizeMake(width * ratio, height * ratio);
-    _descriptor.productID = 0xeeee + width + height + ppi;
+    
+    // Generate random IDs to support multiple displays
+    // Use current time + random to ensure uniqueness
+    _descriptor.productID = (unsigned int)(arc4random_uniform(0xFFFF));
     _descriptor.vendorID = 0xeeee;
-    _descriptor.serialNum = 0x0001;
+    _descriptor.serialNum = (unsigned int)(arc4random_uniform(0xFFFFFFFF));
 }
 
 void VDisplay::InitializeSettings(unsigned int width, unsigned int height, CGFloat refreshRate, bool hiDPI) {
@@ -128,7 +131,14 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
 
     unsigned int width = info[0].As<Napi::Number>().Uint32Value();
     unsigned int height = info[1].As<Napi::Number>().Uint32Value();
-    CGFloat refreshRate = Clamp(info[2].As<Napi::Number>().Int32Value(), 30, 60);
+    int refreshRateVal = info[2].As<Napi::Number>().Int32Value();
+    
+    if (width == 0 || height == 0) {
+        Napi::Error::New(env, "Width and height must be greater than 0").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+    
+    CGFloat refreshRate = Clamp(refreshRateVal, 30, 120); // support up to 120Hz
     bool hiDPI = info[3].As<Napi::Boolean>().Value();
     std::string displayNameStr = info[4].As<Napi::String>().Utf8Value();
     int ppi = Clamp(info[5].As<Napi::Number>().Int32Value(), 72, 300);
@@ -140,6 +150,8 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
     }
 
     // store current main display id and bounds
+
+    // store current main display id and bounds
     // CGRect mainBounds = CGDisplayBounds(CGMainDisplayID());
     uint32_t mainDisplay = CGMainDisplayID();
     NSLog(@"Previous Main display ID: %d", mainDisplay);
@@ -149,7 +161,7 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
         Napi::Error::New(env, "Failed to create display descriptor").ThrowAsJavaScriptException();
         return env.Null();
     }
-
+    
     _display = [[CGVirtualDisplay alloc] initWithDescriptor:_descriptor];
     if (!_display) {
         Napi::Error::New(env, "Failed to create virtual display").ThrowAsJavaScriptException();

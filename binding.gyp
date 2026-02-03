@@ -22,7 +22,10 @@
             "SYSTEM_VERSION_COMPAT": 1,
             "OTHER_CPLUSPLUSFLAGS": ["-std=c++17", "-stdlib=libc++"],
             "OTHER_LDFLAGS": [
-                "-framework Storekit"
+                "-framework Cocoa",
+                "-framework CoreGraphics",
+                "-framework CoreVideo",
+                "-framework IOKit"
             ]
         }
     }]

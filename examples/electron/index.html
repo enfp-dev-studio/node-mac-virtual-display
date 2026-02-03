@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Electron Virtual Display Test</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        padding: 20px;
+        background-color: #f5f5f7;
+        color: #1d1d1f;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .control-group {
+        margin-bottom: 15px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      label {
+        font-weight: 500;
+        min-width: 80px;
+      }
+      input[type="number"] {
+        padding: 8px;
+        border: 1px solid #d2d2d7;
+        border-radius: 6px;
+        width: 80px;
+      }
+      input[type="checkbox"] {
+        transform: scale(1.2);
+      }
+      button {
+        background-color: #0071e3;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      button:hover {
+        background-color: #0077ed;
+      }
+      button:disabled {
+        background-color: #d2d2d7;
+        cursor: not-allowed;
+      }
+      button.destructive {
+        background-color: #ff3b30;
+      }
+      button.destructive:hover {
+        background-color: #ff453a;
+      }
+      #status-log {
+        background: #1d1d1f;
+        color: #fff;
+        font-family: "SF Mono", Monaco, Consolas, monospace;
+        padding: 15px;
+        border-radius: 8px;
+        height: 150px;
+        overflow-y: auto;
+        font-size: 12px;
+        text-align: left;
+      }
+      .log-entry {
+        margin-bottom: 5px;
+        border-bottom: 1px solid #333;
+        padding-bottom: 2px;
+      }
+      .log-success {
+        color: #30d158;
+      }
+      .log-error {
+        color: #ff453a;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Virtual Display Controls</h1>
+
+    <div class="card">
+      <h3>Create Display</h3>
+      <div class="control-group">
+        <label>Width:</label>
+        <input type="number" id="width" value="1920" />
+        <label>Height:</label>
+        <input type="number" id="height" value="1080" />
+      </div>
+      <div class="control-group">
+        <label>HiDPI:</label>
+        <input type="checkbox" id="hidpi" checked />
+        <label>Mirror:</label>
+        <input type="checkbox" id="mirror" />
+      </div>
+      <button id="btn-create">Create Virtual Display</button>
+    </div>
+
+    <div class="card">
+      <h3>Manage</h3>
+      <div class="control-group">
+        <button id="btn-clone">Clone Main Display</button>
+        <button id="btn-settings" style="background-color: #8e8e93">
+          Open Settings
+        </button>
+        <button id="btn-destroy" class="destructive">Destroy Display</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Status Log</h3>
+      <div id="status-log"></div>
+    </div>
+
+    <script>
+      const { ipcRenderer } = require("electron");
+
+      const logDiv = document.getElementById("status-log");
+      function log(message, type = "info") {
+        const entry = document.createElement("div");
+        entry.className = `log-entry log-${type}`;
+        entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        logDiv.appendChild(entry);
+        logDiv.scrollTop = logDiv.scrollHeight;
+      }
+
+      document
+        .getElementById("btn-create")
+        .addEventListener("click", async () => {
+          const width = parseInt(document.getElementById("width").value);
+          const height = parseInt(document.getElementById("height").value);
+          const hiDPI = document.getElementById("hidpi").checked;
+          const mirror = document.getElementById("mirror").checked;
+
+          log(
+            `Creating display: ${width}x${height}, HiDPI: ${hiDPI}, Mirror: ${mirror}`,
+          );
+
+          try {
+            const result = await ipcRenderer.invoke("create-display", {
+              width,
+              height,
+              hiDPI,
+              mirror,
+              frameRate: 60,
+              displayName: "Electron Test Display",
+            });
+
+            if (result.success) {
+              log(`Success! ID: ${result.id}`, "success");
+            } else {
+              log(`Error: ${result.error}`, "error");
+            }
+          } catch (e) {
+            log(`IPC Error: ${e.message}`, "error");
+          }
+        });
+
+      document
+        .getElementById("btn-destroy")
+        .addEventListener("click", async () => {
+          log("Destroying display...");
+          try {
+            const result = await ipcRenderer.invoke("destroy-display");
+            if (result.success) {
+              log("Display destroyed", "success");
+            } else {
+              log(`Error: ${result.error}`, "error");
+            }
+          } catch (e) {
+            log(`IPC Error: ${e.message}`, "error");
+          }
+        });
+
+      document
+        .getElementById("btn-clone")
+        .addEventListener("click", async () => {
+          log("Cloning main display...");
+          try {
+            const result = await ipcRenderer.invoke("clone-display", {
+              displayName: "Cloned Display",
+              mirror: false, // Usually clone implies copying properties, not necessarily mirroring content, but let's stick to defaults
+            });
+            if (result.success) {
+              log(`Success! Cloned ID: ${result.id}`, "success");
+            } else {
+              log(`Error: ${result.error}`, "error");
+            }
+          } catch (e) {
+            log(`IPC Error: ${e.message}`, "error");
+          }
+        });
+
+      document
+        .getElementById("btn-settings")
+        .addEventListener("click", async () => {
+          log("Opening Display Settings...");
+          try {
+            const result = await ipcRenderer.invoke("open-settings");
+            if (!result.success) {
+              log(`Error: ${result.error}`, "error");
+            }
+          } catch (e) {
+            log(`IPC Error: ${e.message}`, "error");
+          }
+        });
+    </script>
+  </body>
+</html>

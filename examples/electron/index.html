@@ -105,6 +105,10 @@
       <div class="control-group">
         <label>HiDPI:</label>
         <input type="checkbox" id="hidpi" checked />
+        <label>Display Name:</label>
+        <input type="text" id="displayName" placeholder="Virtual Display" />
+      </div>
+      <div class="control-group">
         <label>Mirror:</label>
         <input type="checkbox" id="mirror" />
       </div>
@@ -146,9 +150,10 @@
           const height = parseInt(document.getElementById("height").value);
           const hiDPI = document.getElementById("hidpi").checked;
           const mirror = document.getElementById("mirror").checked;
+          const displayName = document.getElementById("displayName").value || "Virtual Display"; // Default if empty
 
           log(
-            `Creating display: ${width}x${height}, HiDPI: ${hiDPI}, Mirror: ${mirror}`,
+            `Creating display: ${width}x${height}, Name: "${displayName}", HiDPI: ${hiDPI}, Mirror: ${mirror}`,
           );
 
           try {
@@ -158,7 +163,7 @@
               hiDPI,
               mirror,
               frameRate: 60,
-              displayName: "Electron Test Display",
+              displayName,
             });
 
             if (result.success) {
@@ -190,11 +195,14 @@
       document
         .getElementById("btn-clone")
         .addEventListener("click", async () => {
-          log("Cloning main display...");
+          const displayName = document.getElementById("displayName").value || "Virtual Display";
+          const mirror = document.getElementById("mirror").checked;
+
+          log(`Cloning main display with Name: "${displayName}", Mirror: ${mirror}...`);
           try {
             const result = await ipcRenderer.invoke("clone-display", {
-              displayName: "Cloned Display",
-              mirror: false, // Usually clone implies copying properties, not necessarily mirroring content, but let's stick to defaults
+              displayName,
+              mirror,
             });
             if (result.success) {
               log(`Success! Cloned ID: ${result.id}`, "success");

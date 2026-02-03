@@ -127,3 +127,6 @@ dist
 .pnp.*
 
 build/
+
+bin/
+*.node

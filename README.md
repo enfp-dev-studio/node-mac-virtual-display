@@ -48,7 +48,18 @@ vdisplay.createVirtualDisplay({
 //To destroy a virtual display:
 vdisplay.destroyVirtualDisplay()
 
-```
+## Persistent Display Identity
+
+This library now automatically uses the **Display Name** (`displayName`) as the persistent identity key.
+
+- **Name-Based Persistence**: When you create a display with `displayName: "My Monitor"`, it receives a consistent internal ID derived from that name.
+- **Mac Memory**: macOS will remember the window layout and resolution settings associated with that specific name.
+- **Simple Usage**: Just use the same name next time, and your windows will be exactly where you left them.
+
+### ⚠️ Note on Changing Resolutions
+If you keep the same `displayName` but drastically change the resolution or aspect ratio (e.g., 16:9 -> 4:3), macOS might get confused because it thinks it's the same monitor. If you need a "fresh" monitor profile, simply give it a **new name** (e.g. "Monitor V2").
+
+
 
 ## Contribute
 

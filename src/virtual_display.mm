@@ -50,9 +50,9 @@ private:
     CGVirtualDisplayDescriptor *_descriptor = nil;
     CGVirtualDisplaySettings *_settings = nil;
 
-    void InitializeDescriptor(NSString *displayName, unsigned int width, unsigned int height, int ppi);
+    void InitializeDescriptor(NSString *displayName, unsigned int width, unsigned int height, int ppi, std::string serial);
     void InitializeSettings(unsigned int width, unsigned int height, CGFloat refreshRate, bool hiDPI);
-    Napi::Value CreateDisplayObject(Napi::Env env, unsigned int width, unsigned int height);
+    Napi::Value CreateDisplayObject(Napi::Env env, unsigned int width, unsigned int height, std::string serial);
     
     int Clamp(int value, int low, int high) {
         return (value < low) ? low : ((value > high) ? high : value);
@@ -69,7 +69,7 @@ Napi::Function VDisplay::GetClass(Napi::Env env) {
     });
 }
 
-void VDisplay::InitializeDescriptor(NSString *displayName, unsigned int width, unsigned int height, int ppi) {
+void VDisplay::InitializeDescriptor(NSString *displayName, unsigned int width, unsigned int height, int ppi, std::string serialStr) {
     _descriptor = [[CGVirtualDisplayDescriptor alloc] init];
     _descriptor.name = displayName;
     _descriptor.maxPixelsWide = width;
@@ -78,11 +78,18 @@ void VDisplay::InitializeDescriptor(NSString *displayName, unsigned int width, u
     double ratio = 25.4 / ppi;
     _descriptor.sizeInMillimeters = CGSizeMake(width * ratio, height * ratio);
     
-    // Generate random IDs to support multiple displays
-    // Use current time + random to ensure uniqueness
-    _descriptor.productID = (unsigned int)(arc4random_uniform(0xFFFF));
+    // DJB2 Hash Algorithm (Simple & Stable)
+    unsigned long hash = 5381;
+    for (char c : serialStr) {
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+    }
+    
+    unsigned int serialNum = (unsigned int)(hash & 0xFFFFFFFF);
+    unsigned int productID = (unsigned int)((hash >> 16) & 0xFFFF);
+
+    _descriptor.productID = productID;
     _descriptor.vendorID = 0xeeee;
-    _descriptor.serialNum = (unsigned int)(arc4random_uniform(0xFFFFFFFF));
+    _descriptor.serialNum = serialNum;
 }
 
 void VDisplay::InitializeSettings(unsigned int width, unsigned int height, CGFloat refreshRate, bool hiDPI) {
@@ -101,7 +108,7 @@ void VDisplay::InitializeSettings(unsigned int width, unsigned int height, CGFlo
     }
 }
 
-Napi::Value VDisplay::CreateDisplayObject(Napi::Env env, unsigned int width, unsigned int height) {
+Napi::Value VDisplay::CreateDisplayObject(Napi::Env env, unsigned int width, unsigned int height, std::string serial) {
     Napi::Object obj = Napi::Object::New(env);
     obj.Set(Napi::String::New(env, "id"), Napi::Number::New(env, _display.displayID));
     obj.Set(Napi::String::New(env, "width"), Napi::Number::New(env, width));
@@ -112,7 +119,7 @@ Napi::Value VDisplay::CreateDisplayObject(Napi::Env env, unsigned int width, uns
 Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
     
-    if (info.Length() < 7) {
+    if (info.Length() < 8) {
         Napi::TypeError::New(env, "Wrong number of arguments").ThrowAsJavaScriptException();
         return env.Null();
     }
@@ -127,7 +134,7 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
         _display = nil;
     }
 
-    // Params [width, height, refreshRate, hiDPI, displayName, ppi, useMirror]
+    // Params [width, height, refreshRate, hiDPI, displayName, ppi, useMirror, serial]
 
     unsigned int width = info[0].As<Napi::Number>().Uint32Value();
     unsigned int height = info[1].As<Napi::Number>().Uint32Value();
@@ -143,6 +150,7 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
     std::string displayNameStr = info[4].As<Napi::String>().Utf8Value();
     int ppi = Clamp(info[5].As<Napi::Number>().Int32Value(), 72, 300);
     bool useMirror = info[6].As<Napi::Boolean>().Value();
+    std::string serialStr = info[7].As<Napi::String>().Utf8Value();
 
     NSString *displayName = [NSString stringWithUTF8String:displayNameStr.c_str()];
     if (!displayName) {
@@ -156,7 +164,7 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
     uint32_t mainDisplay = CGMainDisplayID();
     NSLog(@"Previous Main display ID: %d", mainDisplay);
 
-    InitializeDescriptor(displayName, width, height, ppi);
+    InitializeDescriptor(displayName, width, height, ppi, serialStr);
     if (!_descriptor) {
         Napi::Error::New(env, "Failed to create display descriptor").ThrowAsJavaScriptException();
         return env.Null();
@@ -217,7 +225,7 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
     // postprocess end
 
     NSLog(@"Virtual display created with ID: %d", _display.displayID);
-    return CreateDisplayObject(env, width, height);
+    return CreateDisplayObject(env, width, height, serialStr);
 }
 
 Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
@@ -239,9 +247,11 @@ Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
     }
 
     // Params [displayName, useMirror]
-    NSString *displayName = [NSString stringWithUTF8String:info[0].As<Napi::String>().Utf8Value().c_str()];
+    std::string displayNameStr = info[0].As<Napi::String>().Utf8Value();
+    NSString *displayName = [NSString stringWithUTF8String:displayNameStr.c_str()];
     if (!displayName || displayName.length == 0) {
         displayName = @"Virtual Display";
+        displayNameStr = "Virtual Display";
     }
 
     bool useMirror = info[1].As<Napi::Boolean>().Value();
@@ -261,8 +271,14 @@ Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
     // increase DPI for retina display
     bool isHiDPI = (dpi > 200);
 
-    InitializeDescriptor(displayName, width, height, dpi);
-    _descriptor.productID = CGDisplayModelNumber(mainDisplay) + 1;
+    // Use displayName as serial seed to ensure consistent ID if same name is used
+    InitializeDescriptor(displayName, width, height, dpi, displayNameStr);
+    
+    // NOTE: We rely on the hash from displayName. 
+    // If specific productID logic is needed for clones, it can be added here, 
+    // but user requested consistent name-based ID.
+    // _descriptor.productID = CGDisplayModelNumber(mainDisplay) + 1; // Removed to respect hash
+
     _descriptor.vendorID = CGDisplayVendorNumber(mainDisplay);
 
     _display = [[CGVirtualDisplay alloc] initWithDescriptor:_descriptor];
@@ -316,7 +332,8 @@ Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
     CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
     // postprocess end
 
-    return CreateDisplayObject(env, width, height);
+    // Return the name-based object, consistent with standard Create
+    return CreateDisplayObject(env, width, height, displayNameStr);
 }
 
 Napi::Value VDisplay::DestroyVirtualDisplay(const Napi::CallbackInfo &info) {

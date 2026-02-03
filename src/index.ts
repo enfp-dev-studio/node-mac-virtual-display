@@ -27,6 +27,7 @@ interface NativeDisplay {
     displayName: string,
     ppi: number,
     mirror: boolean,
+    serial: string,
   ): VirtualDisplayInfo;
 
   cloneVirtualDisplay(displayName: string, mirror: boolean): VirtualDisplayInfo;
@@ -125,14 +126,16 @@ class VirtualDisplay {
       displayName,
       ppi,
       mirror,
+      displayName, // Use displayName as the serial string for deterministic ID
     );
   }
 
-  cloneVirtualDisplay(options: {
+  cloneVirtualDisplay(options?: {
     displayName?: string;
     mirror?: boolean;
   }): VirtualDisplayInfo {
     const { displayName = "Virtual Display", mirror = false } = options || {};
+    // Use displayName directly - "Clone" refers to properties (resolution), not identity
     return this._addonInstance.cloneVirtualDisplay(displayName, mirror);
   }
 

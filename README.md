@@ -20,14 +20,14 @@ A native library for macOS to create virtual displays for your applications usin
 Use npm to install the library:
 
 ```shell
-yarn add node-mac-virtual-display
+yarn add @enfp-dev-studio/node-mac-virtual-display
 ```
 ## Usage
 
 To create/destroy a virtual display:
 
 ```javascript
-const VirtualDisplay = require('node-mac-virtual-display')
+const VirtualDisplay = require('@enfp-dev-studio/node-mac-virtual-display')
 const vdisplay = new VirtualDisplay()
 // Clone primary display
 vdisplay.cloneVirtualDisplay({

@@ -80,6 +80,17 @@ ipcMain.handle("destroy-display", async () => {
   }
 });
 
+ipcMain.handle("open-settings", async () => {
+  try {
+    const { shell } = require("electron");
+    await shell.openPath("/System/Library/PreferencePanes/Displays.prefPane");
+    return { success: true };
+  } catch (err) {
+    console.error(err);
+    return { success: false, error: err.message };
+  }
+});
+
 ipcMain.handle("clone-display", async (event, options) => {
   if (!vdisplay) throw new Error("VirtualDisplay not initialized");
   // Clone logic in C++ might require cleanup of existing display first, or not.

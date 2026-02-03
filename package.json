@@ -9,7 +9,6 @@
     "build": "npm run build:ts && node-gyp rebuild",
     "build:ts": "tsc",
     "clean": "node-gyp clean",
-    "build:binary": "pkg examples/diagnostic.js --targets node18-macos-x64,node18-macos-arm64 --out-path dist --public && cp build/Release/virtual_display.node dist/",
     "rebuild:electron": "electron-rebuild -f -w node-mac-virtual-display",
     "test:electron": "npm run rebuild:electron && electron examples/electron/main.js",
     "lint": "clang-format --dry-run -Werror ./src/virtual_display.mm && prettier --check index.js",
@@ -29,16 +28,16 @@
     "@types/node": "^25.2.0",
     "@typescript-eslint/eslint-plugin": "^8.54.0",
     "@typescript-eslint/parser": "^8.54.0",
-    "chai": "^6.2.1",
+    "chai": "^6.2.2",
     "clang-format": "^1.8.0",
     "electron": "^40.1.0",
     "eslint": "^9.39.2",
-    "husky": "^8.0.3",
-    "lint-staged": "^13.3.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "mocha": "^11.7.5",
-    "node-gyp": "^10.3.1",
+    "node-gyp": "^12.2.0",
     "pkg": "^5.8.1",
-    "prettier": "^2.8.8",
+    "prettier": "^3.8.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
@@ -54,9 +53,6 @@
       "clang-format -i"
     ]
   },
-  "os": [
-    "darwin"
-  ],
   "publishConfig": {
     "@enfp-dev-studio:registry": "https://npm.pkg.github.com"
   }

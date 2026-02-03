@@ -34,18 +34,53 @@ interface NativeDisplay {
   destroyVirtualDisplay(): boolean;
 }
 
+// Mock implementation for non-macOS platforms or failures
+class MockNativeDisplay implements NativeDisplay {
+  createVirtualDisplay(
+    width: number,
+    height: number,
+    frameRate: number,
+    hiDPI: boolean,
+    displayName: string,
+    ppi: number,
+    mirror: boolean,
+  ): VirtualDisplayInfo {
+    console.warn(
+      "[VirtualDisplay] Using mock implementation (not on macOS or failed to load)",
+    );
+    return {
+      id: Math.floor(Math.random() * 1000),
+      width,
+      height,
+    };
+  }
+
+  cloneVirtualDisplay(
+    displayName: string,
+    mirror: boolean,
+  ): VirtualDisplayInfo {
+    console.warn("[VirtualDisplay] Using mock implementation (clone)");
+    return {
+      id: Math.floor(Math.random() * 1000),
+      width: 1920,
+      height: 1080,
+    };
+  }
+
+  destroyVirtualDisplay(): boolean {
+    console.warn("[VirtualDisplay] Using mock implementation (destroy)");
+    return true;
+  }
+}
+
 // Load Native Module with standalone support
 let addon: { VDisplay: new () => NativeDisplay };
 try {
   addon = bindings("virtual_display.node");
 } catch (e: any) {
-  // Fallback for pkg/standalone: look in executable directory
-  try {
-    addon = require(path.join(
-      path.dirname(process.execPath),
-      "virtual_display.node",
-    ));
-  } catch (e2) {
+  if (process.platform !== "darwin") {
+    addon = { VDisplay: MockNativeDisplay };
+  } else {
     throw e;
   }
 }
@@ -54,7 +89,15 @@ class VirtualDisplay {
   private _addonInstance: NativeDisplay;
 
   constructor() {
-    this._addonInstance = new addon.VDisplay();
+    try {
+      this._addonInstance = new addon.VDisplay();
+    } catch (e) {
+      if (process.platform !== "darwin") {
+        this._addonInstance = new MockNativeDisplay();
+      } else {
+        throw e;
+      }
+    }
   }
 
   createVirtualDisplay(options: VirtualDisplayOptions): VirtualDisplayInfo {

@@ -7,6 +7,10 @@
                 "sources": [
                     "src/virtual_display.mm"
                 ],
+            }, {
+                "sources": [
+                    "src/noop.cc"
+                ]
             }]
         ],
         'include_dirs': [

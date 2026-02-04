@@ -1,5 +1,4 @@
-{
-  "name": "@enfp-dev-studio/node-mac-virtual-display",
+  "name": "node-mac-virtual-display",
   "version": "1.0.12",
   "description": "A Native module to create and handle virtual display on macOS",
   "main": "dist/index.js",
@@ -55,8 +54,5 @@
     "*.mm": [
       "clang-format -i"
     ]
-  },
-  "publishConfig": {
-    "@enfp-dev-studio:registry": "https://npm.pkg.github.com"
   }
 }

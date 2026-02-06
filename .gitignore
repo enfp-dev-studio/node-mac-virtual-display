@@ -130,3 +130,7 @@ build/
 
 bin/
 *.node
+
+# Packaging artifacts
+dist-app/
+_build_temp/

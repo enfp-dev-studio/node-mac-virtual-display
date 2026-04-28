@@ -1,0 +1,18 @@
+{
+  "name": "node-mac-virtual-display-electron-example",
+  "private": true,
+  "description": "Electron example app for node-mac-virtual-display",
+  "main": "main.js",
+  "scripts": {
+    "rebuild": "electron-rebuild -f -w node-mac-virtual-display",
+    "start": "electron main.js",
+    "test": "npm run rebuild && npm run start"
+  },
+  "dependencies": {
+    "node-mac-virtual-display": "file:../.."
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.0.4",
+    "electron": "^40.9.2"
+  }
+}

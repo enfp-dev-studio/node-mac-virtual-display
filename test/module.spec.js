@@ -1,5 +1,5 @@
 const { expect } = require("chai");
-const VirtualDisplay = require("../index");
+const VirtualDisplay = require("..");
 
 describe("virtual_display", () => {
   it("should not throw", () => {

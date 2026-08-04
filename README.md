@@ -22,6 +22,41 @@ Use npm to install the library:
 ```shell
 yarn add node-mac-virtual-display
 ```
+
+### Cross-platform projects
+
+This package declares `"os": ["darwin"]`, so package managers know it only
+applies to macOS. If your project also builds on Windows or Linux, declare it
+as an **optional** dependency:
+
+```json
+{
+  "optionalDependencies": {
+    "node-mac-virtual-display": "^1.0.15"
+  }
+}
+```
+
+Both parts are needed. With `optionalDependencies`, the `os` field makes
+package managers skip the download and the `node-gyp` build entirely on
+non-macOS platforms. Listed under regular `dependencies`, the `os` field alone
+does not prevent installation — the package is still fetched and the native
+build still runs, and fails.
+
+Guard the require at runtime too, since the module will be absent on other
+platforms:
+
+```js
+let VirtualDisplay = null
+if (process.platform === 'darwin') {
+  VirtualDisplay = require('node-mac-virtual-display')
+}
+```
+
+Importing the types has the same constraint: `import type` still makes
+TypeScript resolve the `.d.ts`, which fails on platforms where the package was
+skipped. Declare the shape you need locally instead.
+
 ## Usage
 
 To create/destroy a virtual display:

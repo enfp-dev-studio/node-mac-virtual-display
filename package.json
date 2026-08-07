@@ -24,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/enfp-dev-studio/node-mac-virtual-display.git"
+    "url": "https://github.com/enfp-dev-studio/node-mac-virtual-display.git"
   },
   "author": "ENFP-Dev-Studio",
   "license": "MIT",

@@ -17,14 +17,14 @@
     "clean": "node-gyp clean",
     "rebuild:electron": "npm --prefix examples/electron run rebuild",
     "test:electron": "npm --prefix examples/electron run test",
-    "lint": "clang-format --dry-run -Werror ./src/virtual_display.mm && prettier --check index.js",
-    "format": "clang-format -i ./src/virtual_display.mm && prettier --write index.js",
-    "test": "./node_modules/.bin/mocha --reporter spec",
-    "prepare": "husky install"
+    "lint": "clang-format --dry-run -Werror ./src/virtual_display.mm && prettier --check src/index.ts",
+    "format": "clang-format -i ./src/virtual_display.mm && prettier --write src/index.ts",
+    "test": "mocha --reporter spec",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ENFP-Dev-Studio/node-mac-virtual-display"
+    "url": "git+https://github.com/enfp-dev-studio/node-mac-virtual-display.git"
   },
   "author": "ENFP-Dev-Studio",
   "license": "MIT",

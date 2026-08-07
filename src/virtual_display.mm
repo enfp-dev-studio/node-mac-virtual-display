@@ -1,13 +1,15 @@
-#include <napi.h>
 #import <Cocoa/Cocoa.h>
 #import <CoreGraphics/CoreGraphics.h>
+#include <napi.h>
 
 @class CGVirtualDisplayDescriptor;
 @interface CGVirtualDisplayMode : NSObject
 @property(readonly, nonatomic) CGFloat refreshRate;
 @property(readonly, nonatomic) NSUInteger width;
 @property(readonly, nonatomic) NSUInteger height;
-- (instancetype)initWithWidth:(NSUInteger)arg1 height:(NSUInteger)arg2 refreshRate:(CGFloat)arg3;
+- (instancetype)initWithWidth:(NSUInteger)arg1
+                       height:(NSUInteger)arg2
+                  refreshRate:(CGFloat)arg3;
 @end
 
 @interface CGVirtualDisplaySettings : NSObject
@@ -30,7 +32,7 @@
 @property(nonatomic) unsigned int serialNum;
 @property(nonatomic) unsigned int productID;
 @property(nonatomic) unsigned int vendorID;
-@property(copy, nonatomic) void (^terminationHandler)(id, CGVirtualDisplay*);
+@property(copy, nonatomic) void (^terminationHandler)(id, CGVirtualDisplay *);
 - (instancetype)init;
 - (nullable dispatch_queue_t)dispatchQueue;
 - (void)setDispatchQueue:(dispatch_queue_t)arg1;
@@ -38,322 +40,364 @@
 
 class VDisplay : public Napi::ObjectWrap<VDisplay> {
 public:
-    static Napi::Function GetClass(Napi::Env);
-    VDisplay(const Napi::CallbackInfo &info);
+  static Napi::Function GetClass(Napi::Env);
+  VDisplay(const Napi::CallbackInfo &info);
 
 private:
-    Napi::Value CreateVirtualDisplay(const Napi::CallbackInfo &info);
-    Napi::Value CloneVirtualDisplay(const Napi::CallbackInfo &info);
-    Napi::Value DestroyVirtualDisplay(const Napi::CallbackInfo &info);
-    
-    CGVirtualDisplay *_display = nil;
-    CGVirtualDisplayDescriptor *_descriptor = nil;
-    CGVirtualDisplaySettings *_settings = nil;
+  Napi::Value CreateVirtualDisplay(const Napi::CallbackInfo &info);
+  Napi::Value CloneVirtualDisplay(const Napi::CallbackInfo &info);
+  Napi::Value DestroyVirtualDisplay(const Napi::CallbackInfo &info);
 
-    void InitializeDescriptor(NSString *displayName, unsigned int width, unsigned int height, int ppi, std::string serial);
-    void InitializeSettings(unsigned int width, unsigned int height, CGFloat refreshRate, bool hiDPI);
-    Napi::Value CreateDisplayObject(Napi::Env env, unsigned int width, unsigned int height, std::string serial);
-    
-    int Clamp(int value, int low, int high) {
-        return (value < low) ? low : ((value > high) ? high : value);
-    }
+  CGVirtualDisplay *_display = nil;
+  CGVirtualDisplayDescriptor *_descriptor = nil;
+  CGVirtualDisplaySettings *_settings = nil;
+
+  void InitializeDescriptor(NSString *displayName, unsigned int width,
+                            unsigned int height, int ppi, std::string serial);
+  void InitializeSettings(unsigned int width, unsigned int height,
+                          CGFloat refreshRate, bool hiDPI);
+  Napi::Value CreateDisplayObject(Napi::Env env, unsigned int width,
+                                  unsigned int height, std::string serial);
+
+  int Clamp(int value, int low, int high) {
+    return (value < low) ? low : ((value > high) ? high : value);
+  }
 };
 
 VDisplay::VDisplay(const Napi::CallbackInfo &info) : ObjectWrap(info) {}
 
 Napi::Function VDisplay::GetClass(Napi::Env env) {
-    return DefineClass(env, "VDisplay", {
-        InstanceMethod("createVirtualDisplay", &VDisplay::CreateVirtualDisplay),
-        InstanceMethod("cloneVirtualDisplay", &VDisplay::CloneVirtualDisplay),
-        InstanceMethod("destroyVirtualDisplay", &VDisplay::DestroyVirtualDisplay),
-    });
+  return DefineClass(
+      env, "VDisplay",
+      {
+          InstanceMethod("createVirtualDisplay",
+                         &VDisplay::CreateVirtualDisplay),
+          InstanceMethod("cloneVirtualDisplay", &VDisplay::CloneVirtualDisplay),
+          InstanceMethod("destroyVirtualDisplay",
+                         &VDisplay::DestroyVirtualDisplay),
+      });
 }
 
-void VDisplay::InitializeDescriptor(NSString *displayName, unsigned int width, unsigned int height, int ppi, std::string serialStr) {
-    _descriptor = [[CGVirtualDisplayDescriptor alloc] init];
-    _descriptor.name = displayName;
-    _descriptor.maxPixelsWide = width;
-    _descriptor.maxPixelsHigh = height;
-    
-    double ratio = 25.4 / ppi;
-    _descriptor.sizeInMillimeters = CGSizeMake(width * ratio, height * ratio);
-    
-    // DJB2 Hash Algorithm (Simple & Stable)
-    unsigned long hash = 5381;
-    for (char c : serialStr) {
-        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-    }
-    
-    unsigned int serialNum = (unsigned int)(hash & 0xFFFFFFFF);
-    unsigned int productID = (unsigned int)((hash >> 16) & 0xFFFF);
+void VDisplay::InitializeDescriptor(NSString *displayName, unsigned int width,
+                                    unsigned int height, int ppi,
+                                    std::string serialStr) {
+  _descriptor = [[CGVirtualDisplayDescriptor alloc] init];
+  _descriptor.name = displayName;
+  _descriptor.maxPixelsWide = width;
+  _descriptor.maxPixelsHigh = height;
 
-    _descriptor.productID = productID;
-    _descriptor.vendorID = 0xeeee;
-    _descriptor.serialNum = serialNum;
+  double ratio = 25.4 / ppi;
+  _descriptor.sizeInMillimeters = CGSizeMake(width * ratio, height * ratio);
+
+  // DJB2 Hash Algorithm (Simple & Stable)
+  unsigned long hash = 5381;
+  for (char c : serialStr) {
+    hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+  }
+
+  unsigned int serialNum = (unsigned int)(hash & 0xFFFFFFFF);
+  unsigned int productID = (unsigned int)((hash >> 16) & 0xFFFF);
+
+  _descriptor.productID = productID;
+  _descriptor.vendorID = 0xeeee;
+  _descriptor.serialNum = serialNum;
 }
 
-void VDisplay::InitializeSettings(unsigned int width, unsigned int height, CGFloat refreshRate, bool hiDPI) {
-    _settings = [[CGVirtualDisplaySettings alloc] init];
-    _settings.hiDPI = hiDPI ? 1 : 0;
+void VDisplay::InitializeSettings(unsigned int width, unsigned int height,
+                                  CGFloat refreshRate, bool hiDPI) {
+  _settings = [[CGVirtualDisplaySettings alloc] init];
+  _settings.hiDPI = hiDPI ? 1 : 0;
 
-    CGVirtualDisplayMode *mode = [[CGVirtualDisplayMode alloc] initWithWidth:width height:height refreshRate:refreshRate];
-    if (hiDPI) {
-        CGVirtualDisplayMode *lowResMode = [[CGVirtualDisplayMode alloc] initWithWidth:width/2 height:height/2 refreshRate:refreshRate];
-        _settings.modes = @[mode, lowResMode];
-        [mode release];
-        [lowResMode release];
-    } else {
-        _settings.modes = @[mode];
-        [mode release];
-    }
+  CGVirtualDisplayMode *mode =
+      [[CGVirtualDisplayMode alloc] initWithWidth:width
+                                           height:height
+                                      refreshRate:refreshRate];
+  if (hiDPI) {
+    CGVirtualDisplayMode *lowResMode =
+        [[CGVirtualDisplayMode alloc] initWithWidth:width / 2
+                                             height:height / 2
+                                        refreshRate:refreshRate];
+    _settings.modes = @[ mode, lowResMode ];
+    [mode release];
+    [lowResMode release];
+  } else {
+    _settings.modes = @[ mode ];
+    [mode release];
+  }
 }
 
-Napi::Value VDisplay::CreateDisplayObject(Napi::Env env, unsigned int width, unsigned int height, std::string serial) {
-    Napi::Object obj = Napi::Object::New(env);
-    obj.Set(Napi::String::New(env, "id"), Napi::Number::New(env, _display.displayID));
-    obj.Set(Napi::String::New(env, "width"), Napi::Number::New(env, width));
-    obj.Set(Napi::String::New(env, "height"), Napi::Number::New(env, height));
-    return obj;
+Napi::Value VDisplay::CreateDisplayObject(Napi::Env env, unsigned int width,
+                                          unsigned int height,
+                                          std::string serial) {
+  Napi::Object obj = Napi::Object::New(env);
+  obj.Set(Napi::String::New(env, "id"),
+          Napi::Number::New(env, _display.displayID));
+  obj.Set(Napi::String::New(env, "width"), Napi::Number::New(env, width));
+  obj.Set(Napi::String::New(env, "height"), Napi::Number::New(env, height));
+  return obj;
 }
 
 Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
-    Napi::Env env = info.Env();
-    
-    if (info.Length() < 8) {
-        Napi::TypeError::New(env, "Wrong number of arguments").ThrowAsJavaScriptException();
-        return env.Null();
+  Napi::Env env = info.Env();
+
+  if (info.Length() < 8) {
+    Napi::TypeError::New(env, "Wrong number of arguments")
+        .ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
+  // Clean up existing display if any
+  if (_display) {
+    [_descriptor release];
+    _descriptor = nil;
+    [_settings release];
+    _settings = nil;
+    [_display release];
+    _display = nil;
+  }
+
+  // Params [width, height, refreshRate, hiDPI, displayName, ppi, useMirror,
+  // serial]
+
+  unsigned int width = info[0].As<Napi::Number>().Uint32Value();
+  unsigned int height = info[1].As<Napi::Number>().Uint32Value();
+  int refreshRateVal = info[2].As<Napi::Number>().Int32Value();
+
+  if (width == 0 || height == 0) {
+    Napi::Error::New(env, "Width and height must be greater than 0")
+        .ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
+  CGFloat refreshRate = Clamp(refreshRateVal, 30, 120); // support up to 120Hz
+  bool hiDPI = info[3].As<Napi::Boolean>().Value();
+  std::string displayNameStr = info[4].As<Napi::String>().Utf8Value();
+  int ppi = Clamp(info[5].As<Napi::Number>().Int32Value(), 72, 300);
+  bool useMirror = info[6].As<Napi::Boolean>().Value();
+  std::string serialStr = info[7].As<Napi::String>().Utf8Value();
+
+  NSString *displayName =
+      [NSString stringWithUTF8String:displayNameStr.c_str()];
+  if (!displayName) {
+    displayName = @"Virtual Display";
+  }
+
+  // store current main display id and bounds
+
+  // store current main display id and bounds
+  // CGRect mainBounds = CGDisplayBounds(CGMainDisplayID());
+  uint32_t mainDisplay = CGMainDisplayID();
+  NSLog(@"Previous Main display ID: %d", mainDisplay);
+
+  InitializeDescriptor(displayName, width, height, ppi, serialStr);
+  if (!_descriptor) {
+    Napi::Error::New(env, "Failed to create display descriptor")
+        .ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
+  _display = [[CGVirtualDisplay alloc] initWithDescriptor:_descriptor];
+  if (!_display) {
+    Napi::Error::New(env, "Failed to create virtual display")
+        .ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
+  InitializeSettings(width, height, refreshRate, hiDPI);
+  [_display applySettings:_settings];
+
+  // postprocess start
+  uint32_t newMainDisplayID = CGMainDisplayID();
+  NSLog(@"Current Main Display after virtual display creation: %d",
+        newMainDisplayID);
+
+  CGDisplayConfigRef config;
+  CGBeginDisplayConfiguration(&config);
+  if (newMainDisplayID == _display.displayID &&
+      newMainDisplayID != mainDisplay) {
+    NSLog(@"Unintended case 1: Virtual display set as main display => restore "
+          @"Primary Display as main display");
+    CGConfigureDisplayOrigin(config, mainDisplay, 0, 0);
+  }
+
+  // if Primary Display is Mirroring Virtual Display, disable mirror mode
+  uint32_t displayId = CGDisplayMirrorsDisplay(mainDisplay);
+  NSLog(@"Mirror source of Primary Display is: %d", displayId);
+  if (displayId == _display.displayID) {
+    NSLog(@"Unintended case 2: Primary display is mirroring virtual display => "
+          @"disable mirror mode");
+    CGConfigureDisplayMirrorOfDisplay(config, displayId, kCGNullDirectDisplay);
+  }
+  CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
+
+  boolean_t isMirror = CGDisplayIsInMirrorSet(_display.displayID);
+  NSLog(@"Virtual Display is in mirror set: %d", isMirror);
+  CGBeginDisplayConfiguration(&config);
+  if (useMirror) {
+    if (isMirror == 0) {
+      NSLog(@"Enable Virtual Display mirror mode");
+      // set mirror mode
+      CGError err = CGConfigureDisplayMirrorOfDisplay(
+          config, _display.displayID, mainDisplay);
+      if (err != kCGErrorSuccess) {
+        NSLog(@"Failed to enable mirror mode: %d", err);
+      }
     }
-
-    // Clean up existing display if any
-    if (_display) {
-        [_descriptor release];
-        _descriptor = nil;
-        [_settings release];
-        _settings = nil;
-        [_display release];
-        _display = nil;
+  } else {
+    if (isMirror == 1) {
+      NSLog(@"Disable Virtual Display mirror mode");
+      // if already in mirror mode, disable mirror mode
+      CGError err = CGConfigureDisplayMirrorOfDisplay(
+          config, _display.displayID, kCGNullDirectDisplay);
+      if (err != kCGErrorSuccess) {
+        NSLog(@"Failed to disable mirror mode: %d", err);
+      }
     }
+  }
+  CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
+  // postprocess end
 
-    // Params [width, height, refreshRate, hiDPI, displayName, ppi, useMirror, serial]
-
-    unsigned int width = info[0].As<Napi::Number>().Uint32Value();
-    unsigned int height = info[1].As<Napi::Number>().Uint32Value();
-    int refreshRateVal = info[2].As<Napi::Number>().Int32Value();
-    
-    if (width == 0 || height == 0) {
-        Napi::Error::New(env, "Width and height must be greater than 0").ThrowAsJavaScriptException();
-        return env.Null();
-    }
-    
-    CGFloat refreshRate = Clamp(refreshRateVal, 30, 120); // support up to 120Hz
-    bool hiDPI = info[3].As<Napi::Boolean>().Value();
-    std::string displayNameStr = info[4].As<Napi::String>().Utf8Value();
-    int ppi = Clamp(info[5].As<Napi::Number>().Int32Value(), 72, 300);
-    bool useMirror = info[6].As<Napi::Boolean>().Value();
-    std::string serialStr = info[7].As<Napi::String>().Utf8Value();
-
-    NSString *displayName = [NSString stringWithUTF8String:displayNameStr.c_str()];
-    if (!displayName) {
-        displayName = @"Virtual Display";
-    }
-
-    // store current main display id and bounds
-
-    // store current main display id and bounds
-    // CGRect mainBounds = CGDisplayBounds(CGMainDisplayID());
-    uint32_t mainDisplay = CGMainDisplayID();
-    NSLog(@"Previous Main display ID: %d", mainDisplay);
-
-    InitializeDescriptor(displayName, width, height, ppi, serialStr);
-    if (!_descriptor) {
-        Napi::Error::New(env, "Failed to create display descriptor").ThrowAsJavaScriptException();
-        return env.Null();
-    }
-    
-    _display = [[CGVirtualDisplay alloc] initWithDescriptor:_descriptor];
-    if (!_display) {
-        Napi::Error::New(env, "Failed to create virtual display").ThrowAsJavaScriptException();
-        return env.Null();
-    }
-
-    InitializeSettings(width, height, refreshRate, hiDPI);
-    [_display applySettings:_settings];
-
-    // postprocess start
-    uint32_t newMainDisplayID = CGMainDisplayID();
-    NSLog(@"Current Main Display after virtual display creation: %d", newMainDisplayID);
-    
-    CGDisplayConfigRef config;
-    CGBeginDisplayConfiguration(&config);
-    if (newMainDisplayID == _display.displayID && newMainDisplayID != mainDisplay) {
-        NSLog(@"Unintended case 1: Virtual display set as main display => restore Primary Display as main display");
-        CGConfigureDisplayOrigin(config, mainDisplay, 0, 0);
-    }
-   
-    // if Primary Display is Mirroring Virtual Display, disable mirror mode
-    uint32_t displayId = CGDisplayMirrorsDisplay(mainDisplay);
-    NSLog(@"Mirror source of Primary Display is: %d", displayId);
-    if (displayId == _display.displayID) {
-        NSLog(@"Unintended case 2: Primary display is mirroring virtual display => disable mirror mode");
-        CGConfigureDisplayMirrorOfDisplay(config, displayId, kCGNullDirectDisplay);
-    }
-    CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
-
-    boolean_t isMirror = CGDisplayIsInMirrorSet(_display.displayID);
-    NSLog(@"Virtual Display is in mirror set: %d", isMirror);
-    CGBeginDisplayConfiguration(&config);
-    if (useMirror) {
-        if (isMirror == 0) {
-            NSLog(@"Enable Virtual Display mirror mode");
-            // set mirror mode
-            CGError err = CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, mainDisplay);
-            if (err != kCGErrorSuccess) {
-                NSLog(@"Failed to enable mirror mode: %d", err);
-            }
-        }
-    } else {
-        if (isMirror == 1) {
-            NSLog(@"Disable Virtual Display mirror mode");
-            // if already in mirror mode, disable mirror mode
-            CGError err = CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, kCGNullDirectDisplay);
-            if (err != kCGErrorSuccess) {
-                NSLog(@"Failed to disable mirror mode: %d", err);
-            }
-        }
-    }
-    CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
-    // postprocess end
-
-    NSLog(@"Virtual display created with ID: %d", _display.displayID);
-    return CreateDisplayObject(env, width, height, serialStr);
+  NSLog(@"Virtual display created with ID: %d", _display.displayID);
+  return CreateDisplayObject(env, width, height, serialStr);
 }
 
 Napi::Value VDisplay::CloneVirtualDisplay(const Napi::CallbackInfo &info) {
-    Napi::Env env = info.Env();
+  Napi::Env env = info.Env();
 
-    if (info.Length() < 2) {
-        Napi::TypeError::New(env, "Wrong number of arguments").ThrowAsJavaScriptException();
-        return env.Null();
+  if (info.Length() < 2) {
+    Napi::TypeError::New(env, "Wrong number of arguments")
+        .ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
+  // Clean up existing display if any
+  if (_display) {
+    [_descriptor release];
+    _descriptor = nil;
+    [_settings release];
+    _settings = nil;
+    [_display release];
+    _display = nil;
+  }
+
+  // Params [displayName, useMirror]
+  std::string displayNameStr = info[0].As<Napi::String>().Utf8Value();
+  NSString *displayName =
+      [NSString stringWithUTF8String:displayNameStr.c_str()];
+  if (!displayName || displayName.length == 0) {
+    displayName = @"Virtual Display";
+    displayNameStr = "Virtual Display";
+  }
+
+  bool useMirror = info[1].As<Napi::Boolean>().Value();
+
+  CGDirectDisplayID mainDisplay = CGMainDisplayID();
+  CGDisplayModeRef displayMode = CGDisplayCopyDisplayMode(mainDisplay);
+
+  NSScreen *mainScreen = [NSScreen mainScreen];
+  CGFloat backingScaleFactor = [mainScreen backingScaleFactor];
+
+  unsigned int width =
+      CGDisplayModeGetPixelWidth(displayMode) / backingScaleFactor;
+  unsigned int height =
+      CGDisplayModeGetPixelHeight(displayMode) / backingScaleFactor;
+  CGFloat refreshRate = CGDisplayModeGetRefreshRate(displayMode);
+
+  CGSize screenSize = CGDisplayScreenSize(mainDisplay);
+  float dpi = CGDisplayPixelsWide(mainDisplay) / (screenSize.width / 25.4);
+  // increase DPI for retina display
+  bool isHiDPI = (dpi > 200);
+
+  // Use displayName as serial seed to ensure consistent ID if same name is used
+  InitializeDescriptor(displayName, width, height, dpi, displayNameStr);
+
+  // NOTE: We rely on the hash from displayName.
+  // If specific productID logic is needed for clones, it can be added here,
+  // but user requested consistent name-based ID.
+  // _descriptor.productID = CGDisplayModelNumber(mainDisplay) + 1; // Removed
+  // to respect hash
+
+  _descriptor.vendorID = CGDisplayVendorNumber(mainDisplay);
+
+  _display = [[CGVirtualDisplay alloc] initWithDescriptor:_descriptor];
+  InitializeSettings(width, height, refreshRate, isHiDPI);
+  [_display applySettings:_settings];
+
+  CFRelease(displayMode);
+
+  // postprocess start
+  uint32_t newMainDisplayID = CGMainDisplayID();
+  NSLog(@"Current Main Display after virtual display creation: %d",
+        newMainDisplayID);
+
+  CGDisplayConfigRef config;
+  CGBeginDisplayConfiguration(&config);
+  if (newMainDisplayID == _display.displayID &&
+      newMainDisplayID != mainDisplay) {
+    NSLog(@"Unintended case 1: Virtual display set as main display => restore "
+          @"Primary Display as main display");
+    CGConfigureDisplayOrigin(config, mainDisplay, 0, 0);
+  }
+
+  // if Primary Display is Mirroring Virtual Display, disable mirror mode
+  uint32_t displayId = CGDisplayMirrorsDisplay(mainDisplay);
+  NSLog(@"Mirror source of Primary Display is: %d", displayId);
+  if (displayId == _display.displayID) {
+    NSLog(@"Unintended case 2: Primary display is mirroring virtual display => "
+          @"disable mirror mode");
+    CGConfigureDisplayMirrorOfDisplay(config, displayId, kCGNullDirectDisplay);
+  }
+  CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
+
+  boolean_t isMirror = CGDisplayIsInMirrorSet(_display.displayID);
+  NSLog(@"Virtual Display is in mirror set: %d", isMirror);
+  CGBeginDisplayConfiguration(&config);
+  if (useMirror) {
+    if (isMirror == 0) {
+      NSLog(@"Enable Virtual Display mirror mode");
+      // set mirror mode
+      CGError err = CGConfigureDisplayMirrorOfDisplay(
+          config, _display.displayID, mainDisplay);
+      if (err != kCGErrorSuccess) {
+        NSLog(@"Failed to enable mirror mode: %d", err);
+      }
     }
-
-    // Clean up existing display if any
-    if (_display) {
-        [_descriptor release];
-        _descriptor = nil;
-        [_settings release];
-        _settings = nil;
-        [_display release];
-        _display = nil;
+  } else {
+    if (isMirror == 1) {
+      NSLog(@"Disable Virtual Display mirror mode");
+      // if already in mirror mode, disable mirror mode
+      CGError err = CGConfigureDisplayMirrorOfDisplay(
+          config, _display.displayID, kCGNullDirectDisplay);
+      if (err != kCGErrorSuccess) {
+        NSLog(@"Failed to disable mirror mode: %d", err);
+      }
     }
+  }
+  CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
+  // postprocess end
 
-    // Params [displayName, useMirror]
-    std::string displayNameStr = info[0].As<Napi::String>().Utf8Value();
-    NSString *displayName = [NSString stringWithUTF8String:displayNameStr.c_str()];
-    if (!displayName || displayName.length == 0) {
-        displayName = @"Virtual Display";
-        displayNameStr = "Virtual Display";
-    }
-
-    bool useMirror = info[1].As<Napi::Boolean>().Value();
-
-    CGDirectDisplayID mainDisplay = CGMainDisplayID();
-    CGDisplayModeRef displayMode = CGDisplayCopyDisplayMode(mainDisplay);
-    
-    NSScreen *mainScreen = [NSScreen mainScreen];
-    CGFloat backingScaleFactor = [mainScreen backingScaleFactor];
-    
-    unsigned int width = CGDisplayModeGetPixelWidth(displayMode) / backingScaleFactor;
-    unsigned int height = CGDisplayModeGetPixelHeight(displayMode) / backingScaleFactor;
-    CGFloat refreshRate = CGDisplayModeGetRefreshRate(displayMode);
-
-    CGSize screenSize = CGDisplayScreenSize(mainDisplay);
-    float dpi = CGDisplayPixelsWide(mainDisplay) / (screenSize.width / 25.4);
-    // increase DPI for retina display
-    bool isHiDPI = (dpi > 200);
-
-    // Use displayName as serial seed to ensure consistent ID if same name is used
-    InitializeDescriptor(displayName, width, height, dpi, displayNameStr);
-    
-    // NOTE: We rely on the hash from displayName. 
-    // If specific productID logic is needed for clones, it can be added here, 
-    // but user requested consistent name-based ID.
-    // _descriptor.productID = CGDisplayModelNumber(mainDisplay) + 1; // Removed to respect hash
-
-    _descriptor.vendorID = CGDisplayVendorNumber(mainDisplay);
-
-    _display = [[CGVirtualDisplay alloc] initWithDescriptor:_descriptor];
-    InitializeSettings(width, height, refreshRate, isHiDPI);
-    [_display applySettings:_settings];
-
-    CFRelease(displayMode);
-
-    // postprocess start
-    uint32_t newMainDisplayID = CGMainDisplayID();
-    NSLog(@"Current Main Display after virtual display creation: %d", newMainDisplayID);
-    
-    CGDisplayConfigRef config;
-    CGBeginDisplayConfiguration(&config);
-    if (newMainDisplayID == _display.displayID && newMainDisplayID != mainDisplay) {
-        NSLog(@"Unintended case 1: Virtual display set as main display => restore Primary Display as main display");
-        CGConfigureDisplayOrigin(config, mainDisplay, 0, 0);
-    }
-   
-    // if Primary Display is Mirroring Virtual Display, disable mirror mode
-    uint32_t displayId = CGDisplayMirrorsDisplay(mainDisplay);
-    NSLog(@"Mirror source of Primary Display is: %d", displayId);
-    if (displayId == _display.displayID) {
-        NSLog(@"Unintended case 2: Primary display is mirroring virtual display => disable mirror mode");
-        CGConfigureDisplayMirrorOfDisplay(config, displayId, kCGNullDirectDisplay);
-    }
-    CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
-
-    boolean_t isMirror = CGDisplayIsInMirrorSet(_display.displayID);
-    NSLog(@"Virtual Display is in mirror set: %d", isMirror);
-    CGBeginDisplayConfiguration(&config);
-    if (useMirror) {
-        if (isMirror == 0) {
-            NSLog(@"Enable Virtual Display mirror mode");
-            // set mirror mode
-            CGError err = CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, mainDisplay);
-            if (err != kCGErrorSuccess) {
-                NSLog(@"Failed to enable mirror mode: %d", err);
-            }
-        }
-    } else {
-        if (isMirror == 1) {
-            NSLog(@"Disable Virtual Display mirror mode");
-            // if already in mirror mode, disable mirror mode
-            CGError err = CGConfigureDisplayMirrorOfDisplay(config, _display.displayID, kCGNullDirectDisplay);
-            if (err != kCGErrorSuccess) {
-                NSLog(@"Failed to disable mirror mode: %d", err);
-            }
-        }
-    }
-    CGCompleteDisplayConfiguration(config, kCGConfigureForAppOnly);
-    // postprocess end
-
-    // Return the name-based object, consistent with standard Create
-    return CreateDisplayObject(env, width, height, displayNameStr);
+  // Return the name-based object, consistent with standard Create
+  return CreateDisplayObject(env, width, height, displayNameStr);
 }
 
 Napi::Value VDisplay::DestroyVirtualDisplay(const Napi::CallbackInfo &info) {
-    if (_display) {
-        [_descriptor release];
-        _descriptor = nil;
-        [_settings release];
-        _settings = nil;
-        [_display release];
-        _display = nil;
-        return Napi::Boolean::New(info.Env(), true);
-    } else {
-        return Napi::Boolean::New(info.Env(), false);
-    }
+  if (_display) {
+    [_descriptor release];
+    _descriptor = nil;
+    [_settings release];
+    _settings = nil;
+    [_display release];
+    _display = nil;
+    return Napi::Boolean::New(info.Env(), true);
+  } else {
+    return Napi::Boolean::New(info.Env(), false);
+  }
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
-    Napi::String name = Napi::String::New(env, "VDisplay");
-    exports.Set(name, VDisplay::GetClass(env));
-    return exports;
+  Napi::String name = Napi::String::New(env, "VDisplay");
+  exports.Set(name, VDisplay::GetClass(env));
+  return exports;
 }
 
 NODE_API_MODULE(NODE_GYP_MODULE_NAME, Init)

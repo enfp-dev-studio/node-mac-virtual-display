@@ -38,9 +38,8 @@
     "eslint": "^9.39.2",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
-    "mocha": "^11.7.5",
+    "mocha": "^11.8.0",
     "node-gyp": "^12.2.0",
-    "pkg": "^5.8.1",
     "prettier": "^3.8.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
@@ -58,6 +57,7 @@
     ]
   },
   "overrides": {
-    "serialize-javascript": "^7.0.5"
+    "serialize-javascript": "^7.0.5",
+    "diff": "8.0.3"
   }
 }

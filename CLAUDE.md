@@ -67,19 +67,32 @@ node-mac-virtual-display/
 
 ### Display Creation Logic
 
-When creating a virtual display, the code performs critical post-processing (lines 149-192 in `virtual_display.mm`):
+When creating a virtual display, the code performs critical post-processing in `PostProcessDisplay` (`src/virtual_display.mm`):
 
 1. **Main Display Restoration:** If virtual display becomes main display unintentionally, restore original
 2. **Mirror Prevention:** Prevent primary display from mirroring virtual display
 3. **Mirror Mode Configuration:** Apply user's mirror preference (extend vs mirror mode)
 
-**IMPORTANT:** This post-processing logic is essential and should NOT be removed or modified without deep understanding of macOS display behavior.
+After creation, `RegisterScreenParamsObserver` subscribes to
+`NSApplicationDidChangeScreenParametersNotification`. On every display-topology
+change (e.g. a physical display hot-plug), `EnsurePhysicalDisplayStaysMain` runs
+the physical-main safety net: whenever a physical display is online, the main
+slot (0,0) must belong to a physical display — never the virtual one — otherwise
+the menu bar, dock, and keyboard focus land on an invisible screen. This mirrors
+the fix for SideScreen issue #39.
+
+**IMPORTANT:** This post-processing logic and the main-display guard are
+essential and should NOT be removed or modified without deep understanding of
+macOS display behavior.
 
 ### Parameter Constraints
 
-- **Refresh Rate:** Clamped to 30-60 Hz range
+- **Refresh Rate:** Clamped to 30-120 Hz range (fractional values such as 59.94 preserved)
 - **PPI:** Clamped to 72-300 range
-- **HiDPI Mode:** When enabled, creates both full-res and half-res modes
+- **HiDPI Mode:** Physical (backing) resolution = 2x logical. The descriptor's
+  `maxPixels*` are set to the physical size and the settings expose an anchor
+  (physical) + logical mode pair, so macOS recognises the display as Retina
+  (effective PPI forced to 220 when HiDPI).
 
 ### Memory Management
 
@@ -119,11 +132,17 @@ npm test           # Run test suite
 
 **Test Characteristics:**
 - Located in `test/module.spec.js`
-- Tests create display and wait 10 minutes before cleanup (600000ms timeout)
-- Only basic smoke test - verifies module doesn't throw on initialization
-- Clone test commented out by default
-
-**IMPORTANT:** Tests create real virtual displays - must run on macOS with proper permissions.
+- Two layers:
+  1. **JS-layer validation tests** (safe on any platform) — assert bad inputs
+     (non-integer/zero width/height, non-positive frameRate/PPI) throw before
+     any display is created.
+  2. **Integration tests** (macOS only) — create real virtual displays and
+     verify `createVirtualDisplay`/`cloneVirtualDisplay`/`getDisplayInfo`
+     output, including the HiDPI physical = 2x logical contract. Each test
+     tears its display down in `afterEach` so a failure never leaks an
+     orphaned display.
+- Tests create real virtual displays - must run on macOS with proper
+  permissions (Screen Recording on 10.15+).
 
 ### Code Quality & Formatting
 
@@ -205,8 +224,8 @@ npm run format     # Apply formatting
 ### Adding a New Feature
 
 1. Modify native code in `src/virtual_display.mm`
-2. Update JavaScript wrapper in `index.js` if needed
-3. Update TypeScript definitions in `index.d.ts`
+2. Update TypeScript wrapper in `src/index.ts` if needed
+3. Type declarations are emitted from `src/index.ts` to `dist/index.d.ts`
 4. Add tests in `test/module.spec.js`
 5. Run `npm run format` to format code
 6. Run `npm run build` to compile
@@ -218,8 +237,8 @@ When adding new display parameters:
 
 1. **Update native method signature** in `VDisplay` class
 2. **Update descriptor/settings initialization** in `InitializeDescriptor`/`InitializeSettings`
-3. **Update JavaScript wrapper** parameter destructuring
-4. **Update TypeScript types** in `index.d.ts`
+3. **Update TypeScript wrapper** parameter destructuring in `src/index.ts`
+4. **Update TypeScript types** in `src/index.ts` (emit via `tsc`)
 5. **Maintain parameter order** consistency across layers
 
 ### Debugging Native Code

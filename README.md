@@ -8,6 +8,12 @@ A native library for macOS to create virtual displays for your applications usin
 - [x] Configurable display resolution and refresh rate.
 - [x] Create a virtual display by cloning the main display.
 - [x] Added option to select between Mirror and Extend display modes
+- [x] Reports requested and currently active display mode information.
+- [x] HiDPI support: physical (backing) resolution = 2x logical, with an anchor
+      + logical mode pair so macOS recognises the display as Retina.
+- [x] Persistent main-display guard: keeps the menu bar, dock, and keyboard
+      focus on a physical display whenever one is online (never on an invisible
+      virtual screen), even after display topology changes such as hot-plugs.
 - [ ] Support for multiple virtual displays.
 
 ## Requirements
@@ -80,9 +86,22 @@ vdisplay.createVirtualDisplay({
   mirror: false
 })
 
+// Read back the requested mode and the mode currently reported by macOS.
+// `actualRefreshRate` can be 0 when macOS does not expose a mode refresh rate.
+const info = vdisplay.getDisplayInfo()
+console.log(info?.requestedRefreshRate, info?.actualRefreshRate)
+
 //To destroy a virtual display:
 vdisplay.destroyVirtualDisplay()
 ```
+
+`createVirtualDisplay` keeps the existing 30–120 Hz range and accepts
+fractional refresh rates such as `59.94`. The returned info object includes the
+virtual display ID, requested dimensions/rate, current CoreGraphics mode, and
+online/active state. The requested rate is not a guarantee that the encoder or
+the remote device will deliver that many frames per second; callers should use
+the current mode and their transport/decoder metrics when deciding whether a
+stream is actually sustaining the target rate.
 
 ## Persistent Display Identity
 

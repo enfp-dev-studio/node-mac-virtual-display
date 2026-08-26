@@ -16,6 +16,12 @@ interface VirtualDisplayInfo {
   id: number;
   width: number;
   height: number;
+  requestedRefreshRate: number;
+  actualWidth: number;
+  actualHeight: number;
+  actualRefreshRate: number;
+  isOnline: boolean;
+  isActive: boolean;
 }
 
 interface NativeDisplay {
@@ -33,6 +39,8 @@ interface NativeDisplay {
   cloneVirtualDisplay(displayName: string, mirror: boolean): VirtualDisplayInfo;
 
   destroyVirtualDisplay(): boolean;
+
+  getDisplayInfo(): VirtualDisplayInfo | null;
 }
 
 // Mock implementation for non-macOS platforms or failures
@@ -45,6 +53,7 @@ class MockNativeDisplay implements NativeDisplay {
     displayName: string,
     ppi: number,
     mirror: boolean,
+    serial: string,
   ): VirtualDisplayInfo {
     console.warn(
       "[VirtualDisplay] Using mock implementation (not on macOS or failed to load)",
@@ -53,6 +62,12 @@ class MockNativeDisplay implements NativeDisplay {
       id: Math.floor(Math.random() * 1000),
       width,
       height,
+      requestedRefreshRate: frameRate,
+      actualWidth: width,
+      actualHeight: height,
+      actualRefreshRate: frameRate,
+      isOnline: true,
+      isActive: true,
     };
   }
 
@@ -65,12 +80,23 @@ class MockNativeDisplay implements NativeDisplay {
       id: Math.floor(Math.random() * 1000),
       width: 1920,
       height: 1080,
+      requestedRefreshRate: 60,
+      actualWidth: 1920,
+      actualHeight: 1080,
+      actualRefreshRate: 60,
+      isOnline: true,
+      isActive: true,
     };
   }
 
   destroyVirtualDisplay(): boolean {
     console.warn("[VirtualDisplay] Using mock implementation (destroy)");
     return true;
+  }
+
+  getDisplayInfo(): VirtualDisplayInfo | null {
+    console.warn("[VirtualDisplay] Using mock implementation (info)");
+    return null;
   }
 }
 
@@ -117,6 +143,10 @@ class VirtualDisplay {
       throw new Error("Width must be a positive integer");
     if (!Number.isInteger(height) || height <= 0)
       throw new Error("Height must be a positive integer");
+    if (!Number.isFinite(frameRate) || frameRate <= 0)
+      throw new Error("Frame rate must be a positive number");
+    if (!Number.isFinite(ppi) || ppi <= 0)
+      throw new Error("PPI must be a positive number");
 
     return this._addonInstance.createVirtualDisplay(
       width,
@@ -141,6 +171,10 @@ class VirtualDisplay {
 
   destroyVirtualDisplay(): boolean {
     return this._addonInstance.destroyVirtualDisplay();
+  }
+
+  getDisplayInfo(): VirtualDisplayInfo | null {
+    return this._addonInstance.getDisplayInfo();
   }
 }
 

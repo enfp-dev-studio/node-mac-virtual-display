@@ -79,7 +79,8 @@ change (e.g. a physical display hot-plug), `EnsurePhysicalDisplayStaysMain` runs
 the physical-main safety net: whenever a physical display is online, the main
 slot (0,0) must belong to a physical display — never the virtual one — otherwise
 the menu bar, dock, and keyboard focus land on an invisible screen. This mirrors
-the fix for SideScreen issue #39.
+the fix for SideScreen issue #39 (see docs/IMPROVEMENTS.md for source
+attribution).
 
 **IMPORTANT:** This post-processing logic and the main-display guard are
 essential and should NOT be removed or modified without deep understanding of

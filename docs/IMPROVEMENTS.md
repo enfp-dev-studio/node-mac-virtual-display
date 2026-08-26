@@ -1,11 +1,12 @@
 # Stability & Correctness Improvements
 
 This document captures the display-management improvements adopted in this
-library, most of which were derived from a review of
+library. Most of the patterns were derived from a review of
 [SideScreen](https://github.com/tranvuongquocdat/SideScreen)'s
 `VirtualDisplayManager` (notably its fix for issue #39: a virtual display
 re-adopted as the main display by WindowServer, leaving the menu bar, dock, and
-keyboard focus on an invisible screen).
+keyboard focus on an invisible screen). SideScreen is MIT-licensed; see
+[Acknowledgements](#acknowledgements) below.
 
 ## 1. HiDPI physical / logical resolution handling
 
@@ -124,3 +125,18 @@ two layers:
    `getDisplayInfo` returns `null` after destroy, and that destroying a
    non-existent display returns `false`. Each test tears its display down in
    `afterEach`.
+
+## Acknowledgements
+
+Several of the display-management patterns above — the persistent main-display
+guard (§2), the online-display filtering by vendor ID (§3), and the
+session-scoped configuration scope (§4) — were derived from a review of
+[SideScreen](https://github.com/tranvuongquocdat/SideScreen)
+(`MacHost/Sources/VirtualDisplayManager.swift`), released by
+[Tran Vuong Quoc Dat](https://github.com/tranvuongquocdat) under the
+[MIT License](https://github.com/tranvuongquocdat/SideScreen/blob/main/LICENSE).
+
+The techniques were adopted conceptually rather than by copying code, but the
+attribution is kept here to acknowledge the source and to satisfy the MIT
+license's request to include the original copyright notice where substantial
+portions are reused. No code from SideScreen is vendored in this repository.

@@ -99,11 +99,12 @@ vdisplay.destroyVirtualDisplay()
 given as a positive integer (e.g. `60`); values outside 30–120 are clamped.
 The returned info object includes the virtual display ID, requested
 dimensions/rate, current CoreGraphics mode, and online/active state. Rates are
-reported as integers (matching how displays are conventionally labelled), even
-when macOS exposes a fractional mode such as 59.94. The requested rate is not a
-guarantee that the encoder or the remote device will deliver that many frames
-per second; callers should use the current mode and their transport/decoder
-metrics when deciding whether a stream is actually sustaining the target rate.
+reported exactly as supplied for `create`; for a clone, the actual mode rate is
+reported as-is (macOS can expose fractional values such as 59.94, and we do not
+round them). The requested rate is not a guarantee that the encoder or the
+remote device will deliver that many frames per second; callers should use the
+current mode and their transport/decoder metrics when deciding whether a
+stream is actually sustaining the target rate.
 
 ## Persistent Display Identity
 

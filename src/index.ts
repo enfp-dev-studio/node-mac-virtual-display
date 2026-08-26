@@ -143,8 +143,8 @@ class VirtualDisplay {
       throw new Error("Width must be a positive integer");
     if (!Number.isInteger(height) || height <= 0)
       throw new Error("Height must be a positive integer");
-    if (!Number.isFinite(frameRate) || frameRate <= 0)
-      throw new Error("Frame rate must be a positive number");
+    if (!Number.isInteger(frameRate) || frameRate <= 0)
+      throw new Error("Frame rate must be a positive integer");
     if (!Number.isFinite(ppi) || ppi <= 0)
       throw new Error("PPI must be a positive number");
 

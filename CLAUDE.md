@@ -87,7 +87,10 @@ macOS display behavior.
 
 ### Parameter Constraints
 
-- **Refresh Rate:** Clamped to 30-120 Hz range (fractional values such as 59.94 preserved)
+- **Refresh Rate:** Clamped to 30-120 Hz. `frameRate` is a positive integer;
+  returned rates are rounded to integers for display, while the exact
+  fractional value is kept internally when building the display mode (e.g. a
+  cloned 59.94 mode is built as 59.94 but reported as 60).
 - **PPI:** Clamped to 72-300 range
 - **HiDPI Mode:** Physical (backing) resolution = 2x logical. The descriptor's
   `maxPixels*` are set to the physical size and the settings expose an anchor

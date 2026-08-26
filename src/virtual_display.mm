@@ -238,8 +238,11 @@ Napi::Object VDisplay::BuildDisplayInfo(Napi::Env env, unsigned int width,
           Napi::Number::New(env, _display.displayID));
   obj.Set(Napi::String::New(env, "width"), Napi::Number::New(env, width));
   obj.Set(Napi::String::New(env, "height"), Napi::Number::New(env, height));
+  // Report integer rates to the caller (59.94 -> 60, 119.88 -> 120), matching
+  // how displays are conventionally labelled. The exact fractional value is
+  // still used internally to build the CGVirtualDisplayMode.
   obj.Set(Napi::String::New(env, "requestedRefreshRate"),
-          Napi::Number::New(env, requestedRefreshRate));
+          Napi::Number::New(env, std::round(requestedRefreshRate)));
 
   NSUInteger actualWidth = 0;
   NSUInteger actualHeight = 0;
@@ -266,7 +269,7 @@ Napi::Object VDisplay::BuildDisplayInfo(Napi::Env env, unsigned int width,
   obj.Set(Napi::String::New(env, "actualHeight"),
           Napi::Number::New(env, actualHeight));
   obj.Set(Napi::String::New(env, "actualRefreshRate"),
-          Napi::Number::New(env, actualRefreshRate));
+          Napi::Number::New(env, std::round(actualRefreshRate)));
   obj.Set(Napi::String::New(env, "isOnline"),
           Napi::Boolean::New(env, CGDisplayIsOnline(_display.displayID)));
   obj.Set(Napi::String::New(env, "isActive"),

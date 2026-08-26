@@ -95,13 +95,15 @@ console.log(info?.requestedRefreshRate, info?.actualRefreshRate)
 vdisplay.destroyVirtualDisplay()
 ```
 
-`createVirtualDisplay` keeps the existing 30–120 Hz range and accepts
-fractional refresh rates such as `59.94`. The returned info object includes the
-virtual display ID, requested dimensions/rate, current CoreGraphics mode, and
-online/active state. The requested rate is not a guarantee that the encoder or
-the remote device will deliver that many frames per second; callers should use
-the current mode and their transport/decoder metrics when deciding whether a
-stream is actually sustaining the target rate.
+`createVirtualDisplay` keeps the existing 30–120 Hz range. `frameRate` is
+given as a positive integer (e.g. `60`); values outside 30–120 are clamped.
+The returned info object includes the virtual display ID, requested
+dimensions/rate, current CoreGraphics mode, and online/active state. Rates are
+reported as integers (matching how displays are conventionally labelled), even
+when macOS exposes a fractional mode such as 59.94. The requested rate is not a
+guarantee that the encoder or the remote device will deliver that many frames
+per second; callers should use the current mode and their transport/decoder
+metrics when deciding whether a stream is actually sustaining the target rate.
 
 ## Persistent Display Identity
 

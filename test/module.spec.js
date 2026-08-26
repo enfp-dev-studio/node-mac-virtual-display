@@ -50,7 +50,14 @@ describe("VirtualDisplay JS-layer validation (no display created)", () => {
     const vd = makeDisplay();
     expect(() =>
       vd.createVirtualDisplay({ width: 1280, height: 720, frameRate: 0 }),
-    ).to.throw(/Frame rate must be a positive number/);
+    ).to.throw(/Frame rate must be a positive integer/);
+  });
+
+  it("throws on fractional frame rate", () => {
+    const vd = makeDisplay();
+    expect(() =>
+      vd.createVirtualDisplay({ width: 1280, height: 720, frameRate: 59.94 }),
+    ).to.throw(/Frame rate must be a positive integer/);
   });
 
   it("throws on non-positive PPI", () => {

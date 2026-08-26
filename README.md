@@ -7,8 +7,9 @@ A native library for macOS to create virtual displays for your applications usin
 - [x] Create and Destroy single virtual displays on macOS.
 - [x] Configurable display resolution and refresh rate.
 - [x] Create a virtual display by cloning the main display.
-- [x] Added option to select between Mirror and Extend display modes
+- [x] Added option to select between Mirror and Extend display modes.
 - [x] Reports requested and currently active display mode information.
+- [x] Query live display state via `getDisplayInfo()`.
 - [x] HiDPI support: physical (backing) resolution = 2x logical, with an anchor
       + logical mode pair so macOS recognises the display as Retina.
 - [x] Persistent main-display guard: keeps the menu bar, dock, and keyboard
@@ -19,7 +20,7 @@ A native library for macOS to create virtual displays for your applications usin
 ## Requirements
 
 - macOS 10.14 or later
-- Node.js 12 or later
+- Node.js 22 or later
 
 ## Installation
 
@@ -91,7 +92,7 @@ vdisplay.createVirtualDisplay({
 const info = vdisplay.getDisplayInfo()
 console.log(info?.requestedRefreshRate, info?.actualRefreshRate)
 
-//To destroy a virtual display:
+// To destroy a virtual display:
 vdisplay.destroyVirtualDisplay()
 ```
 
@@ -106,9 +107,56 @@ remote device will deliver that many frames per second; callers should use the
 current mode and their transport/decoder metrics when deciding whether a
 stream is actually sustaining the target rate.
 
+### API reference
+
+**`createVirtualDisplay(options)` → `DisplayInfo`**
+
+Creates a new virtual display. `options`:
+
+| Option | Type | Default | Notes |
+|---|---|---|---|
+| `width` | `number` | required | Logical width in pixels (positive integer). |
+| `height` | `number` | required | Logical height in pixels (positive integer). |
+| `frameRate` | `number` | `60` | Positive integer, clamped to 30–120 Hz. |
+| `hiDPI` | `boolean` | `true` | When enabled the physical (backing) resolution is 2x logical and the display is recognised as Retina. |
+| `displayName` | `string` | `"Virtual Display"` | Also used as the persistent identity key (see below). |
+| `ppi` | `number` | `81` | Positive, clamped to 72–300. |
+| `mirror` | `boolean` | `false` | `true` mirrors the main display, `false` extends. |
+
+**`cloneVirtualDisplay(options)` → `DisplayInfo`**
+
+Creates a display matching the main display's resolution and refresh rate.
+`options`: `displayName` (default `"Virtual Display"`) and `mirror`
+(default `false`).
+
+**`getDisplayInfo()` → `DisplayInfo | null`**
+
+Returns the current display info, or `null` if no display is active.
+
+**`destroyVirtualDisplay()` → `boolean`**
+
+Destroys the virtual display. Returns `true` if a display was destroyed,
+`false` if there was nothing to destroy.
+
+**`DisplayInfo`**
+
+```ts
+{
+  id: number;                 // CoreGraphics display ID
+  width: number;              // requested logical width
+  height: number;             // requested logical height
+  requestedRefreshRate: number;
+  actualWidth: number;        // mode reported by macOS (may be 0 pre-settle)
+  actualHeight: number;
+  actualRefreshRate: number;  // may be 0 when macOS does not expose a rate
+  isOnline: boolean;
+  isActive: boolean;
+}
+```
+
 ## Persistent Display Identity
 
-This library now automatically uses the **Display Name** (`displayName`) as the persistent identity key.
+This library automatically uses the **Display Name** (`displayName`) as the persistent identity key.
 
 - **Name-Based Persistence**: When you create a display with `displayName: "My Monitor"`, it receives a consistent internal ID derived from that name.
 - **Mac Memory**: macOS will remember the window layout and resolution settings associated with that specific name.
@@ -116,8 +164,6 @@ This library now automatically uses the **Display Name** (`displayName`) as the 
 
 ### ⚠️ Note on Changing Resolutions
 If you keep the same `displayName` but drastically change the resolution or aspect ratio (e.g., 16:9 -> 4:3), macOS might get confused because it thinks it's the same monitor. If you need a "fresh" monitor profile, simply give it a **new name** (e.g. "Monitor V2").
-
-
 
 ## Contribute
 

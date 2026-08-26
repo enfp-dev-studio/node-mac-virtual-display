@@ -17,6 +17,9 @@ A native library for macOS to create virtual displays for your applications usin
       virtual screen), even after display topology changes such as hot-plugs.
 - [ ] Support for multiple virtual displays.
 
+> See [docs/IMPROVEMENTS.md](docs/IMPROVEMENTS.md) for the HiDPI, main-display
+> guard, and refresh-rate design notes and how they were verified.
+
 ## Requirements
 
 - macOS 10.14 or later

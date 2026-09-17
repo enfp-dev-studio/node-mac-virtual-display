@@ -113,9 +113,19 @@ The native addon uses manual memory management:
 
 **Commands:**
 ```bash
-npm run build      # Rebuild native addon (node-gyp rebuild)
+npm run build      # Rebuild native addon for the host arch (node-gyp rebuild)
+npm run prebuild   # prebuildify: prebuilds/darwin-{x64,arm64}/ (what ships on npm)
 npm run clean      # Clean build artifacts (node-gyp clean)
 ```
+
+**Binary distribution:** the npm tarball carries `prebuilds/darwin-x64` and
+`prebuilds/darwin-arm64` (see `files` in `package.json`); `build/` never
+ships. `src/index.ts` loads through `node-gyp-build`, which prefers a local
+`build/Release` (dev checkout) and otherwise selects the prebuild for
+`process.arch`. The `install` script is `node-gyp-build` too, so a consumer
+only compiles when no prebuild matches. Keep both architectures in the tarball:
+consumers such as Tab Display package one `node_modules` into x64 and arm64
+app bundles from a single arm64 build machine.
 
 **Build Configuration** (`binding.gyp`):
 - Target: `virtual_display.node`
@@ -172,20 +182,18 @@ npm run format     # Apply formatting
 
 **Triggers:** On GitHub release creation
 
-**Jobs:**
-1. **Build** (macOS runner)
-   - Checkout code
-   - Setup Node.js 16
-   - Run `npm build`
-   - Run `npm test`
+**Triggers:** On `v*` tag push
 
-2. **Publish** (macOS runner, requires build success)
-   - Checkout code
-   - Setup Node.js 16 with GitHub Package Registry
-   - Run `npm build`
-   - Run `npm publish` to GitHub Packages
+**Job** (single macOS arm64 runner):
+- `npm ci`
+- `npm run build:ts` — emit `dist/`
+- `npm run prebuild` — prebuildify both slices; the x64 one is cross-compiled
+  with `node-gyp --arch x64`
+- Verify each prebuild's architecture with `lipo -archs` (fails the job on a
+  mismatch)
+- `npm publish --provenance --access public`
 
-**Registry:** GitHub Packages (`https://npm.pkg.github.com`)
+**Registry:** npmjs.org
 
 ## Key Conventions
 
@@ -260,7 +268,7 @@ When adding new display parameters:
 
 1. **macOS Only:** This code CANNOT run on Windows/Linux - uses macOS-private APIs
 2. **Requires macOS 10.14+:** Older versions lack `CGVirtualDisplay` APIs
-3. **Architecture-Specific:** x86_64 and arm64 (Apple Silicon) support via node-gyp
+3. **Architecture-Specific:** x86_64 and arm64 (Apple Silicon); both are prebuilt and shipped, node-gyp is only the fallback
 
 ### Critical Code Sections
 

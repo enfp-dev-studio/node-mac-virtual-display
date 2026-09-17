@@ -131,6 +131,9 @@ dist
 
 build/
 
+# prebuildify output; CI regenerates it for both architectures before publish
+prebuilds/
+
 bin/
 *.node
 

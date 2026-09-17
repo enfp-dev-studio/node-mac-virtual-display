@@ -11,9 +11,19 @@
     "darwin"
   ],
   "gypfile": true,
+  "files": [
+    "dist/",
+    "prebuilds/",
+    "src/",
+    "binding.gyp",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
+    "install": "node-gyp-build",
     "build": "npm run build:ts && node-gyp rebuild",
     "build:ts": "tsc",
+    "prebuild": "prebuildify --napi --strip --arch x64 && prebuildify --napi --strip --arch arm64",
     "clean": "node-gyp clean",
     "rebuild:electron": "npm --prefix examples/electron run rebuild",
     "test:electron": "npm --prefix examples/electron run test",
@@ -29,7 +39,6 @@
   "author": "ENFP-Dev-Studio",
   "license": "MIT",
   "devDependencies": {
-    "@types/bindings": "^1.5.5",
     "@types/node": "^25.2.0",
     "@typescript-eslint/eslint-plugin": "^8.54.0",
     "@typescript-eslint/parser": "^8.54.0",
@@ -40,13 +49,14 @@
     "lint-staged": "^16.2.7",
     "mocha": "^11.8.0",
     "node-gyp": "^12.2.0",
+    "prebuildify": "^6.0.1",
     "prettier": "^3.8.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "bindings": "^1.5.0",
-    "node-addon-api": "^8.5.0"
+    "node-addon-api": "^8.5.0",
+    "node-gyp-build": "^4.8.4"
   },
   "lint-staged": {
     "*.js": [

@@ -19,5 +19,19 @@ jobs:
       - name: Upgrade npm (OIDC trusted publishing requires npm >= 11.5.1)
         run: npm install -g npm@latest
       - run: npm ci
-      - run: npm run build
+      - run: npm run build:ts
+      # The runner is arm64; prebuildify cross-compiles the x64 slice with
+      # node-gyp --arch. Both land in prebuilds/ and ship in the tarball, so
+      # consumers pick the right one at runtime instead of compiling.
+      - run: npm run prebuild
+      - name: Verify prebuild architectures
+        run: |
+          set -euo pipefail
+          for pair in darwin-x64:x86_64 darwin-arm64:arm64; do
+            dir="${pair%%:*}"; want="${pair##*:}"
+            file="$(ls prebuilds/$dir/*.node)"
+            have="$(lipo -archs "$file")"
+            echo "$file -> $have"
+            [ "$have" = "$want" ] || { echo "::error::$file is $have, expected $want"; exit 1; }
+          done
       - run: npm publish --provenance --access public

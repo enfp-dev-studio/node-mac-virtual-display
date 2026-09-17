@@ -33,6 +33,13 @@ Use npm to install the library:
 yarn add node-mac-virtual-display
 ```
 
+The package ships prebuilt binaries for both Intel (x64) and Apple Silicon
+(arm64), so installing does not compile anything. The matching binary is picked
+at runtime by `process.arch`, which also makes it safe to package one
+`node_modules` into both x64 and arm64 app bundles (e.g. electron-builder
+building both targets on one machine). `node-gyp` and Xcode are only needed
+as a fallback on an architecture without a prebuild, or for local development.
+
 ### Cross-platform projects
 
 This package declares `"os": ["darwin"]`, so package managers know it only

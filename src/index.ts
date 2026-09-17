@@ -1,5 +1,5 @@
 import path from "path";
-import bindings from "bindings";
+import nodeGypBuild from "node-gyp-build";
 
 // Type definitions
 interface VirtualDisplayOptions {
@@ -100,10 +100,13 @@ class MockNativeDisplay implements NativeDisplay {
   }
 }
 
-// Load Native Module with standalone support
+// Load the native addon. node-gyp-build prefers a local build/Release (a dev
+// checkout that ran node-gyp) and otherwise picks prebuilds/<platform>-<arch>
+// shipped in the npm tarball, so consumers never compile and an x64 process
+// never sees an arm64 binary. __dirname is dist/, the package root is one up.
 let addon: { VDisplay: new () => NativeDisplay };
 try {
-  addon = bindings("virtual_display.node");
+  addon = nodeGypBuild(path.join(__dirname, ".."));
 } catch (e: any) {
   if (process.platform !== "darwin") {
     addon = { VDisplay: MockNativeDisplay };

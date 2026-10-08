@@ -23,13 +23,14 @@
     "install": "node-gyp-build",
     "build": "npm run build:ts && node-gyp rebuild",
     "build:ts": "tsc",
-    "prebuild": "prebuildify --napi --strip --arch x64 && prebuildify --napi --strip --arch arm64",
+    "build:prebuilds": "prebuildify --napi --strip --arch x64 && prebuildify --napi --strip --arch arm64",
     "clean": "node-gyp clean",
     "rebuild:electron": "npm --prefix examples/electron run rebuild",
     "test:electron": "npm --prefix examples/electron run test",
     "lint": "clang-format --dry-run -Werror ./src/virtual_display.mm && prettier --check src/index.ts",
     "format": "clang-format -i ./src/virtual_display.mm && prettier --write src/index.ts",
-    "test": "mocha --reporter spec",
+    "test": "mocha --reporter spec --grep '^VirtualDisplay integration' --invert",
+    "test:integration": "mocha --reporter spec --grep '^VirtualDisplay integration'",
     "prepare": "husky"
   },
   "repository": {

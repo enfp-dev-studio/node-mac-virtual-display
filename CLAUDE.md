@@ -7,9 +7,9 @@
 **Key Information:**
 - **Language:** Objective-C++ (`.mm`), JavaScript, TypeScript definitions
 - **Platform:** macOS 10.14+ only
-- **Node.js:** v12+
+- **Node.js:** v22+
 - **License:** MIT
-- **Version:** 1.0.9
+- **Version:** 1.0.17
 - **Primary Use Case:** Used in [Tab Display](https://tab-display.enfpdev.com) for tablet-as-monitor functionality
 
 ## Codebase Structure
@@ -17,15 +17,16 @@
 ```
 node-mac-virtual-display/
 ├── src/
+│   ├── index.ts                 # TypeScript wrapper and API definitions
 │   └── virtual_display.mm       # Main C++ native addon implementation
 ├── test/
 │   └── module.spec.js           # Mocha test suite
 ├── .github/
 │   ├── workflows/
+│   │   ├── validate.yml         # PR/main build, test, lint and audit
 │   │   └── release-package.yml  # CI/CD for package publishing
 │   └── FUNDING.yml              # Funding configuration
-├── index.js                     # JavaScript wrapper/entry point
-├── index.d.ts                   # TypeScript type definitions
+├── dist/                        # Generated JavaScript and declarations
 ├── binding.gyp                  # Node-gyp build configuration
 ├── package.json                 # NPM package configuration
 ├── README.md                    # User-facing documentation
@@ -44,7 +45,7 @@ node-mac-virtual-display/
      - `CGVirtualDisplaySettings` - Display mode settings
      - `CGVirtualDisplayMode` - Resolution/refresh rate configuration
 
-2. **JavaScript Wrapper** (`index.js`)
+2. **TypeScript Wrapper** (`src/index.ts`, compiled to `dist/index.js`)
    - Exports `VirtualDisplay` constructor
    - Provides clean API over native addon
    - Three main methods:
@@ -52,7 +53,7 @@ node-mac-virtual-display/
      - `cloneVirtualDisplay()` - Clone main display
      - `destroyVirtualDisplay()` - Remove virtual display
 
-3. **TypeScript Definitions** (`index.d.ts`)
+3. **TypeScript Definitions** (`dist/index.d.ts`, generated from `src/index.ts`)
    - Type-safe interface definitions
    - Exports `DisplayInfo` type
 
@@ -114,7 +115,7 @@ The native addon uses manual memory management:
 **Commands:**
 ```bash
 npm run build      # Rebuild native addon for the host arch (node-gyp rebuild)
-npm run prebuild   # prebuildify: prebuilds/darwin-{x64,arm64}/ (what ships on npm)
+npm run build:prebuilds # prebuildify: prebuilds/darwin-{x64,arm64}/ (what ships on npm)
 npm run clean      # Clean build artifacts (node-gyp clean)
 ```
 
@@ -129,10 +130,10 @@ app bundles from a single arm64 build machine.
 
 **Build Configuration** (`binding.gyp`):
 - Target: `virtual_display.node`
-- Compiler: Clang with C++14 standard
+- Compiler: Clang with C++17 standard
 - macOS Deployment Target: 10.14
-- Framework Dependencies: StoreKit
-- Compiler Flags: `-std=c++14 -stdlib=libc++`
+- Framework Dependencies: Cocoa, CoreGraphics, CoreVideo, IOKit
+- Compiler Flags: `-std=c++17 -stdlib=libc++`
 - N-API Exception Mode: `NAPI_DISABLE_CPP_EXCEPTIONS`
 
 ### Testing
@@ -141,7 +142,8 @@ app bundles from a single arm64 build machine.
 
 **Command:**
 ```bash
-npm test           # Run test suite
+npm test                  # Safe input validation; creates no display
+npm run test:integration  # Explicit real-display integration tests on macOS
 ```
 
 **Test Characteristics:**
@@ -155,8 +157,9 @@ npm test           # Run test suite
      output, including the HiDPI physical = 2x logical contract. Each test
      tears its display down in `afterEach` so a failure never leaks an
      orphaned display.
-- Tests create real virtual displays - must run on macOS with proper
-  permissions (Screen Recording on 10.15+).
+- Native argument validation rejects invalid dimensions without creating displays.
+- Only `npm run test:integration` creates real displays on macOS. These tests
+  do not capture screen contents and do not exercise Screen Recording permission.
 
 ### Code Quality & Formatting
 
@@ -187,7 +190,7 @@ npm run format     # Apply formatting
 **Job** (single macOS arm64 runner):
 - `npm ci`
 - `npm run build:ts` — emit `dist/`
-- `npm run prebuild` — prebuildify both slices; the x64 one is cross-compiled
+- `npm run build:prebuilds` — prebuildify both slices; the x64 one is cross-compiled
   with `node-gyp --arch x64`
 - Verify each prebuild's architecture with `lipo -archs` (fails the job on a
   mismatch)
@@ -288,8 +291,12 @@ When adding new display parameters:
 
 ### Security Considerations
 
-- **No input validation on dimensions:** Width/height not validated beyond type checking
-- **Extreme values:** Could cause system issues (very large displays, extreme PPI)
+- **Dimension validation:** JS and native reject non-positive, non-integer,
+  and overflowing dimensions before replacing an existing display. HiDPI
+  reserves room for 2x physical pixels in unsigned 32-bit fields.
+- **Activation limits:** Numeric validation does not prove macOS can activate
+  a requested mode. Actual mode reporting is unchanged in this update;
+  existing descriptor fallbacks do not prove capture readiness.
 - **Resource limits:** No check for maximum displays or system resources
 
 **AI Assistant Action:** When adding features, validate user inputs for reasonableness.
@@ -309,16 +316,17 @@ When adding new display parameters:
 
 ### Testing Considerations
 
-- Tests create **real virtual displays**
-- Requires **Screen Recording permission** on macOS 10.15+
-- May affect active displays during development
-- 10-minute timeout allows manual inspection of created display
+- `npm test` runs input validation without creating displays.
+- `npm run test:integration` creates real displays on macOS and cleans them up.
+- Integration tests may affect the active desktop layout.
+- These tests verify the existing reported-info contract, including descriptor
+  fallbacks; they do not independently prove live capture readiness.
 
 ### Documentation Updates
 
 When modifying APIs, update:
 1. `README.md` - User-facing documentation
-2. `index.d.ts` - TypeScript definitions
+2. `src/index.ts` - TypeScript API and generated definitions
 3. `CLAUDE.md` - This file (AI assistant guide)
 4. Inline code comments for complex logic
 
@@ -343,7 +351,7 @@ yarn install
 # Build native addon
 npm run build
 
-# Run tests (creates real display - be prepared!)
+# Run input validation (creates no displays)
 npm test
 
 # Format code
@@ -355,7 +363,7 @@ npm run lint
 
 ## Version History Context
 
-- **v1.0.9:** Current version
+- **v1.0.17:** Current version
 - Recent changes focused on:
   - Virtual display as main display handling
   - HiDPI scaling adjustments
@@ -376,5 +384,5 @@ npm run lint
 
 ---
 
-**Last Updated:** 2025-11-15 (Auto-generated by Claude)
-**Repository Version:** 1.0.9
+**Last Updated:** 2026-10-08
+**Repository Version:** 1.0.17

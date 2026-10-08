@@ -1,16 +1,13 @@
 const { expect } = require("chai");
+const path = require("path");
 const VirtualDisplay = require("..");
 
 /**
  * Integration + unit tests for node-mac-virtual-display.
  *
- * Two layers:
- *   1. JS-layer validation tests are SAFE — they assert input validation
- *      throws before any virtual display is created, so they run on any
- *      platform and never touch the display stack.
- *   2. Integration tests create real virtual displays and therefore require
- *      macOS + Screen Recording permission. Each test tears down its display
- *      in `afterEach` so a failure never leaves an orphaned virtual display.
+ * `npm test` runs JS validation against a guarded native-call boundary and,
+ * on macOS, native argument rejection tests. Neither creates a display.
+ * `npm run test:integration` explicitly exercises the real macOS display stack.
  */
 
 // Use a distinctive, small, non-HiDPI resolution for the integration display
@@ -24,44 +21,61 @@ function makeDisplay() {
   return new VirtualDisplay();
 }
 
+function makeValidationDisplay() {
+  const vd = makeDisplay();
+  // Guard the boundary so invalid JS input can never create a real display,
+  // even if validation regresses. Native rejection cannot mask a JS failure.
+  vd._addonInstance = {
+    createVirtualDisplay() {
+      throw new Error("Invalid JS input reached native display creation");
+    },
+  };
+  return vd;
+}
+
+const overflowCases = [
+  { hiDPI: true, maxDimension: 2147483647 },
+  { hiDPI: false, maxDimension: 4294967295 },
+];
+
 describe("VirtualDisplay JS-layer validation (no display created)", () => {
   it("throws on non-positive width", () => {
-    const vd = makeDisplay();
+    const vd = makeValidationDisplay();
     expect(() =>
       vd.createVirtualDisplay({ width: 0, height: 720, frameRate: 60 }),
     ).to.throw(/Width must be a positive integer/);
   });
 
   it("throws on non-integer width", () => {
-    const vd = makeDisplay();
+    const vd = makeValidationDisplay();
     expect(() =>
       vd.createVirtualDisplay({ width: 1280.5, height: 720, frameRate: 60 }),
     ).to.throw(/Width must be a positive integer/);
   });
 
   it("throws on non-positive height", () => {
-    const vd = makeDisplay();
+    const vd = makeValidationDisplay();
     expect(() =>
       vd.createVirtualDisplay({ width: 1280, height: 0, frameRate: 60 }),
     ).to.throw(/Height must be a positive integer/);
   });
 
   it("throws on non-positive frame rate", () => {
-    const vd = makeDisplay();
+    const vd = makeValidationDisplay();
     expect(() =>
       vd.createVirtualDisplay({ width: 1280, height: 720, frameRate: 0 }),
     ).to.throw(/Frame rate must be a positive integer/);
   });
 
   it("throws on fractional frame rate", () => {
-    const vd = makeDisplay();
+    const vd = makeValidationDisplay();
     expect(() =>
       vd.createVirtualDisplay({ width: 1280, height: 720, frameRate: 59.94 }),
     ).to.throw(/Frame rate must be a positive integer/);
   });
 
   it("throws on non-positive PPI", () => {
-    const vd = makeDisplay();
+    const vd = makeValidationDisplay();
     expect(() =>
       vd.createVirtualDisplay({
         width: 1280,
@@ -73,12 +87,81 @@ describe("VirtualDisplay JS-layer validation (no display created)", () => {
   });
 
   it("throws when width is not a number", () => {
-    const vd = makeDisplay();
+    const vd = makeValidationDisplay();
     expect(() =>
       vd.createVirtualDisplay({ width: "1280", height: 720, frameRate: 60 }),
     ).to.throw(/Width must be a positive integer/);
   });
+
+  for (const { hiDPI, maxDimension } of overflowCases) {
+    for (const dimension of ["width", "height"]) {
+      it(`rejects overflowing ${dimension} for ${hiDPI ? "HiDPI" : "standard"} displays before native creation`, () => {
+        const vd = makeValidationDisplay();
+        expect(() =>
+          vd.createVirtualDisplay({
+            width: TEST_WIDTH,
+            height: TEST_HEIGHT,
+            hiDPI,
+            [dimension]: maxDimension + 1,
+          }),
+        ).to.throw(
+          `Dimensions exceed the ${maxDimension}-pixel limit for ${hiDPI ? "HiDPI" : "standard"} displays`,
+        );
+      });
+    }
+  }
+
+  it("applies the HiDPI dimension limit when hiDPI is omitted", () => {
+    const vd = makeValidationDisplay();
+    expect(() =>
+      vd.createVirtualDisplay({ width: 2147483648, height: TEST_HEIGHT }),
+    ).to.throw(
+      "Dimensions exceed the 2147483647-pixel limit for HiDPI displays",
+    );
+  });
 });
+
+const describeNative = process.platform === "darwin" ? describe : describe.skip;
+describeNative(
+  "VirtualDisplay native argument validation (no display created)",
+  () => {
+    let nativeDisplay;
+
+    beforeEach(() => {
+      const addon = require("node-gyp-build")(path.join(__dirname, ".."));
+      nativeDisplay = new addon.VDisplay();
+    });
+
+    afterEach(() => {
+      nativeDisplay.destroyVirtualDisplay();
+    });
+
+    for (const { hiDPI, maxDimension } of overflowCases) {
+      for (const dimension of ["width", "height"]) {
+        it(`rejects overflowing ${dimension} for ${hiDPI ? "HiDPI" : "standard"} displays`, () => {
+          const dimensions = {
+            width: TEST_WIDTH,
+            height: TEST_HEIGHT,
+            [dimension]: maxDimension + 1,
+          };
+          expect(() =>
+            nativeDisplay.createVirtualDisplay(
+              dimensions.width,
+              dimensions.height,
+              TEST_FRAME_RATE,
+              hiDPI,
+              TEST_NAME,
+              81,
+              false,
+              TEST_NAME,
+            ),
+          ).to.throw(/Invalid virtual display dimensions or refresh rate/);
+          expect(nativeDisplay.getDisplayInfo()).to.equal(null);
+        });
+      }
+    }
+  },
+);
 
 describe("VirtualDisplay integration (requires macOS virtual display support)", () => {
   let vd;
@@ -89,11 +172,7 @@ describe("VirtualDisplay integration (requires macOS virtual display support)", 
 
   afterEach(() => {
     // Always tear down so a failed assertion never leaks a virtual display.
-    try {
-      vd.destroyVirtualDisplay();
-    } catch (_err) {
-      // ignore cleanup errors in teardown
-    }
+    vd.destroyVirtualDisplay();
   });
 
   it("creates a virtual display and reports the display info", () => {

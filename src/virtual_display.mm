@@ -504,12 +504,14 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
   const double heightValue = info[1].As<Napi::Number>().DoubleValue();
   const double refreshRateValue = info[2].As<Napi::Number>().DoubleValue();
   const double ppiValue = info[5].As<Napi::Number>().DoubleValue();
+  const bool hiDPI = info[3].As<Napi::Boolean>().Value();
+  const unsigned int maxDimension =
+      std::numeric_limits<unsigned int>::max() / (hiDPI ? 2 : 1);
 
   if (!std::isfinite(widthValue) || !std::isfinite(heightValue) ||
       !std::isfinite(refreshRateValue) || !std::isfinite(ppiValue) ||
       widthValue <= 0 || heightValue <= 0 || refreshRateValue <= 0 ||
-      widthValue > std::numeric_limits<unsigned int>::max() ||
-      heightValue > std::numeric_limits<unsigned int>::max() ||
+      widthValue > maxDimension || heightValue > maxDimension ||
       std::floor(widthValue) != widthValue ||
       std::floor(heightValue) != heightValue || ppiValue <= 0) {
     Napi::Error::New(env, "Invalid virtual display dimensions or refresh rate")
@@ -523,7 +525,6 @@ Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {
   // such as 59.94 when a caller supplies them.
   const CGFloat refreshRate =
       static_cast<CGFloat>(Clamp(refreshRateValue, 30.0, 120.0));
-  const bool hiDPI = info[3].As<Napi::Boolean>().Value();
   std::string displayNameStr = info[4].As<Napi::String>().Utf8Value();
   const int ppi = static_cast<int>(Clamp(ppiValue, 72.0, 300.0));
   const bool useMirror = info[6].As<Napi::Boolean>().Value();

@@ -117,6 +117,10 @@ remote device will deliver that many frames per second; callers should use the
 current mode and their transport/decoder metrics when deciding whether a
 stream is actually sustaining the target rate.
 
+Dimensions must fit the native 32-bit unsigned physical-pixel fields. HiDPI
+reserves room for the 2x backing size. These overflow checks are numeric limits,
+not a guarantee that macOS can activate a display of that size.
+
 ### API reference
 
 **`createVirtualDisplay(options)` → `DisplayInfo`**
@@ -176,6 +180,20 @@ This library automatically uses the **Display Name** (`displayName`) as the pers
 If you keep the same `displayName` but drastically change the resolution or aspect ratio (e.g., 16:9 -> 4:3), macOS might get confused because it thinks it's the same monitor. If you need a "fresh" monitor profile, simply give it a **new name** (e.g. "Monitor V2").
 
 ## Contribute
+
+### Development checks
+
+```sh
+npm ci --ignore-scripts
+npm run build          # TypeScript and the host-architecture native addon
+npm test               # Input validation; creates no virtual displays
+npm run lint
+npm run build:prebuilds # Package binaries for x64 and arm64
+```
+
+`npm run test:integration` explicitly creates real virtual displays on macOS
+and checks their reported display info. It can affect the current desktop layout;
+each test destroys its display during teardown. Build the addon first.
 
 Coffee fuels coding ☕️
 <p align="center">

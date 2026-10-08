@@ -146,6 +146,13 @@ class VirtualDisplay {
       throw new Error("Width must be a positive integer");
     if (!Number.isInteger(height) || height <= 0)
       throw new Error("Height must be a positive integer");
+    // Native descriptors use uint32 physical dimensions. Reserve room for
+    // HiDPI's 2x backing size before calling into the display stack.
+    const maxDimension = hiDPI ? Math.floor(0xffffffff / 2) : 0xffffffff;
+    if (width > maxDimension || height > maxDimension)
+      throw new RangeError(
+        `Dimensions exceed the ${maxDimension}-pixel limit for ${hiDPI ? "HiDPI" : "standard"} displays`,
+      );
     if (!Number.isInteger(frameRate) || frameRate <= 0)
       throw new Error("Frame rate must be a positive integer");
     if (!Number.isFinite(ppi) || ppi <= 0)

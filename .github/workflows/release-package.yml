@@ -23,7 +23,9 @@ jobs:
       # The runner is arm64; prebuildify cross-compiles the x64 slice with
       # node-gyp --arch. Both land in prebuilds/ and ship in the tarball, so
       # consumers pick the right one at runtime instead of compiling.
-      - run: npm run prebuild
+      - run: npm run build:prebuilds
+      - name: Run validation tests without creating displays
+        run: npm test
       - name: Verify prebuild architectures
         run: |
           set -euo pipefail

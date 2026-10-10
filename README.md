@@ -49,7 +49,7 @@ as an **optional** dependency:
 ```json
 {
   "optionalDependencies": {
-    "node-mac-virtual-display": "^1.0.15"
+    "node-mac-virtual-display": "^1.0.18"
   }
 }
 ```
@@ -181,15 +181,38 @@ If you keep the same `displayName` but drastically change the resolution or aspe
 
 ## Contribute
 
+### Separate native screen capture library (experimental)
+
+ScreenCaptureKit → VideoToolbox capture is maintained in the independent private
+repository [`node-mac-screen-capture`](https://github.com/enfp-dev-studio/node-mac-screen-capture).
+The public virtual-display package keeps its existing API and macOS 10.14+
+deployment target; it ships no capture entry or helpers.
+
+The capture library supports macOS 13+ and can be included in Sender through a
+vendored npm tarball without publishing to npm. Bundle its unpacked, app-signed
+helpers and required MIT notices. Capture lifecycle, virtual-display lifecycle
+and USB transport remain separate; await capture stop before destroying its display.
+
+The [reference comparison](docs/native-capture-reference.md) and
+[cadence analysis](docs/capture-cadence-analysis.md) preserve earlier experiments.
+They do not extend the hardware or distribution coverage of the separated library.
+
 ### Development checks
 
 ```sh
 npm ci --ignore-scripts
 npm run build          # TypeScript and the host-architecture native addon
-npm test               # Input validation; creates no virtual displays
+npm test               # Virtual-display input validation; creates no displays
 npm run lint
 npm run build:prebuilds # Package binaries for x64 and arm64
+npm pack --pack-destination /private/tmp
+npm run test:package -- /private/tmp/node-mac-virtual-display-1.0.18.tgz
 ```
+
+`test:package` checks the virtual-display tarball allowlist and both native
+architectures, then installs it in a clean temporary directory and loads the
+default entry without creating a display. Capture has a separate build, tarball
+and validation command in its [own repository](https://github.com/enfp-dev-studio/node-mac-screen-capture).
 
 `npm run test:integration` explicitly creates real virtual displays on macOS
 and checks their reported display info. It can affect the current desktop layout;

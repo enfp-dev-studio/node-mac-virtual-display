@@ -1,0 +1,968 @@
+{
+  "date": "2026-10-08",
+  "platform": {
+    "architecture": "arm64",
+    "macOS": "27.0.1"
+  },
+  "referenceCommit": "9b0ac6d671b67e6d36ccde48d41c84cf636b616d",
+  "referenceEncoderSha256": "372197dfb2aeb62c4f318e8cc5143c8953aa4c04b4eec9ade54af053cfbb2120",
+  "method": "Own animated virtual displays; sequential 6-second ScreenCaptureKit/HEVC runs. Reference driver compiles unmodified SideScreen VideoEncoder.swift and reproduces its capture/idle handler. This is not a comparison of the full SideScreen app.",
+  "result": "1080p60 and HiDPI60 meet 85-percent unique and encoded FPS tolerance. 720p120 fails unique FPS on both implementations. No physical Android USB validation.",
+  "cases": [
+    {
+      "case": "1080p60",
+      "native": {
+        "case": "1080p60",
+        "requested": {
+          "width": 1920,
+          "height": 1080,
+          "fps": 60,
+          "codec": "h265",
+          "bitrate": 60000000,
+          "quality": "ultralow"
+        },
+        "actualDisplay": {
+          "actualRefreshRate": 60,
+          "backingScaleFactor": 1,
+          "displayId": 49,
+          "logicalHeight": 1080,
+          "logicalWidth": 1920,
+          "physicalHeight": 1080,
+          "physicalWidth": 1920,
+          "screenHeight": 1080,
+          "screenWidth": 1920,
+          "stage": "ready"
+        },
+        "encoderReady": {
+          "bitrate": 60000000,
+          "codec": "h265",
+          "displayId": 49,
+          "displaySleepPrevented": true,
+          "encoderTuning": {
+            "quality": 0.5,
+            "qualityApplied": true,
+            "qualityStatus": 0,
+            "zeroFrameDelayApplied": false,
+            "zeroFrameDelayStatus": -12900
+          },
+          "fps": 60,
+          "hardware": true,
+          "height": 1080,
+          "quality": "ultralow",
+          "type": "ready",
+          "width": 1920
+        },
+        "measurement": {
+          "seconds": 6.001424499999999,
+          "frames": 340,
+          "actualFps": 56.65321624890892,
+          "ptsFps": 56.65710069738373,
+          "ptsGapP95Ms": 33.333,
+          "ptsGapMaxMs": 66.667,
+          "bitrateMbps": 0.5048214803002188,
+          "keyframes": 6,
+          "keyframeLatencyMs": 7.097084000000905,
+          "afterStopFrames": 0,
+          "recovery": {
+            "event": {
+              "attempt": 1,
+              "generation": 2,
+              "reason": "requested",
+              "type": "recovered"
+            },
+            "firstFramePtsUs": 1380336,
+            "latencyMs": 401.5064170000005
+          },
+          "stopDuringRestartLateFrames": 0,
+          "patternProgress": {
+            "draws": 539,
+            "elapsedSeconds": 9.074884249988827,
+            "stage": "pattern-progress"
+          }
+        },
+        "decoded": {
+          "codec_name": "hevc",
+          "profile": "Main",
+          "width": 1920,
+          "height": 1080,
+          "pix_fmt": "yuv420p"
+        },
+        "hevcSps": {
+          "profileSpace": 0,
+          "profileIdc": 1,
+          "highTier": false,
+          "levelIdc": 123
+        },
+        "nativeStats": [
+          {
+            "capturedFrames": 58,
+            "coalescedFrames": 0,
+            "droppedFrames": 0,
+            "encodedFrames": 58,
+            "generation": 1,
+            "idleCallbacks": 0,
+            "intervalSeconds": 1.257770625,
+            "maxEncodeMs": 25.688167,
+            "meanEncodeMs": 6.245707603448274,
+            "replayedFrames": 0,
+            "submittedFrames": 58,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 57,
+            "coalescedFrames": 0,
+            "droppedFrames": 0,
+            "encodedFrames": 57,
+            "generation": 2,
+            "idleCallbacks": 0,
+            "intervalSeconds": 1.102623125,
+            "maxEncodeMs": 22.293042,
+            "meanEncodeMs": 6.033532807017543,
+            "replayedFrames": 0,
+            "submittedFrames": 57,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 114,
+            "coalescedFrames": 0,
+            "droppedFrames": 0,
+            "encodedFrames": 114,
+            "generation": 2,
+            "idleCallbacks": 0,
+            "intervalSeconds": 2.105628375,
+            "maxEncodeMs": 22.293042,
+            "meanEncodeMs": 5.841892131578946,
+            "replayedFrames": 0,
+            "submittedFrames": 114,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 171,
+            "coalescedFrames": 0,
+            "droppedFrames": 0,
+            "encodedFrames": 171,
+            "generation": 2,
+            "idleCallbacks": 0,
+            "intervalSeconds": 3.105670791,
+            "maxEncodeMs": 22.293042,
+            "meanEncodeMs": 5.775222918128652,
+            "replayedFrames": 0,
+            "submittedFrames": 171,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 228,
+            "coalescedFrames": 0,
+            "droppedFrames": 0,
+            "encodedFrames": 227,
+            "generation": 2,
+            "idleCallbacks": 0,
+            "intervalSeconds": 4.102676041,
+            "maxEncodeMs": 22.293042,
+            "meanEncodeMs": 6.174856251101317,
+            "replayedFrames": 0,
+            "submittedFrames": 228,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 285,
+            "coalescedFrames": 0,
+            "droppedFrames": 0,
+            "encodedFrames": 284,
+            "generation": 2,
+            "idleCallbacks": 0,
+            "intervalSeconds": 5.102669958,
+            "maxEncodeMs": 22.293042,
+            "meanEncodeMs": 6.358507457746478,
+            "replayedFrames": 0,
+            "submittedFrames": 285,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 342,
+            "coalescedFrames": 0,
+            "droppedFrames": 0,
+            "encodedFrames": 341,
+            "generation": 2,
+            "idleCallbacks": 0,
+            "intervalSeconds": 6.102654375,
+            "maxEncodeMs": 22.293042,
+            "meanEncodeMs": 6.529494607038122,
+            "replayedFrames": 0,
+            "submittedFrames": 342,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 397,
+            "coalescedFrames": 0,
+            "droppedFrames": 0,
+            "encodedFrames": 396,
+            "generation": 2,
+            "idleCallbacks": 0,
+            "intervalSeconds": 7.10270875,
+            "maxEncodeMs": 22.293042,
+            "meanEncodeMs": 6.822002924242422,
+            "replayedFrames": 0,
+            "submittedFrames": 397,
+            "type": "stats"
+          }
+        ],
+        "nativeSteady": {
+          "seconds": 6.000085625,
+          "capturedFps": 56.66585799765149,
+          "encodedFps": 56.49919370942311,
+          "coalescedFrames": 0,
+          "droppedFrames": 0,
+          "idleCallbacks": 0,
+          "replayedFrames": 0,
+          "replayedFps": 0,
+          "meanEncodeMs": 6.822002924242422,
+          "maxEncodeMs": 22.293042
+        },
+        "quality": {
+          "borders": {
+            "pixels": 279675,
+            "lumaMae": 1.2548253565746017,
+            "lumaP95": 7,
+            "lumaPsnrDb": 39.72097119477698,
+            "darkPixelMae": 1.1410264788871793,
+            "darkPixels": 161608
+          },
+          "checker": {
+            "pixels": 218697,
+            "lumaMae": 2.897570611393846,
+            "lumaP95": 16,
+            "lumaPsnrDb": 32.32895499007705,
+            "darkPixelMae": 3.18624053030303,
+            "darkPixels": 105600
+          },
+          "text": {
+            "pixels": 257982,
+            "lumaMae": 1.1491150545386888,
+            "lumaP95": 10,
+            "lumaPsnrDb": 36.97904804508071,
+            "darkPixelMae": 9.099900917589283,
+            "darkPixels": 23213
+          },
+          "colorBars": {
+            "pixels": 151989,
+            "lumaMae": 0.4457428840241982,
+            "lumaP95": 1,
+            "lumaPsnrDb": 50.742702888821505,
+            "darkPixelMae": 0.35136405481498706,
+            "darkPixels": 76038
+          }
+        }
+      },
+      "reference": {
+        "case": "1080p60",
+        "actualDisplay": {
+          "actualRefreshRate": 60,
+          "backingScaleFactor": 1,
+          "displayId": 52,
+          "logicalHeight": 1080,
+          "logicalWidth": 1920,
+          "physicalHeight": 1080,
+          "physicalWidth": 1920,
+          "screenHeight": 1080,
+          "screenWidth": 1920,
+          "stage": "ready"
+        },
+        "reference": {
+          "encoderSource": "/Users/enfpdev/research/SideScreen/MacHost/Sources/VideoEncoder.swift",
+          "encoderSha256": "372197dfb2aeb62c4f318e8cc5143c8953aa4c04b4eec9ade54af053cfbb2120",
+          "referenceCommit": "9b0ac6d671b67e6d36ccde48d41c84cf636b616d"
+        },
+        "metrics": {
+          "bitrateMbps": 0.4919653333333333,
+          "callbackFps": 56.333333333333336,
+          "callbacks": 338,
+          "completeFps": 56.166666666666664,
+          "completeFrames": 337,
+          "encodedFps": 56.166666666666664,
+          "encodedFrames": 337,
+          "imageFrames": 337,
+          "keyframes": 6,
+          "maxEncodeMs": 11.003958,
+          "meanEncodeMs": 7.060759661721069,
+          "replayedFrames": 1,
+          "seconds": 6,
+          "skippedFrames": 0,
+          "stage": "baseline-result",
+          "statuses": {
+            "0": 337,
+            "1": 1
+          }
+        },
+        "quality": {
+          "borders": {
+            "pixels": 279675,
+            "lumaMae": 0.7776497670510382,
+            "lumaP95": 3,
+            "lumaPsnrDb": 44.526024371284365,
+            "darkPixelMae": 0.6469769231721201,
+            "darkPixels": 161608
+          },
+          "checker": {
+            "pixels": 218697,
+            "lumaMae": 2.8971087852142463,
+            "lumaP95": 16,
+            "lumaPsnrDb": 32.329373215135966,
+            "darkPixelMae": 3.1857670454545453,
+            "darkPixels": 105600
+          },
+          "text": {
+            "pixels": 257982,
+            "lumaMae": 0.8731616934514811,
+            "lumaP95": 6,
+            "lumaPsnrDb": 39.643827162287025,
+            "darkPixelMae": 4.230086589411106,
+            "darkPixels": 23213
+          },
+          "colorBars": {
+            "pixels": 151989,
+            "lumaMae": 0.32550120995610127,
+            "lumaP95": 1,
+            "lumaPsnrDb": 52.52922798619683,
+            "darkPixelMae": 0.3498530129674341,
+            "darkPixels": 76038
+          }
+        },
+        "hevcSps": {
+          "profileSpace": 0,
+          "profileIdc": 1,
+          "highTier": false,
+          "levelIdc": 123
+        },
+        "limits": "Unmodified reference VideoEncoder, matching capture settings and cached-buffer handler; this is a pipeline comparison, not the full SideScreen application."
+      }
+    },
+    {
+      "case": "720p120",
+      "native": {
+        "case": "720p120",
+        "requested": {
+          "width": 1280,
+          "height": 720,
+          "fps": 120,
+          "codec": "h265",
+          "bitrate": 60000000,
+          "quality": "ultralow"
+        },
+        "actualDisplay": {
+          "actualRefreshRate": 120,
+          "backingScaleFactor": 1,
+          "displayId": 50,
+          "logicalHeight": 720,
+          "logicalWidth": 1280,
+          "physicalHeight": 720,
+          "physicalWidth": 1280,
+          "screenHeight": 720,
+          "screenWidth": 1280,
+          "stage": "ready"
+        },
+        "encoderReady": {
+          "bitrate": 60000000,
+          "codec": "h265",
+          "displayId": 50,
+          "displaySleepPrevented": true,
+          "encoderTuning": {
+            "quality": 0.5,
+            "qualityApplied": true,
+            "qualityStatus": 0,
+            "zeroFrameDelayApplied": false,
+            "zeroFrameDelayStatus": -12900
+          },
+          "fps": 120,
+          "hardware": true,
+          "height": 720,
+          "quality": "ultralow",
+          "type": "ready",
+          "width": 1280
+        },
+        "measurement": {
+          "seconds": 6.000513000000002,
+          "frames": 534,
+          "actualFps": 88.99239115055659,
+          "ptsFps": 88.95644905883076,
+          "ptsGapP95Ms": 16.667,
+          "ptsGapMaxMs": 25,
+          "bitrateMbps": 0.325828141693885,
+          "keyframes": 6,
+          "keyframeLatencyMs": 3.180333000000246,
+          "afterStopFrames": 0,
+          "recovery": {
+            "event": {
+              "attempt": 1,
+              "generation": 2,
+              "reason": "requested",
+              "type": "recovered"
+            },
+            "firstFramePtsUs": 1367549,
+            "latencyMs": 386.8561669999981
+          },
+          "stopDuringRestartLateFrames": 0,
+          "patternProgress": {
+            "draws": 1080,
+            "elapsedSeconds": 9.03539658333466,
+            "stage": "pattern-progress"
+          }
+        },
+        "decoded": {
+          "codec_name": "hevc",
+          "profile": "Main",
+          "width": 1280,
+          "height": 720,
+          "pix_fmt": "yuv420p"
+        },
+        "hevcSps": {
+          "profileSpace": 0,
+          "profileIdc": 1,
+          "highTier": false,
+          "levelIdc": 123
+        },
+        "nativeStats": [
+          {
+            "capturedFrames": 102,
+            "coalescedFrames": 0,
+            "droppedFrames": 0,
+            "encodedFrames": 107,
+            "generation": 2,
+            "idleCallbacks": 5,
+            "intervalSeconds": 1.095860917,
+            "maxEncodeMs": 20.323084,
+            "meanEncodeMs": 3.4878691962616823,
+            "replayedFrames": 5,
+            "submittedFrames": 107,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 163,
+            "coalescedFrames": 0,
+            "droppedFrames": 0,
+            "encodedFrames": 197,
+            "generation": 2,
+            "idleCallbacks": 35,
+            "intervalSeconds": 2.103032917,
+            "maxEncodeMs": 20.323084,
+            "meanEncodeMs": 3.42227349746193,
+            "replayedFrames": 35,
+            "submittedFrames": 198,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 222,
+            "coalescedFrames": 0,
+            "droppedFrames": 0,
+            "encodedFrames": 285,
+            "generation": 2,
+            "idleCallbacks": 63,
+            "intervalSeconds": 3.102998042,
+            "maxEncodeMs": 20.323084,
+            "meanEncodeMs": 3.3647896245614053,
+            "replayedFrames": 63,
+            "submittedFrames": 285,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 282,
+            "coalescedFrames": 2,
+            "droppedFrames": 0,
+            "encodedFrames": 374,
+            "generation": 2,
+            "idleCallbacks": 93,
+            "intervalSeconds": 4.102983,
+            "maxEncodeMs": 22.272709,
+            "meanEncodeMs": 3.5085894705882383,
+            "replayedFrames": 92,
+            "submittedFrames": 374,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 342,
+            "coalescedFrames": 2,
+            "droppedFrames": 0,
+            "encodedFrames": 463,
+            "generation": 2,
+            "idleCallbacks": 123,
+            "intervalSeconds": 5.10299825,
+            "maxEncodeMs": 22.272709,
+            "meanEncodeMs": 3.639627438444926,
+            "replayedFrames": 122,
+            "submittedFrames": 464,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 401,
+            "coalescedFrames": 2,
+            "droppedFrames": 0,
+            "encodedFrames": 551,
+            "generation": 2,
+            "idleCallbacks": 152,
+            "intervalSeconds": 6.103022667,
+            "maxEncodeMs": 22.272709,
+            "meanEncodeMs": 3.7988968548094375,
+            "replayedFrames": 151,
+            "submittedFrames": 552,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 461,
+            "coalescedFrames": 2,
+            "droppedFrames": 0,
+            "encodedFrames": 641,
+            "generation": 2,
+            "idleCallbacks": 181,
+            "intervalSeconds": 7.102995083,
+            "maxEncodeMs": 22.272709,
+            "meanEncodeMs": 3.7330658517940716,
+            "replayedFrames": 180,
+            "submittedFrames": 641,
+            "type": "stats"
+          }
+        ],
+        "nativeSteady": {
+          "seconds": 6.007134166,
+          "capturedFps": 59.76227433572523,
+          "encodedFps": 88.89430221525703,
+          "coalescedFrames": 2,
+          "droppedFrames": 0,
+          "idleCallbacks": 176,
+          "replayedFrames": 175,
+          "replayedFps": 29.132027879531798,
+          "meanEncodeMs": 3.7330658517940716,
+          "maxEncodeMs": 22.272709
+        },
+        "quality": {
+          "borders": {
+            "pixels": 124821,
+            "lumaMae": 1.5964140649409955,
+            "lumaP95": 10,
+            "lumaPsnrDb": 37.25484615672665,
+            "darkPixelMae": 1.7080309158402127,
+            "darkPixels": 72196
+          },
+          "checker": {
+            "pixels": 97378,
+            "lumaMae": 1.903828380126928,
+            "lumaP95": 8,
+            "lumaPsnrDb": 36.48278633029248,
+            "darkPixelMae": 2.229986431478969,
+            "darkPixels": 47168
+          },
+          "text": {
+            "pixels": 114169,
+            "lumaMae": 1.9038820380313317,
+            "lumaP95": 11,
+            "lumaPsnrDb": 34.693171023877284,
+            "darkPixelMae": 10.95051298953662,
+            "darkPixels": 13380
+          },
+          "colorBars": {
+            "pixels": 67570,
+            "lumaMae": 0.5097460737012672,
+            "lumaP95": 2,
+            "lumaPsnrDb": 49.02829519160183,
+            "darkPixelMae": 0.49863690187505594,
+            "darkPixels": 33814
+          }
+        }
+      },
+      "reference": {
+        "case": "720p120",
+        "actualDisplay": {
+          "actualRefreshRate": 120,
+          "backingScaleFactor": 1,
+          "displayId": 53,
+          "logicalHeight": 720,
+          "logicalWidth": 1280,
+          "physicalHeight": 720,
+          "physicalWidth": 1280,
+          "screenHeight": 720,
+          "screenWidth": 1280,
+          "stage": "ready"
+        },
+        "reference": {
+          "encoderSource": "/Users/enfpdev/research/SideScreen/MacHost/Sources/VideoEncoder.swift",
+          "encoderSha256": "372197dfb2aeb62c4f318e8cc5143c8953aa4c04b4eec9ade54af053cfbb2120",
+          "referenceCommit": "9b0ac6d671b67e6d36ccde48d41c84cf636b616d"
+        },
+        "metrics": {
+          "bitrateMbps": 0.3363653333333333,
+          "callbackFps": 88.83333333333333,
+          "callbacks": 533,
+          "completeFps": 59.833333333333336,
+          "completeFrames": 359,
+          "encodedFps": 88.83333333333333,
+          "encodedFrames": 533,
+          "imageFrames": 359,
+          "keyframes": 7,
+          "maxEncodeMs": 5.664292,
+          "meanEncodeMs": 3.5839738761726094,
+          "replayedFrames": 174,
+          "seconds": 6,
+          "skippedFrames": 0,
+          "stage": "baseline-result",
+          "statuses": {
+            "0": 359,
+            "1": 174
+          }
+        },
+        "quality": {
+          "borders": {
+            "pixels": 124821,
+            "lumaMae": 0.9418286986965334,
+            "lumaP95": 3,
+            "lumaPsnrDb": 43.04647453810726,
+            "darkPixelMae": 0.8859909136240235,
+            "darkPixels": 72196
+          },
+          "checker": {
+            "pixels": 97378,
+            "lumaMae": 1.9038899956869109,
+            "lumaP95": 8,
+            "lumaPsnrDb": 36.4893215806242,
+            "darkPixelMae": 2.239463195386703,
+            "darkPixels": 47168
+          },
+          "text": {
+            "pixels": 114169,
+            "lumaMae": 1.1018749835769137,
+            "lumaP95": 7,
+            "lumaPsnrDb": 38.781065427691594,
+            "darkPixelMae": 3.453564499252615,
+            "darkPixels": 13380
+          },
+          "colorBars": {
+            "pixels": 67570,
+            "lumaMae": 0.37630234423555486,
+            "lumaP95": 1,
+            "lumaPsnrDb": 49.869785932385085,
+            "darkPixelMae": 0.41783085112676005,
+            "darkPixels": 33814
+          }
+        },
+        "hevcSps": {
+          "profileSpace": 0,
+          "profileIdc": 1,
+          "highTier": false,
+          "levelIdc": 123
+        },
+        "limits": "Unmodified reference VideoEncoder, matching capture settings and cached-buffer handler; this is a pipeline comparison, not the full SideScreen application."
+      }
+    },
+    {
+      "case": "hidpi60",
+      "native": {
+        "case": "hidpi60",
+        "requested": {
+          "width": 1920,
+          "height": 1080,
+          "fps": 60,
+          "codec": "h265",
+          "bitrate": 60000000,
+          "quality": "ultralow"
+        },
+        "actualDisplay": {
+          "actualRefreshRate": 60,
+          "backingScaleFactor": 2,
+          "displayId": 51,
+          "logicalHeight": 540,
+          "logicalWidth": 960,
+          "physicalHeight": 1080,
+          "physicalWidth": 1920,
+          "screenHeight": 540,
+          "screenWidth": 960,
+          "stage": "ready"
+        },
+        "encoderReady": {
+          "bitrate": 60000000,
+          "codec": "h265",
+          "displayId": 51,
+          "displaySleepPrevented": true,
+          "encoderTuning": {
+            "quality": 0.5,
+            "qualityApplied": true,
+            "qualityStatus": 0,
+            "zeroFrameDelayApplied": false,
+            "zeroFrameDelayStatus": -12900
+          },
+          "fps": 60,
+          "hardware": true,
+          "height": 1080,
+          "quality": "ultralow",
+          "type": "ready",
+          "width": 1920
+        },
+        "measurement": {
+          "seconds": 6.002531917000004,
+          "frames": 340,
+          "actualFps": 56.64276420373089,
+          "ptsFps": 56.65710069738373,
+          "ptsGapP95Ms": 33.333,
+          "ptsGapMaxMs": 50.001,
+          "bitrateMbps": 0.5059544942024834,
+          "keyframes": 6,
+          "keyframeLatencyMs": 8.020540999998047,
+          "afterStopFrames": 0,
+          "recovery": {
+            "event": {
+              "attempt": 1,
+              "generation": 2,
+              "reason": "requested",
+              "type": "recovered"
+            },
+            "firstFramePtsUs": 1384389,
+            "latencyMs": 406.1040410000023
+          },
+          "stopDuringRestartLateFrames": 0,
+          "patternProgress": {
+            "draws": 542,
+            "elapsedSeconds": 9.045650208339794,
+            "stage": "pattern-progress"
+          }
+        },
+        "decoded": {
+          "codec_name": "hevc",
+          "profile": "Main",
+          "width": 1920,
+          "height": 1080,
+          "pix_fmt": "yuv420p"
+        },
+        "hevcSps": {
+          "profileSpace": 0,
+          "profileIdc": 1,
+          "highTier": false,
+          "levelIdc": 123
+        },
+        "nativeStats": [
+          {
+            "capturedFrames": 57,
+            "coalescedFrames": 0,
+            "droppedFrames": 0,
+            "encodedFrames": 57,
+            "generation": 2,
+            "idleCallbacks": 0,
+            "intervalSeconds": 1.116628208,
+            "maxEncodeMs": 21.957375,
+            "meanEncodeMs": 6.2313222982456145,
+            "replayedFrames": 0,
+            "submittedFrames": 57,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 114,
+            "coalescedFrames": 0,
+            "droppedFrames": 0,
+            "encodedFrames": 113,
+            "generation": 2,
+            "idleCallbacks": 0,
+            "intervalSeconds": 2.11664525,
+            "maxEncodeMs": 21.957375,
+            "meanEncodeMs": 6.118341415929203,
+            "replayedFrames": 0,
+            "submittedFrames": 114,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 171,
+            "coalescedFrames": 0,
+            "droppedFrames": 0,
+            "encodedFrames": 171,
+            "generation": 2,
+            "idleCallbacks": 0,
+            "intervalSeconds": 3.116634083,
+            "maxEncodeMs": 21.957375,
+            "meanEncodeMs": 6.048334783625733,
+            "replayedFrames": 0,
+            "submittedFrames": 171,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 229,
+            "coalescedFrames": 0,
+            "droppedFrames": 0,
+            "encodedFrames": 228,
+            "generation": 2,
+            "idleCallbacks": 0,
+            "intervalSeconds": 4.116649583,
+            "maxEncodeMs": 21.957375,
+            "meanEncodeMs": 6.007370048245618,
+            "replayedFrames": 0,
+            "submittedFrames": 229,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 284,
+            "coalescedFrames": 0,
+            "droppedFrames": 0,
+            "encodedFrames": 283,
+            "generation": 2,
+            "idleCallbacks": 0,
+            "intervalSeconds": 5.116693542,
+            "maxEncodeMs": 21.957375,
+            "meanEncodeMs": 6.009526918727917,
+            "replayedFrames": 0,
+            "submittedFrames": 284,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 341,
+            "coalescedFrames": 0,
+            "droppedFrames": 0,
+            "encodedFrames": 340,
+            "generation": 2,
+            "idleCallbacks": 0,
+            "intervalSeconds": 6.1166855,
+            "maxEncodeMs": 21.957375,
+            "meanEncodeMs": 6.399935161764707,
+            "replayedFrames": 0,
+            "submittedFrames": 341,
+            "type": "stats"
+          },
+          {
+            "capturedFrames": 397,
+            "coalescedFrames": 0,
+            "droppedFrames": 0,
+            "encodedFrames": 396,
+            "generation": 2,
+            "idleCallbacks": 0,
+            "intervalSeconds": 7.11665125,
+            "maxEncodeMs": 21.957375,
+            "meanEncodeMs": 6.643374040404038,
+            "replayedFrames": 0,
+            "submittedFrames": 397,
+            "type": "stats"
+          }
+        ],
+        "nativeSteady": {
+          "seconds": 6.0000230420000005,
+          "capturedFps": 56.6664490486135,
+          "encodedFps": 56.49978302199993,
+          "coalescedFrames": 0,
+          "droppedFrames": 0,
+          "idleCallbacks": 0,
+          "replayedFrames": 0,
+          "replayedFps": 0,
+          "meanEncodeMs": 6.643374040404038,
+          "maxEncodeMs": 21.957375
+        },
+        "quality": {
+          "borders": {
+            "pixels": 279675,
+            "lumaMae": 1.2556906466434317,
+            "lumaP95": 7,
+            "lumaPsnrDb": 39.720429274136194,
+            "darkPixelMae": 1.1410264788871793,
+            "darkPixels": 161608
+          },
+          "checker": {
+            "pixels": 218697,
+            "lumaMae": 2.897570611393846,
+            "lumaP95": 16,
+            "lumaPsnrDb": 32.32895499007705,
+            "darkPixelMae": 3.18624053030303,
+            "darkPixels": 105600
+          },
+          "text": {
+            "pixels": 257982,
+            "lumaMae": 1.2013163709095984,
+            "lumaP95": 10,
+            "lumaPsnrDb": 37.061166099441145,
+            "darkPixelMae": 8.968724421660276,
+            "darkPixels": 23213
+          },
+          "colorBars": {
+            "pixels": 151989,
+            "lumaMae": 0.4457428840241982,
+            "lumaP95": 1,
+            "lumaPsnrDb": 50.742702888821505,
+            "darkPixelMae": 0.35136405481498706,
+            "darkPixels": 76038
+          }
+        }
+      },
+      "reference": {
+        "case": "hidpi60",
+        "actualDisplay": {
+          "actualRefreshRate": 60,
+          "backingScaleFactor": 2,
+          "displayId": 54,
+          "logicalHeight": 540,
+          "logicalWidth": 960,
+          "physicalHeight": 1080,
+          "physicalWidth": 1920,
+          "screenHeight": 540,
+          "screenWidth": 960,
+          "stage": "ready"
+        },
+        "reference": {
+          "encoderSource": "/Users/enfpdev/research/SideScreen/MacHost/Sources/VideoEncoder.swift",
+          "encoderSha256": "372197dfb2aeb62c4f318e8cc5143c8953aa4c04b4eec9ade54af053cfbb2120",
+          "referenceCommit": "9b0ac6d671b67e6d36ccde48d41c84cf636b616d"
+        },
+        "metrics": {
+          "bitrateMbps": 0.49868666666666667,
+          "callbackFps": 56.833333333333336,
+          "callbacks": 341,
+          "completeFps": 56.833333333333336,
+          "completeFrames": 341,
+          "encodedFps": 56.666666666666664,
+          "encodedFrames": 340,
+          "imageFrames": 341,
+          "keyframes": 6,
+          "maxEncodeMs": 11.058041,
+          "meanEncodeMs": 7.108355502941179,
+          "replayedFrames": 0,
+          "seconds": 6,
+          "skippedFrames": 0,
+          "stage": "baseline-result",
+          "statuses": {
+            "0": 341
+          }
+        },
+        "quality": {
+          "borders": {
+            "pixels": 279675,
+            "lumaMae": 0.7735235491195105,
+            "lumaP95": 3,
+            "lumaPsnrDb": 44.532054745056726,
+            "darkPixelMae": 0.6708990062373148,
+            "darkPixels": 161608
+          },
+          "checker": {
+            "pixels": 218697,
+            "lumaMae": 2.8971087852142463,
+            "lumaP95": 16,
+            "lumaPsnrDb": 32.329373215135966,
+            "darkPixelMae": 3.1857670454545453,
+            "darkPixels": 105600
+          },
+          "text": {
+            "pixels": 257982,
+            "lumaMae": 0.8985937003356823,
+            "lumaP95": 6,
+            "lumaPsnrDb": 39.767561273701965,
+            "darkPixelMae": 4.261534484986861,
+            "darkPixels": 23213
+          },
+          "colorBars": {
+            "pixels": 151989,
+            "lumaMae": 0.32550120995610127,
+            "lumaP95": 1,
+            "lumaPsnrDb": 52.52922798619683,
+            "darkPixelMae": 0.3498530129674341,
+            "darkPixels": 76038
+          }
+        },
+        "hevcSps": {
+          "profileSpace": 0,
+          "profileIdc": 1,
+          "highTier": false,
+          "levelIdc": 123
+        },
+        "limits": "Unmodified reference VideoEncoder, matching capture settings and cached-buffer handler; this is a pipeline comparison, not the full SideScreen application."
+      }
+    }
+  ]
+}

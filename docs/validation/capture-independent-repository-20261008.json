@@ -1,0 +1,127 @@
+{
+  "validatedAtUTC": "2026-10-08T13:43:28.551914+00:00",
+  "scope": "Actual Git repository extraction after the earlier workspace-only split. Capture runtime unchanged; no new application build or physical-device streaming test.",
+  "standalone": {
+    "path": "/Users/enfpdev/dev/node-mac-screen-capture",
+    "url": "https://github.com/enfp-dev-studio/node-mac-screen-capture",
+    "visibility": "PRIVATE",
+    "branch": "main",
+    "commit": "e6f01dd5d0d4aa56fd8038c3196ff933dadeafd5",
+    "version": "0.1.1",
+    "npmPrivate": true,
+    "npmPublished": false,
+    "sourceOriginCommit": "a7f4c77634ed235a867c9e2be3e80fb5f42382aa",
+    "ownLockfile": true,
+    "ownBuildTestsAndCI": true,
+    "runtimeDependencies": []
+  },
+  "archive": {
+    "name": "enfp-dev-studio-node-mac-screen-capture-0.1.1.tgz",
+    "sha256": "efc4efa9025c9f78442ec0269bd53aa3bd4accb10f2cc883c2014be8408a9f6b",
+    "sourceAndPackedFilesMatch": true,
+    "oldVersion0_1_0ArchivePreserved": true,
+    "unchangedRuntimeFromVendor0_1_0": {
+      "src/index.ts": true,
+      "native/capture-helper.swift": true,
+      "dist/index.js": true,
+      "dist/index.d.ts": true
+    }
+  },
+  "virtualDisplay": {
+    "captureSourcesRemoved": true,
+    "workspaceRemoved": true,
+    "captureBuildAndCIJobsRemoved": true,
+    "coreSourcesIdenticalToPreSplitHEAD": {
+      "src/index.ts": true,
+      "src/virtual_display.mm": true
+    },
+    "packagedFiles": 13,
+    "captureExcludedFromTarball": true,
+    "cleanInstallPassed": true,
+    "diagnosticCaptureSelection": "explicit absolute --capture-library or TAB_DISPLAY_NATIVE_CAPTURE_MODULE",
+    "commitOrPushPerformedThisExtraction": false
+  },
+  "sender": {
+    "dependency": "file:vendor/enfp-dev-studio-node-mac-screen-capture-0.1.1.tgz",
+    "version": "0.1.1",
+    "lockAndChecksumVerified": true,
+    "offlineStagedProductionInstall": true,
+    "installedDependencies": 212,
+    "captureSourceCheckoutRequired": false,
+    "privateGitHubCredentialsRequiredForInstall": false,
+    "encoderProbe": {
+      "platform": "darwin-arm64",
+      "config": {
+        "width": 2560,
+        "height": 1600,
+        "fps": 120,
+        "codec": "h265",
+        "bitrate": 20000000
+      },
+      "hardwareSupported": true,
+      "screenCaptured": false
+    },
+    "commitOrPushPerformedThisExtraction": false
+  },
+  "validation": {
+    "localHost": {
+      "node": "v26.3.0",
+      "architecture": "arm64"
+    },
+    "coreInputTests": 16,
+    "captureFixtureTests": 17,
+    "senderRegressionTests": 209,
+    "senderTypeLintAndFormatChecks": "passed",
+    "independentDiagnosticLoaderChecks": 8,
+    "standaloneAuditVulnerabilities": 0,
+    "bothHelperArchitecturesAndSignatures": "passed",
+    "isolatedCapturePackageMainAndTypeValidation": "passed",
+    "githubCI": {
+      "url": "https://github.com/enfp-dev-studio/node-mac-screen-capture/actions/runs/37786072406",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "runner": "macos-latest",
+          "node": 22,
+          "conclusion": "success"
+        },
+        {
+          "runner": "macos-latest",
+          "node": 24,
+          "conclusion": "success"
+        },
+        {
+          "runner": "macos-15-intel",
+          "node": 22,
+          "conclusion": "success"
+        },
+        {
+          "runner": "macos-15-intel",
+          "node": 24,
+          "conclusion": "success"
+        }
+      ],
+      "scope": "Build, fixture tests, audit, isolated package install and architecture checks; no real Intel HEVC streaming."
+    }
+  },
+  "limits": {
+    "newAppBundleBuilt": false,
+    "newPhysicalStreamingTest": false,
+    "priorSignedAppEvidenceVersion": "0.1.0",
+    "realIntelHEVCStreamingVerified": false,
+    "existingPublicGitHistoryRewritten": false
+  },
+  "evidence": {
+    "senderValidation": "/private/tmp/tabdisplay-independent-capture-20261008/sender-validation.json",
+    "stagedCleanInstall": "/private/tmp/tabdisplay-independent-capture-20261008/sender-clean-install-validation.json",
+    "previousWorkspaceValidation": "docs/validation/capture-package-split-20261008.json"
+  },
+  "claudeAppReview": {
+    "conversation": "claude.ai/epitaxy/local_ac95a753-fa08-4cf6-a026-289d66dcbc15",
+    "message": 19,
+    "readOnly": true,
+    "result": "Independent private repository and checksum-pinned file tarball satisfy independent management and app embedding without npm publication. No new extraction blocker found in reviewed manifest, loader, checksum and VD package boundaries.",
+    "limits": "No rerun of tests by Claude; no new 0.1.1 app build/signing or Intel HEVC physical streaming verification."
+  }
+}

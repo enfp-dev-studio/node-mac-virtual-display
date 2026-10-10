@@ -1,0 +1,227 @@
+{
+  "validatedAt": "2026-10-08T12:35:56.982578+00:00",
+  "scope": "Packaging split: core sources match the pre-split HEAD; capture algorithms are unchanged.",
+  "archives": {
+    "node-mac-virtual-display": {
+      "version": "1.0.18",
+      "sha256": "858f2f9f63ccf47a810bb75b479e00a342cecc3601f836c9ed9c74431817114d"
+    },
+    "@enfp-dev-studio/node-mac-screen-capture": {
+      "version": "0.1.0",
+      "sha256": "fbb0c4b144c4a9194ef5d10ee8c33d1c3e29b55c179a613e7d6e09cfe7341a9e"
+    }
+  },
+  "captureNpmPublicationRequired": false,
+  "capturePrivate": true,
+  "sourceVisibility": "Same public Git repository; private:true only prevents npm publication.",
+  "unchangedSources": [
+    {
+      "previous": "src/index.ts",
+      "current": "src/index.ts",
+      "sha256": "09de2416e2fe41d3fc7f439be3b9915d489a38f5aee74bd2861c5ed16afaa46b",
+      "unchanged": true
+    },
+    {
+      "previous": "src/virtual_display.mm",
+      "current": "src/virtual_display.mm",
+      "sha256": "54bddbfac6d36f159dd167e1e2109417a46003ff8c81f869a8b86e7fc13bd836",
+      "unchanged": true
+    },
+    {
+      "previous": "native/capture-helper.swift",
+      "current": "packages/node-mac-screen-capture/native/capture-helper.swift",
+      "sha256": "bf247cd3dd15e11f82c1254f43212fbfad6935991c070b49588f1d3a294e82e3",
+      "unchanged": true
+    },
+    {
+      "previous": "test/fixtures/capture-helper.cjs",
+      "current": "packages/node-mac-screen-capture/test/fixtures/capture-helper.cjs",
+      "sha256": "fbd734f401b4e3d8e0b050493a06b5b9d129f02cdfe6cb06066b21d7fe5bba32",
+      "unchanged": true
+    }
+  ],
+  "testsPassed": {
+    "virtualDisplay": 16,
+    "captureFixtures": 17,
+    "senderReviewAndPhysicalHarness": 209
+  },
+  "typechecks": {
+    "core": true,
+    "capture": true,
+    "isolatedCaptureConsumer": true,
+    "senderNode": true,
+    "senderWeb": true
+  },
+  "productionViteBuild": true,
+  "cleanInstall": {
+    "coreTarball": true,
+    "captureOfflineWithoutCore": true,
+    "senderProductionOfflineFrozenLock": true,
+    "senderSiblingCheckoutRequired": false,
+    "captureVendorSha256AndLockSha512Match": true
+  },
+  "macBundles": [
+    {
+      "architecture": "arm64",
+      "bundle": "/private/tmp/tabdisplay-capture-split-20261008/mac/mac-arm64/Tab Display.app",
+      "nativeChecks": 11,
+      "nativeFailures": [],
+      "strictDeepSignatureVerified": true,
+      "helpers": [
+        {
+          "architecture": "arm64",
+          "signatureVerified": true,
+          "developerId": true,
+          "hardenedRuntime": true
+        },
+        {
+          "architecture": "x64",
+          "signatureVerified": true,
+          "developerId": true,
+          "hardenedRuntime": true
+        }
+      ],
+      "packagedRuntime": {
+        "architecture": "arm64",
+        "packageVersion": "0.1.0",
+        "private": true,
+        "bundledNotices": true,
+        "coreEntryLoaded": true,
+        "importStartedNoCapture": true,
+        "unpackedHelperSelected": true,
+        "probes": [
+          {
+            "width": 2560,
+            "height": 1600,
+            "fps": 120,
+            "codec": "h265",
+            "bitrate": 20000000,
+            "quality": "ultralow",
+            "supported": true,
+            "permission": true
+          },
+          {
+            "width": 1920,
+            "height": 1080,
+            "fps": 60,
+            "codec": "h264",
+            "bitrate": 20000000,
+            "quality": "ultralow",
+            "supported": true,
+            "permission": true
+          }
+        ]
+      }
+    },
+    {
+      "architecture": "x64",
+      "bundle": "/private/tmp/tabdisplay-capture-split-20261008/mac/mac/Tab Display.app",
+      "nativeChecks": 11,
+      "nativeFailures": [],
+      "strictDeepSignatureVerified": true,
+      "helpers": [
+        {
+          "architecture": "arm64",
+          "signatureVerified": true,
+          "developerId": true,
+          "hardenedRuntime": true
+        },
+        {
+          "architecture": "x64",
+          "signatureVerified": true,
+          "developerId": true,
+          "hardenedRuntime": true
+        }
+      ],
+      "packagedRuntime": {
+        "architecture": "x64",
+        "packageVersion": "0.1.0",
+        "private": true,
+        "bundledNotices": true,
+        "coreEntryLoaded": true,
+        "importStartedNoCapture": true,
+        "unpackedHelperSelected": true,
+        "probes": [
+          {
+            "width": 2560,
+            "height": 1600,
+            "fps": 120,
+            "codec": "h265",
+            "bitrate": 20000000,
+            "quality": "ultralow",
+            "supported": false,
+            "permission": true,
+            "reason": "Create hardware encoder failed (OSStatus -12908)"
+          },
+          {
+            "width": 1920,
+            "height": 1080,
+            "fps": 60,
+            "codec": "h264",
+            "bitrate": 20000000,
+            "quality": "ultralow",
+            "supported": true,
+            "permission": true
+          }
+        ]
+      }
+    }
+  ],
+  "rosettaH265Comparison": {
+    "host": "Apple Silicon",
+    "execution": "x64 via Rosetta",
+    "configurations": [
+      "1920x1080@60, 20 Mbps, ultralow",
+      "2560x1600@120, 20 Mbps, ultralow"
+    ],
+    "beforeSplit": "supported:false",
+    "separatePackage": "supported:false",
+    "signedPackage": "supported:false",
+    "reason": "Create hardware encoder failed (OSStatus -12908)",
+    "h264At1920x1080At60": "supported:true for all three",
+    "splitRegressionObserved": false,
+    "actualIntelHardware": "unverified"
+  },
+  "boundaries": [
+    "Encoder probes do not start screen capture or prove sustained FPS.",
+    "No physical USB or Android rebuild/retest for this packaging-only change.",
+    "Actual Intel hardware and Windows builds were not executed.",
+    "Previously reviewed runtime and harness improvements remain separate work.",
+    "Notarization, npm publication, commit, push and app distribution were not performed."
+  ],
+  "claudeReview": {
+    "destination": "Claude desktop app",
+    "mode": "read-only code and file review",
+    "status": "complete",
+    "conclusion": "No new release-blocking defect confirmed in the package split after the three verification-tool corrections.",
+    "testResultsRerunByClaude": false,
+    "acceptedBoundary": "Generated helpers are built by capture CI; Sender uses a separately pinned vendor archive and lockfile.",
+    "remainingVerification": "Actual Intel H.265 hardware is unverified; Rosetta H.265 failure also occurs before the split.",
+    "previousRuntimeItems": "Lock/unplug restart validity, quit stop ordering, keyframe causality and double-failure cleanup remain separate work."
+  },
+  "coreVersionBoundary": "Core 1.0.18 dimension hardening predates this split. Sender retains its installed public core 1.0.17.",
+  "packageRejectionChecks": [
+    {
+      "case": "unexpected-source",
+      "rejected": true
+    },
+    {
+      "case": "non-addon-prebuild",
+      "rejected": true
+    }
+  ],
+  "stagedInstall": {
+    "stagedIndexSnapshot": true,
+    "productionOfflineFrozenLockInstall": true,
+    "committedFileSetIncludesVendor": true,
+    "captureChecksumVerified": true,
+    "captureAndDisplayApiLoaded": true,
+    "captureNpmPublicationRequired": false,
+    "siblingCheckoutRequired": false
+  },
+  "reviewCorrections": [
+    "Core package source allowlist and native-only prebuild validation tightened.",
+    "Manual architecture CLI requires capture helper, matching afterPack.",
+    "Explicit capture checkout and environment overrides must agree before capture or USB work."
+  ]
+}

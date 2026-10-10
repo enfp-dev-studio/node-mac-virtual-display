@@ -10,6 +10,6 @@
     "forceConsistentCasingInFileNames": true,
     "declaration": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/index.ts", "src/node-gyp-build.d.ts"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }

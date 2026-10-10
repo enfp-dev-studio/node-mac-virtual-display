@@ -28,3 +28,25 @@ jobs:
       - run: npm test
       - run: npm run lint
       - run: npm audit
+
+  package:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, macos-15-intel]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run build:ts
+      - run: npm run build:prebuilds
+      - name: Validate a clean install on the runner architecture
+        run: |
+          set -euo pipefail
+          npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP"
+          task_archive="$RUNNER_TEMP/$(node -p 'const p = require("./package.json"); `${p.name}-${p.version}.tgz`')"
+          npm run test:package -- "$task_archive"

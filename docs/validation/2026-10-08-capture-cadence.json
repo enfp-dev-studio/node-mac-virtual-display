@@ -1,0 +1,5286 @@
+{
+  "date": "2026-10-08",
+  "generatedAt": "2026-10-08T02:33:26.580Z",
+  "environment": {
+    "hardware": "Apple M2",
+    "os": "macOS 27.0.1 (26A434)",
+    "architecture": "arm64",
+    "node": "v26.3.0"
+  },
+  "scope": "Sequential tests of owned virtual displays only. Raw probe has no encoder, transport, or receiver. Current source hashes identify reproduction code; they are not historical executable hashes for the earlier exploratory matrices.",
+  "sourceSha256": {
+    "native/capture-cadence-pattern.swift": "8348d699715399dc0212753f40ee2c5dcbc4e1fc1823aab85ee6b7ba12d9eb15",
+    "native/capture-cadence-metal.swift": "de61e711ed0cf78cb7a01ea2c0eb398563566bc6048340f878622420349d88cc",
+    "native/capture-cadence-probe.swift": "d140268386ee4d7517c81da94939b886e7be269663c40d751c2f422d1ed68a4c",
+    "native/capture-test-pattern.swift": "225f51c3ee1ad8a48d12c0861ba049605e3c0a20c2f4290f02b17aa0b2c2b9f9",
+    "scripts/diagnose-capture-cadence.cjs": "57586dc349c5ded67b74a8a2c154321c1a0766afc916b778a5386b7ff572cf28",
+    "scripts/validate-reference-capture.cjs": "087a9860322adb04b1989fd9cd772076fc628bed9ed7eafe6dd3e73407588749"
+  },
+  "findings": {
+    "baseline60": "Confirmed fixture presentation/compositor-path limitation: same 120 Hz display/filter/format exceeds 60 distinct image frames/s when source submission changes. Buffered source frame IDs predominantly advance by two; layer plus explicit transaction flush predominantly advances by one.",
+    "universal60Cap": false,
+    "sustained120Validated": false,
+    "remaining120Gap": "Unresolved division among source scheduling, WindowServer composition, SCK delivery and transient encoder waiting. Existing clock values do not prove unique content presentation. No maximum-capacity claim.",
+    "sourceClock": "CG mode, NSScreen and measured CVDisplayLink agree on 120 Hz in 120 Hz cases.",
+    "measurementControl": "Disabling all pixel locking/marker reads leaves buffered complete-sample rate at 56.25 FPS vs 56 FPS with reads; no pixel-reader explanation for baseline 60.",
+    "encoder": "Actual HEVC 60 Mbps ultralow receives 92.46 complete samples/s with corrected original fixture; encoder output ~90.90/s in native stats, ~88.71/s on the independently timed Node window. 53 raw deferrals, zero VT drops; deferrals are not an exact discarded-frame count.",
+    "limits": [
+      "Complete samples do not guarantee pixel-distinct content; uniqueFPS is derived from decoded frame IDs only when markerDecodingEnabled=true.",
+      "Renderer progress is lifetime cadence; capture measurements use warmup and shorter windows. Do not subtract their FPS as synchronized stage counters.",
+      "Virtual Metal drawables report only zero presentedTime in these tests; no direct presentation success/drop inference.",
+      "The initial heavy renderer did not establish source liveness; its rate is excluded.",
+      "CPU/GPU load and thread scheduling are uncontrolled; repeats have long outliers. These are diagnostics, not a sustained 120 FPS qualification.",
+      "Physical Android USB and receiver rendering were not exercised."
+    ]
+  },
+  "rawResults": [
+    {
+      "run": "initial",
+      "case": "default120",
+      "startedAt": "2026-10-08T02:22:49.792Z",
+      "seconds": 4,
+      "warmup": 1,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "timer-default",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck"
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 58,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": false,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123551.491916291,
+        "stage": "ready",
+        "variant": "timer-default",
+        "windowId": 2673
+      },
+      "capture": {
+        "completeFPS": 54.5,
+        "uniqueFPS": 53.75,
+        "callbackFPS": 82.75,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 218,
+          "idle": 113
+        },
+        "validMarkers": 218,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 214,
+        "skippedFrameIds": 241,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "2": 125,
+          "4": 1,
+          "6": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 166.66750000149477,
+          "meanMs": 18.279661290338993,
+          "minMs": 8.333374993526377,
+          "p50Ms": 16.66675000160467,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 50.000250004814006,
+          "positiveIntervals": 217,
+          "repeated": 0,
+          "samples": 218
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 207,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 3,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 2,
+            "milliseconds": 50
+          },
+          {
+            "count": 1,
+            "milliseconds": 25
+          },
+          {
+            "count": 1,
+            "milliseconds": 33.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 58.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 108.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 166.7
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 175.211459,
+          "meanMs": 0.6025038972809666
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000304603,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 113.32157633292299,
+          "maxMs": 194.27525000355672,
+          "p50Ms": 8.331333330716006,
+          "p95Ms": 9.252291667507961,
+          "samples": 557
+        },
+        "callbacks": 557,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 113.60336986691577,
+          "maxMs": 190.17133332090452,
+          "p50Ms": 8.327916671987623,
+          "p95Ms": 9.253041673218831,
+          "samples": 559
+        },
+        "drawMaxMs": 0.41745833004824817,
+        "drawMeanMs": 0.024268634657730385,
+        "draws": 559,
+        "elapsedSeconds": 5.08075433333579,
+        "flushCalls": 0,
+        "frameId": 559,
+        "screenLastDisplayUpdateTimestamp": 123556.483607916,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 0,
+        "variant": "timer-default"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-R1WOkV/default120.json"
+    },
+    {
+      "run": "initial",
+      "case": "flush120",
+      "startedAt": "2026-10-08T02:22:57.100Z",
+      "seconds": 4,
+      "warmup": 1,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "timer-window-flush",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck"
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 59,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": false,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123560.65031025,
+        "stage": "ready",
+        "variant": "timer-window-flush",
+        "windowId": 2714
+      },
+      "capture": {
+        "completeFPS": 60.25,
+        "uniqueFPS": 59,
+        "callbackFPS": 88.75,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 241,
+          "idle": 114
+        },
+        "validMarkers": 241,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 235,
+        "skippedFrameIds": 236,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "0": 5,
+          "2": 121,
+          "4": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 75.00037499994505,
+          "meanMs": 16.562582812487864,
+          "minMs": 8.333374993526377,
+          "p50Ms": 16.66675000160467,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 25.000124995131046,
+          "positiveIntervals": 240,
+          "repeated": 0,
+          "samples": 241
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 221,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 15,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 2,
+            "milliseconds": 25
+          },
+          {
+            "count": 1,
+            "milliseconds": 41.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 75
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 9.237291,
+          "meanMs": 0.17296607323943672
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000304102,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 116.82931199279992,
+          "maxMs": 71.48495833098423,
+          "p50Ms": 8.32654167606961,
+          "p95Ms": 9.250375005649403,
+          "samples": 688
+        },
+        "callbacks": 688,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 116.8137521026714,
+          "maxMs": 71.47125000483356,
+          "p50Ms": 8.325499991769902,
+          "p95Ms": 9.25870833452791,
+          "samples": 689
+        },
+        "drawMaxMs": 0.23025000700727105,
+        "drawMeanMs": 0.03154493235754517,
+        "draws": 689,
+        "elapsedSeconds": 6.219815708333044,
+        "flushCalls": 688,
+        "frameId": 689,
+        "screenLastDisplayUpdateTimestamp": 123566.667007,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 0,
+        "variant": "timer-window-flush"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-R1WOkV/flush120.json"
+    },
+    {
+      "run": "initial",
+      "case": "layer120",
+      "startedAt": "2026-10-08T02:23:07.154Z",
+      "seconds": 4,
+      "warmup": 1,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "timer-layer-flush",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck"
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 60,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": true,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123571.5420495,
+        "stage": "ready",
+        "variant": "timer-layer-flush",
+        "windowId": 2755
+      },
+      "capture": {
+        "completeFPS": 102,
+        "uniqueFPS": 102,
+        "callbackFPS": 102.5,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 408,
+          "idle": 2
+        },
+        "validMarkers": 408,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 407,
+        "skippedFrameIds": 68,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "1": 112,
+          "2": 14,
+          "19": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 158.3341250079684,
+          "meanMs": 9.82805896803985,
+          "minMs": 8.333374993526377,
+          "p50Ms": 8.333374993526377,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 16.66675000160467,
+          "positiveIntervals": 407,
+          "repeated": 0,
+          "samples": 408
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 362,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 42,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 25
+          },
+          {
+            "count": 1,
+            "milliseconds": 100
+          },
+          {
+            "count": 1,
+            "milliseconds": 158.3
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 172.726167,
+          "meanMs": 0.5861724512195128
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000300973,
+          "measuredFPS": 119.5
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 111.84298959670774,
+          "maxMs": 116.41724999935832,
+          "p50Ms": 8.320500011905096,
+          "p95Ms": 10.033124999608845,
+          "samples": 766
+        },
+        "callbacks": 766,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 109.15175867028078,
+          "maxMs": 177.8761250025127,
+          "p50Ms": 8.326041657710448,
+          "p95Ms": 10.045458329841495,
+          "samples": 767
+        },
+        "drawMaxMs": 3.0860416736686602,
+        "drawMeanMs": 0.036333387420419236,
+        "draws": 767,
+        "elapsedSeconds": 7.4217081250099,
+        "flushCalls": 0,
+        "frameId": 767,
+        "screenLastDisplayUpdateTimestamp": 123578.575418,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 766,
+        "variant": "timer-layer-flush"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-R1WOkV/layer120.json"
+    },
+    {
+      "run": "initial",
+      "case": "displayLink120",
+      "startedAt": "2026-10-08T02:23:18.655Z",
+      "seconds": 4,
+      "warmup": 1,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "display-link",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck"
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 61,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": false,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123582.192123125,
+        "stage": "ready",
+        "variant": "display-link",
+        "windowId": 2796
+      },
+      "capture": {
+        "completeFPS": 55.25,
+        "uniqueFPS": 54.5,
+        "callbackFPS": 81,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 221,
+          "idle": 103
+        },
+        "validMarkers": 221,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 217,
+        "skippedFrameIds": 17,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "0": 3,
+          "1": 122,
+          "8": 1,
+          "10": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 175.00087499502115,
+          "meanMs": 18.14403011363042,
+          "minMs": 8.333374993526377,
+          "p50Ms": 16.66675000160467,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 41.66687501128763,
+          "positiveIntervals": 220,
+          "repeated": 0,
+          "samples": 221
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 205,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 10,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 25
+          },
+          {
+            "count": 1,
+            "milliseconds": 41.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 91.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 158.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 175
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 185.24425,
+          "meanMs": 0.7484082932098757
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.9994000030392,
+          "measuredFPS": 119
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 58.42916956829092,
+          "maxMs": 93.67966666468419,
+          "p50Ms": 16.667083342326805,
+          "p95Ms": 16.69854167266749,
+          "samples": 345
+        },
+        "callbacks": 345,
+        "displayLinkCadence": {
+          "fps": 58.435056940331314,
+          "maxMs": 94.23066666931845,
+          "p50Ms": 16.66658333851956,
+          "p95Ms": 16.66658333851956,
+          "samples": 345
+        },
+        "displayLinkDurationMs": 8.333333333333336,
+        "displayLinkTargetTimestamp": 123588.65042420836,
+        "drawCadence": {
+          "fps": 58.49941869388311,
+          "maxMs": 93.90083333710209,
+          "p50Ms": 16.66708332777489,
+          "p95Ms": 16.809624998131767,
+          "samples": 346
+        },
+        "drawMaxMs": 0.23229166981764138,
+        "drawMeanMs": 0.03456563066026314,
+        "draws": 346,
+        "elapsedSeconds": 6.230643541668542,
+        "flushCalls": 0,
+        "frameId": 346,
+        "screenLastDisplayUpdateTimestamp": 123588.65048875,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 0,
+        "variant": "display-link"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-R1WOkV/displayLink120.json"
+    },
+    {
+      "run": "initial",
+      "case": "heavy120",
+      "startedAt": "2026-10-08T02:23:29.097Z",
+      "seconds": 4,
+      "warmup": 1,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "timer-heavy",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck"
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 62,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": false,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123592.183857458,
+        "stage": "ready",
+        "variant": "timer-heavy",
+        "windowId": 2837
+      },
+      "capture": {
+        "completeFPS": 10.25,
+        "uniqueFPS": 0.25,
+        "callbackFPS": 66,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 41,
+          "idle": 223
+        },
+        "validMarkers": 38,
+        "invalidMarkers": 3,
+        "formatMismatches": 0,
+        "changedFrameIds": 0,
+        "skippedFrameIds": 0,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "0": 37
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 441.668874991592,
+          "meanMs": 43.54188437500852,
+          "minMs": 8.333374993526377,
+          "p50Ms": 8.333375008078292,
+          "p95Ms": 183.33425000309944,
+          "p99Ms": 266.6680000111228,
+          "positiveIntervals": 40,
+          "repeated": 0,
+          "samples": 41
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 23,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 5,
+            "milliseconds": 25
+          },
+          {
+            "count": 3,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 2,
+            "milliseconds": 33.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 50
+          },
+          {
+            "count": 1,
+            "milliseconds": 75
+          },
+          {
+            "count": 1,
+            "milliseconds": 141.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 150
+          },
+          {
+            "count": 1,
+            "milliseconds": 183.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 266.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 441.7
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 225.748417,
+          "meanMs": 1.2406998030303023
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000310964,
+          "measuredFPS": 119.25
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 105.74768015938332,
+          "maxMs": 63.440958329010755,
+          "p50Ms": 8.89008333615493,
+          "p95Ms": 10.8546249975916,
+          "samples": 88
+        },
+        "callbacks": 88,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 97.97869761173882,
+          "maxMs": 75.5664583411999,
+          "p50Ms": 8.940291663748212,
+          "p95Ms": 12.162250000983477,
+          "samples": 89
+        },
+        "drawMaxMs": 61.67341666878201,
+        "drawMeanMs": 1.4348071170879235,
+        "draws": 89,
+        "elapsedSeconds": 1.149672333340277,
+        "flushCalls": 0,
+        "frameId": 89,
+        "screenLastDisplayUpdateTimestamp": 123593.450530458,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 0,
+        "variant": "timer-heavy"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": "Source heartbeat stopped and valid markers stayed at frame 181; pre-exit-status runner did not establish source health. Not evidence of capture capacity.",
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-R1WOkV/heavy120.json"
+    },
+    {
+      "run": "initial",
+      "case": "bgra120",
+      "startedAt": "2026-10-08T02:23:39.267Z",
+      "seconds": 4,
+      "warmup": 1,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "timer-default",
+        "pixelFormat": "bgra",
+        "scope": "display",
+        "backend": "sck"
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 63,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": false,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123601.625588916,
+        "stage": "ready",
+        "variant": "timer-default",
+        "windowId": 2878
+      },
+      "capture": {
+        "completeFPS": 55.5,
+        "uniqueFPS": 53.5,
+        "callbackFPS": 81,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 222,
+          "idle": 102
+        },
+        "validMarkers": 222,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 213,
+        "skippedFrameIds": 240,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "0": 8,
+          "2": 114,
+          "4": 2,
+          "7": 1,
+          "8": 1,
+          "14": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 125.00062500475906,
+          "meanMs": 18.024222850636264,
+          "minMs": 8.333374993526377,
+          "p50Ms": 16.66675000160467,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 66.66700000641868,
+          "positiveIntervals": 221,
+          "repeated": 0,
+          "samples": 222
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 198,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 14,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 3,
+            "milliseconds": 25
+          },
+          {
+            "count": 2,
+            "milliseconds": 50
+          },
+          {
+            "count": 1,
+            "milliseconds": 66.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 91.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 108.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 125
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 45.360709,
+          "meanMs": 0.5625152932098769
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000304187,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 113.3220504932717,
+          "maxMs": 201.7972500034375,
+          "p50Ms": 8.329458330990747,
+          "p95Ms": 10.222750002867542,
+          "samples": 668
+        },
+        "callbacks": 668,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 113.4199773139777,
+          "maxMs": 194.53120834077708,
+          "p50Ms": 8.333583333296701,
+          "p95Ms": 10.233166671241634,
+          "samples": 670
+        },
+        "drawMaxMs": 0.7178750092862174,
+        "drawMeanMs": 0.029339925789990142,
+        "draws": 670,
+        "elapsedSeconds": 6.228707958332961,
+        "flushCalls": 0,
+        "frameId": 670,
+        "screenLastDisplayUpdateTimestamp": 123608.750624541,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 0,
+        "variant": "timer-default"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-R1WOkV/bgra120.json"
+    },
+    {
+      "run": "initial",
+      "case": "nativeInterval120",
+      "startedAt": "2026-10-08T02:23:48.844Z",
+      "seconds": 4,
+      "warmup": 1,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 0,
+        "variant": "timer-default",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck"
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 64,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": false,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123611.550655083,
+        "stage": "ready",
+        "variant": "timer-default",
+        "windowId": 2919
+      },
+      "capture": {
+        "completeFPS": 55.25,
+        "uniqueFPS": 52.25,
+        "callbackFPS": 103,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 221,
+          "idle": 191
+        },
+        "validMarkers": 221,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 208,
+        "skippedFrameIds": 245,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "0": 12,
+          "2": 108,
+          "4": 4,
+          "7": 1,
+          "10": 1,
+          "14": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 116.66725001123268,
+          "meanMs": 18.10615113638712,
+          "minMs": 8.333374993526377,
+          "p50Ms": 16.66675000160467,
+          "p95Ms": 25.00012500968296,
+          "p99Ms": 66.66700000641868,
+          "positiveIntervals": 220,
+          "repeated": 0,
+          "samples": 221
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 186,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 19,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 6,
+            "milliseconds": 25
+          },
+          {
+            "count": 3,
+            "milliseconds": 33.3
+          },
+          {
+            "count": 2,
+            "milliseconds": 66.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 50
+          },
+          {
+            "count": 1,
+            "milliseconds": 83.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 91.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 116.7
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 80.779291,
+          "meanMs": 0.27122552427184454
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000303788,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 111.9204548052756,
+          "maxMs": 190.50662500376347,
+          "p50Ms": 8.338541665580124,
+          "p95Ms": 9.002541672089137,
+          "samples": 667
+        },
+        "callbacks": 667,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 112.5393864090605,
+          "maxMs": 190.47358333773445,
+          "p50Ms": 8.337166655110195,
+          "p95Ms": 9.014499999466352,
+          "samples": 667
+        },
+        "drawMaxMs": 0.4707500047516078,
+        "drawMeanMs": 0.031296789049760146,
+        "draws": 667,
+        "elapsedSeconds": 6.214996750000864,
+        "flushCalls": 0,
+        "frameId": 667,
+        "screenLastDisplayUpdateTimestamp": 123618.250688583,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 0,
+        "variant": "timer-default"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-R1WOkV/nativeInterval120.json"
+    },
+    {
+      "run": "initial",
+      "case": "relaxedInterval120",
+      "startedAt": "2026-10-08T02:23:58.405Z",
+      "seconds": 4,
+      "warmup": 1,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 240,
+        "variant": "timer-default",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck"
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 65,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": false,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123627.950753041,
+        "stage": "ready",
+        "variant": "timer-default",
+        "windowId": 2960
+      },
+      "capture": {
+        "completeFPS": 69.5,
+        "uniqueFPS": 58.75,
+        "callbackFPS": 116.75,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 278,
+          "idle": 189
+        },
+        "validMarkers": 278,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 234,
+        "skippedFrameIds": 234,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "0": 43,
+          "1": 3,
+          "2": 79,
+          "3": 2
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 58.33362499834038,
+          "meanMs": 14.320167870048959,
+          "minMs": 8.333374993526377,
+          "p50Ms": 16.66675000160467,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 16.66675000160467,
+          "positiveIntervals": 277,
+          "repeated": 0,
+          "samples": 278
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 193,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 83,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 58.3
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 3.406583,
+          "meanMs": 0.06883030406852249
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000303356,
+          "measuredFPS": 119.75
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 108.27509317578637,
+          "maxMs": 373.5035416757455,
+          "p50Ms": 8.582124995882623,
+          "p95Ms": 8.939291656133719,
+          "samples": 705
+        },
+        "callbacks": 705,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 108.14953260609964,
+          "maxMs": 373.51716666307766,
+          "p50Ms": 8.487208324368112,
+          "p95Ms": 8.96749999083113,
+          "samples": 706
+        },
+        "drawMaxMs": 1.507666675024666,
+        "drawMeanMs": 0.029338290770610703,
+        "draws": 706,
+        "elapsedSeconds": 10.766836124996189,
+        "flushCalls": 0,
+        "frameId": 706,
+        "screenLastDisplayUpdateTimestamp": 123635.050788541,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 0,
+        "variant": "timer-default"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-R1WOkV/relaxedInterval120.json"
+    },
+    {
+      "run": "initial",
+      "case": "window120",
+      "startedAt": "2026-10-08T02:24:15.441Z",
+      "seconds": 4,
+      "warmup": 1,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "timer-default",
+        "pixelFormat": "nv12",
+        "scope": "window",
+        "backend": "sck"
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 66,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": false,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123639.334171625,
+        "stage": "ready",
+        "variant": "timer-default",
+        "windowId": 3001
+      },
+      "capture": {
+        "completeFPS": 53.75,
+        "uniqueFPS": 53,
+        "callbackFPS": 89.25,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 215,
+          "idle": 142
+        },
+        "validMarkers": 215,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 211,
+        "skippedFrameIds": 249,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "0": 2,
+          "1": 3,
+          "2": 118,
+          "3": 1,
+          "4": 1,
+          "6": 2
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 208.67695832566824,
+          "meanMs": 18.765971573204602,
+          "minMs": 7.512041658628732,
+          "p50Ms": 17.732124993926845,
+          "p95Ms": 20.012333334307186,
+          "p99Ms": 54.81170833809301,
+          "positiveIntervals": 214,
+          "repeated": 0,
+          "samples": 215
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 15,
+            "milliseconds": 17.8
+          },
+          {
+            "count": 14,
+            "milliseconds": 17.9
+          },
+          {
+            "count": 11,
+            "milliseconds": 15.5
+          },
+          {
+            "count": 11,
+            "milliseconds": 18
+          },
+          {
+            "count": 10,
+            "milliseconds": 17.7
+          },
+          {
+            "count": 9,
+            "milliseconds": 15.7
+          },
+          {
+            "count": 6,
+            "milliseconds": 14.2
+          },
+          {
+            "count": 6,
+            "milliseconds": 19.2
+          },
+          {
+            "count": 5,
+            "milliseconds": 14
+          },
+          {
+            "count": 5,
+            "milliseconds": 17.6
+          },
+          {
+            "count": 5,
+            "milliseconds": 18.9
+          },
+          {
+            "count": 5,
+            "milliseconds": 19.1
+          },
+          {
+            "count": 4,
+            "milliseconds": 14.5
+          },
+          {
+            "count": 4,
+            "milliseconds": 15.4
+          },
+          {
+            "count": 4,
+            "milliseconds": 18.2
+          },
+          {
+            "count": 4,
+            "milliseconds": 18.4
+          },
+          {
+            "count": 4,
+            "milliseconds": 18.8
+          },
+          {
+            "count": 4,
+            "milliseconds": 19.3
+          },
+          {
+            "count": 3,
+            "milliseconds": 9.2
+          },
+          {
+            "count": 3,
+            "milliseconds": 14.4
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 18.339833,
+          "meanMs": 0.13958469747899158
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000302803,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 107.96228025230795,
+          "maxMs": 437.1055416704621,
+          "p50Ms": 8.320666660438292,
+          "p95Ms": 9.917166666127741,
+          "samples": 856
+        },
+        "callbacks": 856,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 108.16512656099557,
+          "maxMs": 437.1120416763006,
+          "p50Ms": 8.318041669554077,
+          "p95Ms": 9.922124998411164,
+          "samples": 858
+        },
+        "drawMaxMs": 0.12270834122318774,
+        "drawMeanMs": 0.025215374841381925,
+        "draws": 858,
+        "elapsedSeconds": 8.193390708329389,
+        "flushCalls": 0,
+        "frameId": 858,
+        "screenLastDisplayUpdateTimestamp": 123647.342545,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 0,
+        "variant": "timer-default"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-R1WOkV/window120.json"
+    },
+    {
+      "run": "initial",
+      "case": "cgStream120",
+      "startedAt": "2026-10-08T02:24:27.693Z",
+      "seconds": 4,
+      "warmup": 1,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "timer-default",
+        "pixelFormat": "bgra",
+        "scope": "display",
+        "backend": "cgdisplaystream"
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 67,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": false,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123649.83424375,
+        "stage": "ready",
+        "variant": "timer-default",
+        "windowId": 3044
+      },
+      "capture": {
+        "completeFPS": 71.75,
+        "uniqueFPS": 55.75,
+        "callbackFPS": 71.75,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 287
+        },
+        "validMarkers": 287,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 222,
+        "skippedFrameIds": 239,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "0": 58,
+          "1": 1,
+          "2": 67,
+          "3": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 241.66787500143982,
+          "meanMs": 13.98608391610759,
+          "minMs": 8.333374993526377,
+          "p50Ms": 16.666749987052754,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 25.000124995131046,
+          "positiveIntervals": 286,
+          "repeated": 0,
+          "samples": 287
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 154,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 127,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 3,
+            "milliseconds": 25
+          },
+          {
+            "count": 1,
+            "milliseconds": 58.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 241.7
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 5.556125,
+          "meanMs": 0.24712238675958195
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000304082,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 114.91472877238536,
+          "maxMs": 170.36429166910239,
+          "p50Ms": 8.319916654727422,
+          "p95Ms": 10.064291665912606,
+          "samples": 680
+        },
+        "callbacks": 680,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 114.93201127150448,
+          "maxMs": 170.29550000734162,
+          "p50Ms": 8.31399999151472,
+          "p95Ms": 10.05425000039395,
+          "samples": 681
+        },
+        "drawMaxMs": 1.876374997664243,
+        "drawMeanMs": 0.026127508644523338,
+        "draws": 681,
+        "elapsedSeconds": 6.209533000001102,
+        "flushCalls": 0,
+        "frameId": 681,
+        "screenLastDisplayUpdateTimestamp": 123657.06761325,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 0,
+        "variant": "timer-default"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-R1WOkV/cgStream120.json"
+    },
+    {
+      "run": "initial",
+      "case": "display60",
+      "startedAt": "2026-10-08T02:24:36.667Z",
+      "seconds": 4,
+      "warmup": 1,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 60,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "timer-default",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck"
+      },
+      "source": {
+        "actualRefreshRate": 60,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 68,
+        "displayUpdateGranularity": 0.016666666,
+        "isLayerBacked": false,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 60,
+        "maximumRefreshInterval": 0.016666666,
+        "minimumRefreshInterval": 0.016666666,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123660.342644208,
+        "stage": "ready",
+        "variant": "timer-default",
+        "windowId": 3087
+      },
+      "capture": {
+        "completeFPS": 59.75,
+        "uniqueFPS": 59.75,
+        "callbackFPS": 60,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 239,
+          "idle": 1
+        },
+        "validMarkers": 239,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 238,
+        "skippedFrameIds": 240,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "2": 126,
+          "4": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 33.33350000320934,
+          "meanMs": 16.736778361366245,
+          "minMs": 16.666749987052754,
+          "p50Ms": 16.66675000160467,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 16.66675000160467,
+          "positiveIntervals": 238,
+          "repeated": 0,
+          "samples": 239
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 237,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 33.3
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 0.515583,
+          "meanMs": 0.06169377916666666
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 60,
+          "actualPeriodFPS": 59.99970000152868,
+          "measuredFPS": 60
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 117.94145060398803,
+          "maxMs": 64.93062499794178,
+          "p50Ms": 8.326000010129064,
+          "p95Ms": 10.01312499283813,
+          "samples": 692
+        },
+        "callbacks": 692,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 117.82614006680254,
+          "maxMs": 64.95987500238698,
+          "p50Ms": 8.325708331540227,
+          "p95Ms": 10.030249992269091,
+          "samples": 693
+        },
+        "drawMaxMs": 0.09954167762771249,
+        "drawMeanMs": 0.024232082509887263,
+        "draws": 693,
+        "elapsedSeconds": 6.214745208329987,
+        "flushCalls": 0,
+        "frameId": 693,
+        "screenLastDisplayUpdateTimestamp": 123666.342674208,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 0,
+        "variant": "timer-default"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-R1WOkV/display60.json"
+    },
+    {
+      "run": "initial",
+      "case": "display90",
+      "startedAt": "2026-10-08T02:24:45.978Z",
+      "seconds": 4,
+      "warmup": 1,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 90,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "timer-default",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck"
+      },
+      "source": {
+        "actualRefreshRate": 90,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 69,
+        "displayUpdateGranularity": 0.011111125,
+        "isLayerBacked": false,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 90,
+        "maximumRefreshInterval": 0.011111125,
+        "minimumRefreshInterval": 0.011111125,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123668.454585375,
+        "stage": "ready",
+        "variant": "timer-default",
+        "windowId": 3126
+      },
+      "capture": {
+        "completeFPS": 53.75,
+        "uniqueFPS": 53.75,
+        "callbackFPS": 77,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 215,
+          "idle": 93
+        },
+        "validMarkers": 215,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 214,
+        "skippedFrameIds": 244,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "2": 126,
+          "4": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 200.00024999899324,
+          "meanMs": 18.58776985984796,
+          "minMs": 11.111124986200593,
+          "p50Ms": 22.222249986953102,
+          "p95Ms": 22.222250001505017,
+          "p99Ms": 44.444500003010035,
+          "positiveIntervals": 214,
+          "repeated": 0,
+          "samples": 215
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 106,
+            "milliseconds": 11.1
+          },
+          {
+            "count": 104,
+            "milliseconds": 22.2
+          },
+          {
+            "count": 1,
+            "milliseconds": 44.4
+          },
+          {
+            "count": 1,
+            "milliseconds": 66.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 177.8
+          },
+          {
+            "count": 1,
+            "milliseconds": 200
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 3.44975,
+          "meanMs": 0.20289975324675336
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 89.99988750014063,
+          "actualPeriodFPS": 89.99988750014063,
+          "measuredFPS": 90
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 112.98304902433202,
+          "maxMs": 167.99145832192153,
+          "p50Ms": 8.321708330186084,
+          "p95Ms": 10.063958339742385,
+          "samples": 563
+        },
+        "callbacks": 563,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 113.68125557881518,
+          "maxMs": 157.6737083378248,
+          "p50Ms": 8.314166669151746,
+          "p95Ms": 10.066333328722976,
+          "samples": 564
+        },
+        "drawMaxMs": 0.21154167188797146,
+        "drawMeanMs": 0.022284870347832098,
+        "draws": 564,
+        "elapsedSeconds": 5.097250208331388,
+        "flushCalls": 0,
+        "frameId": 564,
+        "screenLastDisplayUpdateTimestamp": 123673.487925,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 0,
+        "variant": "timer-default"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-R1WOkV/display90.json"
+    },
+    {
+      "run": "initial",
+      "case": "capture60",
+      "startedAt": "2026-10-08T02:24:54.241Z",
+      "seconds": 4,
+      "warmup": 1,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 60,
+        "variant": "timer-default",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck"
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 70,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": false,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123677.284423541,
+        "stage": "ready",
+        "variant": "timer-default",
+        "windowId": 3163
+      },
+      "capture": {
+        "completeFPS": 52.25,
+        "uniqueFPS": 51.25,
+        "callbackFPS": 53.75,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 209,
+          "idle": 6
+        },
+        "validMarkers": 209,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 204,
+        "skippedFrameIds": 250,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "0": 4,
+          "2": 114,
+          "4": 7,
+          "8": 1,
+          "18": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 166.66749998694286,
+          "meanMs": 19.1106724760175,
+          "minMs": 8.333374993526377,
+          "p50Ms": 16.66675000160467,
+          "p95Ms": 33.33350000320934,
+          "p99Ms": 50.000250004814006,
+          "positiveIntervals": 208,
+          "repeated": 0,
+          "samples": 209
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 189,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 12,
+            "milliseconds": 33.3
+          },
+          {
+            "count": 2,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 25
+          },
+          {
+            "count": 1,
+            "milliseconds": 50
+          },
+          {
+            "count": 1,
+            "milliseconds": 66.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 100
+          },
+          {
+            "count": 1,
+            "milliseconds": 166.7
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 9.693542,
+          "meanMs": 0.2214180279069767
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000304059,
+          "measuredFPS": 119.75
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 110.54702762842986,
+          "maxMs": 208.11729166598525,
+          "p50Ms": 8.335791659192182,
+          "p95Ms": 9.260250008082949,
+          "samples": 542
+        },
+        "callbacks": 542,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 110.59225271520772,
+          "maxMs": 208.1004999927245,
+          "p50Ms": 8.340416665305384,
+          "p95Ms": 9.25945834023878,
+          "samples": 543
+        },
+        "drawMaxMs": 0.1619166723685339,
+        "drawMeanMs": 0.03176258470538084,
+        "draws": 543,
+        "elapsedSeconds": 5.140597375007928,
+        "flushCalls": 0,
+        "frameId": 543,
+        "screenLastDisplayUpdateTimestamp": 123683.234453291,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 0,
+        "variant": "timer-default"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-R1WOkV/capture60.json"
+    },
+    {
+      "run": "metal",
+      "case": "metal120",
+      "startedAt": "2026-10-08T02:25:50.152Z",
+      "seconds": 6,
+      "warmup": 2,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "metal-vsync",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck",
+        "renderer": "metal"
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "displayId": 71,
+        "displaySyncEnabled": true,
+        "displayUpdateGranularity": 0.008333333,
+        "drawableHeight": 720,
+        "drawableWidth": 1280,
+        "framebufferOnly": false,
+        "gpuName": "Apple M2",
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumDrawableCount": 3,
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "presentsWithTransaction": false,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123733.184794041,
+        "stage": "ready",
+        "variant": "metal-vsync",
+        "windowId": 3204
+      },
+      "capture": {
+        "completeFPS": 97.66666666666667,
+        "uniqueFPS": 97.66666666666667,
+        "callbackFPS": 98,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 586,
+          "idle": 2
+        },
+        "validMarkers": 586,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 585,
+        "skippedFrameIds": 114,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "1": 107,
+          "2": 20
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 133.33399999828544,
+          "meanMs": 10.242216452995004,
+          "minMs": 8.333374993526377,
+          "p50Ms": 8.333375008078292,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 33.33350000320934,
+          "positiveIntervals": 585,
+          "repeated": 0,
+          "samples": 586
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 493,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 78,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 6,
+            "milliseconds": 25
+          },
+          {
+            "count": 3,
+            "milliseconds": 33.3
+          },
+          {
+            "count": 2,
+            "milliseconds": 41.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 50
+          },
+          {
+            "count": 1,
+            "milliseconds": 66.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 133.3
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 5.174792,
+          "meanMs": 0.16552825170068042
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000300148,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbacks": 1051,
+        "commandErrors": 0,
+        "completed": 1050,
+        "completedCadence": {
+          "fps": 116.62102800449298,
+          "maxMs": 58.69583334424533,
+          "meanMs": 8.574782928182332,
+          "p50Ms": 8.337499995832331,
+          "p95Ms": 8.949249997385778,
+          "samples": 1050
+        },
+        "completedWithoutPresentationAtSnapshot": 2,
+        "drawableMisses": 0,
+        "dropped": 1048,
+        "elapsedSeconds": 9.81364941666834,
+        "gpuDuration": {
+          "maxMs": 3.5567916638683528,
+          "meanMs": 0.12756250015670612,
+          "p50Ms": 0.04787500074598938,
+          "p95Ms": 0.1325416669715196,
+          "samples": 1050
+        },
+        "lastError": "",
+        "lastPresentedFrameId": 0,
+        "nextDrawableWait": {
+          "maxMs": 55.81874999916181,
+          "meanMs": 6.108828214207842,
+          "p50Ms": 5.450458324048668,
+          "p95Ms": 8.316416657180525,
+          "samples": 1050
+        },
+        "pendingPresentation": 2,
+        "presented": 0,
+        "presentedCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "screenLastDisplayUpdateTimestamp": 123742.484840541,
+        "stage": "pattern-progress",
+        "submitted": 1050,
+        "submittedCadence": {
+          "fps": 116.60291685330587,
+          "maxMs": 58.35674999980256,
+          "meanMs": 8.576114791862931,
+          "p50Ms": 8.332833327585831,
+          "p95Ms": 8.626083334092982,
+          "samples": 1050
+        },
+        "uniquePresentedFrameIDs": 0,
+        "variant": "metal-vsync"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-gSVF8U/metal120.json"
+    },
+    {
+      "run": "metal",
+      "case": "metalNoVsync120",
+      "startedAt": "2026-10-08T02:26:02.675Z",
+      "seconds": 6,
+      "warmup": 2,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "metal-no-vsync",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck",
+        "renderer": "metal"
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "displayId": 72,
+        "displaySyncEnabled": false,
+        "displayUpdateGranularity": 0.008333333,
+        "drawableHeight": 720,
+        "drawableWidth": 1280,
+        "framebufferOnly": false,
+        "gpuName": "Apple M2",
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumDrawableCount": 3,
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "presentsWithTransaction": false,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123746.468216083,
+        "stage": "ready",
+        "variant": "metal-no-vsync",
+        "windowId": 3245
+      },
+      "capture": {
+        "completeFPS": 107,
+        "uniqueFPS": 107,
+        "callbackFPS": 107,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 642
+        },
+        "validMarkers": 642,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 641,
+        "skippedFrameIds": 77,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "1": 108,
+          "2": 13,
+          "3": 6
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 25.00012500968296,
+          "meanMs": 9.334420046815213,
+          "minMs": 8.333374993526377,
+          "p50Ms": 8.333375008078292,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 16.66675000160467,
+          "positiveIntervals": 641,
+          "repeated": 0,
+          "samples": 642
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 570,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 65,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 6,
+            "milliseconds": 25
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 5.547125,
+          "meanMs": 0.138547906542056
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000300172,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbacks": 1056,
+        "commandErrors": 0,
+        "completed": 1055,
+        "completedCadence": {
+          "fps": 117.29264809218195,
+          "maxMs": 92.88775001186877,
+          "meanMs": 8.525683546798994,
+          "p50Ms": 8.33250000141561,
+          "p95Ms": 8.627625007648021,
+          "samples": 1055
+        },
+        "completedWithoutPresentationAtSnapshot": 0,
+        "drawableMisses": 0,
+        "dropped": 1055,
+        "elapsedSeconds": 9.02031795833318,
+        "gpuDuration": {
+          "maxMs": 1.9322500011185184,
+          "meanMs": 0.06147116896866322,
+          "p50Ms": 0.047791661927476525,
+          "p95Ms": 0.10137500066775829,
+          "samples": 1055
+        },
+        "lastError": "",
+        "lastPresentedFrameId": 0,
+        "nextDrawableWait": {
+          "maxMs": 74.6287916554138,
+          "meanMs": 0.19052544956304535,
+          "p50Ms": 0.019083323422819376,
+          "p95Ms": 0.04433334106579423,
+          "samples": 1056
+        },
+        "pendingPresentation": 0,
+        "presented": 0,
+        "presentedCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "screenLastDisplayUpdateTimestamp": 123755.459927708,
+        "stage": "pattern-progress",
+        "submitted": 1055,
+        "submittedCadence": {
+          "fps": 117.2546834997642,
+          "maxMs": 89.7067916666856,
+          "meanMs": 8.52844398323766,
+          "p50Ms": 8.333333331393078,
+          "p95Ms": 8.427958324318752,
+          "samples": 1055
+        },
+        "uniquePresentedFrameIDs": 0,
+        "variant": "metal-no-vsync"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-gSVF8U/metalNoVsync120.json"
+    },
+    {
+      "run": "factorial",
+      "case": "default120",
+      "startedAt": "2026-10-08T02:27:16.930Z",
+      "seconds": 6,
+      "warmup": 2,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "timer-default",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck",
+        "decodeMarker": true
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 73,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": false,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "processId": 60716,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123818.843695375,
+        "stage": "ready",
+        "variant": "timer-default",
+        "windowId": 3286
+      },
+      "capture": {
+        "completeFPS": 57.666666666666664,
+        "uniqueFPS": 57.5,
+        "callbackFPS": 86,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 346,
+          "idle": 170
+        },
+        "validMarkers": 346,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 344,
+        "skippedFrameIds": 368,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "0": 1,
+          "2": 124,
+          "7": 1,
+          "14": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 116.66725001123268,
+          "meanMs": 17.34308188404058,
+          "minMs": 8.333374993526377,
+          "p50Ms": 16.66675000160467,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 25.000124995131046,
+          "positiveIntervals": 345,
+          "repeated": 0,
+          "samples": 346
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 336,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 4,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 2,
+            "milliseconds": 83.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 25
+          },
+          {
+            "count": 1,
+            "milliseconds": 41.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 116.7
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 33.057834,
+          "meanMs": 0.2636991240310078
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000301567,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 115.9228653335034,
+          "maxMs": 89.8272500053281,
+          "p50Ms": 8.651083335280418,
+          "p95Ms": 9.713666659081355,
+          "samples": 1033
+        },
+        "callbacks": 1033,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 115.91950493838625,
+          "maxMs": 89.83874999103136,
+          "p50Ms": 8.586999989347532,
+          "p95Ms": 9.79925000865478,
+          "samples": 1034
+        },
+        "drawMaxMs": 1.2980000028619543,
+        "drawMeanMs": 0.04375693104844594,
+        "draws": 1034,
+        "elapsedSeconds": 9.09541762500885,
+        "flushCalls": 0,
+        "frameId": 1034,
+        "screenLastDisplayUpdateTimestamp": 123828.38540975,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 0,
+        "variant": "timer-default"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-IlT2cH/default120.json"
+    },
+    {
+      "run": "factorial",
+      "case": "layerDefault120",
+      "startedAt": "2026-10-08T02:27:28.399Z",
+      "seconds": 6,
+      "warmup": 2,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "timer-layer-default",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck",
+        "decodeMarker": true
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 74,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": true,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "processId": 60985,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123830.67710775,
+        "stage": "ready",
+        "variant": "timer-layer-default",
+        "windowId": 3327
+      },
+      "capture": {
+        "completeFPS": 54.166666666666664,
+        "uniqueFPS": 53.5,
+        "callbackFPS": 81.33333333333333,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 325,
+          "idle": 163
+        },
+        "validMarkers": 325,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 320,
+        "skippedFrameIds": 369,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "0": 2,
+          "1": 1,
+          "2": 118,
+          "3": 1,
+          "4": 2,
+          "8": 1,
+          "10": 1,
+          "15": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 125.00062500475906,
+          "meanMs": 18.415729938293044,
+          "minMs": 8.333374993526377,
+          "p50Ms": 16.66675000160467,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 66.66700000641868,
+          "positiveIntervals": 324,
+          "repeated": 0,
+          "samples": 325
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 301,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 7,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 4,
+            "milliseconds": 33.3
+          },
+          {
+            "count": 3,
+            "milliseconds": 66.7
+          },
+          {
+            "count": 2,
+            "milliseconds": 25
+          },
+          {
+            "count": 2,
+            "milliseconds": 75
+          },
+          {
+            "count": 1,
+            "milliseconds": 41.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 50
+          },
+          {
+            "count": 1,
+            "milliseconds": 58.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 83.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 125
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 101.025959,
+          "meanMs": 0.5146213524590173
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.9994000030131,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 113.56463217784159,
+          "maxMs": 142.05400001083035,
+          "p50Ms": 8.329208329087123,
+          "p95Ms": 9.69700000132434,
+          "samples": 1122
+        },
+        "callbacks": 1122,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 111.89936251621941,
+          "maxMs": 164.83570833224803,
+          "p50Ms": 8.329166666953824,
+          "p95Ms": 9.724999996251427,
+          "samples": 1124
+        },
+        "drawMaxMs": 0.34825000329874456,
+        "drawMeanMs": 0.024665443334824594,
+        "draws": 1124,
+        "elapsedSeconds": 10.238286458334187,
+        "flushCalls": 0,
+        "frameId": 1124,
+        "screenLastDisplayUpdateTimestamp": 123840.718824625,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 0,
+        "variant": "timer-layer-default"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-IlT2cH/layerDefault120.json"
+    },
+    {
+      "run": "factorial",
+      "case": "transactionFlush120",
+      "startedAt": "2026-10-08T02:27:40.909Z",
+      "seconds": 6,
+      "warmup": 2,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "timer-transaction-flush",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck",
+        "decodeMarker": true
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 75,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": false,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "processId": 61257,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123842.8271895,
+        "stage": "ready",
+        "variant": "timer-transaction-flush",
+        "windowId": 3368
+      },
+      "capture": {
+        "completeFPS": 63.666666666666664,
+        "uniqueFPS": 63.5,
+        "callbackFPS": 84.66666666666667,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 382,
+          "idle": 126
+        },
+        "validMarkers": 382,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 380,
+        "skippedFrameIds": 309,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "0": 1,
+          "1": 35,
+          "2": 79,
+          "3": 3,
+          "4": 1,
+          "5": 2,
+          "6": 1,
+          "7": 1,
+          "9": 2,
+          "10": 1,
+          "14": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 191.66762501117773,
+          "meanMs": 15.704365485586749,
+          "minMs": 8.333374993526377,
+          "p50Ms": 16.66675000160467,
+          "p95Ms": 25.000124995131046,
+          "p99Ms": 75.00037499994505,
+          "positiveIntervals": 381,
+          "repeated": 0,
+          "samples": 382
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 215,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 139,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 16,
+            "milliseconds": 25
+          },
+          {
+            "count": 2,
+            "milliseconds": 41.7
+          },
+          {
+            "count": 2,
+            "milliseconds": 83.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 33.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 50
+          },
+          {
+            "count": 1,
+            "milliseconds": 58.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 66.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 75
+          },
+          {
+            "count": 1,
+            "milliseconds": 116.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 191.7
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 42.346958,
+          "meanMs": 0.38689014960629914
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000300447,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 114.41144822990746,
+          "maxMs": 211.83975000167266,
+          "p50Ms": 8.333374993526377,
+          "p95Ms": 8.457166666630656,
+          "samples": 1126
+        },
+        "callbacks": 1126,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 114.5349292640089,
+          "maxMs": 203.52670834108721,
+          "p50Ms": 8.331999997608364,
+          "p95Ms": 8.504708341206424,
+          "samples": 1128
+        },
+        "drawMaxMs": 0.4070833238074556,
+        "drawMeanMs": 0.029548647892863676,
+        "draws": 1128,
+        "elapsedSeconds": 10.16859683333314,
+        "flushCalls": 0,
+        "frameId": 1128,
+        "screenLastDisplayUpdateTimestamp": 123853.368908875,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 1126,
+        "variant": "timer-transaction-flush"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-IlT2cH/transactionFlush120.json"
+    },
+    {
+      "run": "factorial",
+      "case": "layer120",
+      "startedAt": "2026-10-08T02:27:53.124Z",
+      "seconds": 6,
+      "warmup": 2,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "timer-layer-flush",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck",
+        "decodeMarker": true
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 76,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": true,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "processId": 61380,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123855.1939385,
+        "stage": "ready",
+        "variant": "timer-layer-flush",
+        "windowId": 3409
+      },
+      "capture": {
+        "completeFPS": 97.16666666666667,
+        "uniqueFPS": 97.16666666666667,
+        "callbackFPS": 98.66666666666667,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 583,
+          "idle": 9
+        },
+        "validMarkers": 583,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 582,
+        "skippedFrameIds": 111,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "1": 103,
+          "2": 16,
+          "3": 3,
+          "4": 2,
+          "5": 1,
+          "8": 1,
+          "20": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 216.66774999175686,
+          "meanMs": 10.309329896924666,
+          "minMs": 8.333374993526377,
+          "p50Ms": 8.333375008078292,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 33.33349998865742,
+          "positiveIntervals": 582,
+          "repeated": 0,
+          "samples": 583
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 506,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 65,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 4,
+            "milliseconds": 25
+          },
+          {
+            "count": 3,
+            "milliseconds": 33.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 50
+          },
+          {
+            "count": 1,
+            "milliseconds": 66.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 166.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 216.7
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 7.216625,
+          "meanMs": 0.18561209628378378
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000300148,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 113.8199478383786,
+          "maxMs": 240.37758332269732,
+          "p50Ms": 8.333625009981915,
+          "p95Ms": 8.747333340579644,
+          "samples": 1018
+        },
+        "callbacks": 1018,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 113.19943611906776,
+          "maxMs": 238.0855833325768,
+          "p50Ms": 8.332041659741662,
+          "p95Ms": 8.764750004047528,
+          "samples": 1020
+        },
+        "drawMaxMs": 0.15033333329483867,
+        "drawMeanMs": 0.027579166449939685,
+        "draws": 1020,
+        "elapsedSeconds": 9.281273500004318,
+        "flushCalls": 0,
+        "frameId": 1020,
+        "screenLastDisplayUpdateTimestamp": 123865.293989,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 1018,
+        "variant": "timer-layer-flush"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-IlT2cH/layer120.json"
+    },
+    {
+      "run": "factorial",
+      "case": "layerNativeInterval120",
+      "startedAt": "2026-10-08T02:28:05.360Z",
+      "seconds": 6,
+      "warmup": 2,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 0,
+        "variant": "timer-layer-flush",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck",
+        "decodeMarker": true
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 77,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": true,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "processId": 61649,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123868.527357833,
+        "stage": "ready",
+        "variant": "timer-layer-flush",
+        "windowId": 3450
+      },
+      "capture": {
+        "completeFPS": 106.5,
+        "uniqueFPS": 105.66666666666667,
+        "callbackFPS": 109.33333333333333,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 639,
+          "idle": 17
+        },
+        "validMarkers": 639,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 633,
+        "skippedFrameIds": 61,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "0": 5,
+          "1": 107,
+          "2": 8,
+          "3": 1,
+          "4": 2,
+          "5": 2,
+          "11": 1,
+          "18": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 150.0007499998901,
+          "meanMs": 9.391374020379432,
+          "minMs": 8.333374993526377,
+          "p50Ms": 8.333374993526377,
+          "p95Ms": 8.333375008078292,
+          "p99Ms": 41.666874996735714,
+          "positiveIntervals": 638,
+          "repeated": 0,
+          "samples": 639
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 613,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 13,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 2,
+            "milliseconds": 25
+          },
+          {
+            "count": 2,
+            "milliseconds": 33.3
+          },
+          {
+            "count": 2,
+            "milliseconds": 41.7
+          },
+          {
+            "count": 2,
+            "milliseconds": 50
+          },
+          {
+            "count": 1,
+            "milliseconds": 58.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 66.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 91.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 150
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 58.708792,
+          "meanMs": 0.16492530030487812
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000300148,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 115.33046917218111,
+          "maxMs": 207.37625000765547,
+          "p50Ms": 8.324750000610948,
+          "p95Ms": 10.06337501166854,
+          "samples": 1031
+        },
+        "callbacks": 1031,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 114.51238879055319,
+          "maxMs": 201.50508334336337,
+          "p50Ms": 8.326416675117798,
+          "p95Ms": 10.096583340782672,
+          "samples": 1033
+        },
+        "drawMaxMs": 0.09483333269599825,
+        "drawMeanMs": 0.028011898661396552,
+        "draws": 1033,
+        "elapsedSeconds": 9.244456000000355,
+        "flushCalls": 0,
+        "frameId": 1033,
+        "screenLastDisplayUpdateTimestamp": 123877.527402833,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 1031,
+        "variant": "timer-layer-flush"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-IlT2cH/layerNativeInterval120.json"
+    },
+    {
+      "run": "factorial",
+      "case": "layerRelaxedInterval120",
+      "startedAt": "2026-10-08T02:28:17.273Z",
+      "seconds": 6,
+      "warmup": 2,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 240,
+        "variant": "timer-layer-flush",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck",
+        "decodeMarker": true
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 78,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": true,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "processId": 61832,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123880.002431958,
+        "stage": "ready",
+        "variant": "timer-layer-flush",
+        "windowId": 3491
+      },
+      "capture": {
+        "completeFPS": 106.5,
+        "uniqueFPS": 106.33333333333333,
+        "callbackFPS": 108,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 639,
+          "idle": 9
+        },
+        "validMarkers": 639,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 637,
+        "skippedFrameIds": 63,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "0": 1,
+          "1": 116,
+          "2": 5,
+          "3": 2,
+          "4": 1,
+          "10": 1,
+          "16": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 133.33399999828544,
+          "meanMs": 9.391374020379432,
+          "minMs": 8.333374993526377,
+          "p50Ms": 8.333374993526377,
+          "p95Ms": 8.333375008078292,
+          "p99Ms": 41.666874996735714,
+          "positiveIntervals": 638,
+          "repeated": 0,
+          "samples": 639
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 618,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 7,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 5,
+            "milliseconds": 25
+          },
+          {
+            "count": 2,
+            "milliseconds": 50
+          },
+          {
+            "count": 2,
+            "milliseconds": 83.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 41.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 58.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 100
+          },
+          {
+            "count": 1,
+            "milliseconds": 133.3
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 25.2905,
+          "meanMs": 0.14430149382716048
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000300148,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 116.31034262740603,
+          "maxMs": 141.2304583354853,
+          "p50Ms": 8.359166662557982,
+          "p95Ms": 9.57512499007862,
+          "samples": 1036
+        },
+        "callbacks": 1036,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 114.63608156862021,
+          "maxMs": 147.32195832766593,
+          "p50Ms": 8.365166664589196,
+          "p95Ms": 9.652583335991949,
+          "samples": 1038
+        },
+        "drawMaxMs": 8.856666652718559,
+        "drawMeanMs": 0.03776995005666571,
+        "draws": 1038,
+        "elapsedSeconds": 9.265830624994123,
+        "flushCalls": 0,
+        "frameId": 1038,
+        "screenLastDisplayUpdateTimestamp": 123889.077477333,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 1036,
+        "variant": "timer-layer-flush"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-IlT2cH/layerRelaxedInterval120.json"
+    },
+    {
+      "run": "factorial",
+      "case": "layerRenderer240",
+      "startedAt": "2026-10-08T02:28:28.806Z",
+      "seconds": 6,
+      "warmup": 2,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 240,
+        "captureFps": 120,
+        "variant": "timer-layer-flush",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck",
+        "decodeMarker": true
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 79,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": true,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "processId": 62109,
+        "requestedFPS": 240,
+        "screenLastDisplayUpdateTimestamp": 123891.627507083,
+        "stage": "ready",
+        "variant": "timer-layer-flush",
+        "windowId": 3532
+      },
+      "capture": {
+        "completeFPS": 94.33333333333333,
+        "uniqueFPS": 93.66666666666667,
+        "callbackFPS": 95.16666666666667,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 566,
+          "idle": 5
+        },
+        "validMarkers": 566,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 561,
+        "skippedFrameIds": 814,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "0": 4,
+          "1": 1,
+          "2": 103,
+          "4": 15,
+          "6": 2,
+          "7": 1,
+          "8": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 108.33387500315439,
+          "meanMs": 10.590023451316814,
+          "minMs": 8.333374993526377,
+          "p50Ms": 8.333375008078292,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 50.000250004814006,
+          "positiveIntervals": 565,
+          "repeated": 0,
+          "samples": 566
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 485,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 61,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 6,
+            "milliseconds": 33.3
+          },
+          {
+            "count": 3,
+            "milliseconds": 25
+          },
+          {
+            "count": 3,
+            "milliseconds": 50
+          },
+          {
+            "count": 2,
+            "milliseconds": 41.7
+          },
+          {
+            "count": 2,
+            "milliseconds": 58.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 91.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 100
+          },
+          {
+            "count": 1,
+            "milliseconds": 108.3
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 42.103334,
+          "meanMs": 0.3237773502626973
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000300172,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 227.40198304957676,
+          "maxMs": 172.9980833333684,
+          "p50Ms": 4.163333331234753,
+          "p95Ms": 4.943208332406357,
+          "samples": 2021
+        },
+        "callbacks": 2021,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 224.3524869752831,
+          "maxMs": 170.99779166164808,
+          "p50Ms": 4.160291675361805,
+          "p95Ms": 4.9640416546026245,
+          "samples": 2023
+        },
+        "drawMaxMs": 1.5082083264132962,
+        "drawMeanMs": 0.02418454431391676,
+        "draws": 2023,
+        "elapsedSeconds": 9.194072291677003,
+        "flushCalls": 0,
+        "frameId": 2023,
+        "screenLastDisplayUpdateTimestamp": 123900.635885458,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 2021,
+        "variant": "timer-layer-flush"
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-IlT2cH/layerRenderer240.json"
+    },
+    {
+      "run": "factorial",
+      "case": "metalNativeInterval120",
+      "startedAt": "2026-10-08T02:28:40.380Z",
+      "seconds": 6,
+      "warmup": 2,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 0,
+        "variant": "metal-vsync",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck",
+        "decodeMarker": true,
+        "renderer": "metal"
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "displayId": 80,
+        "displaySyncEnabled": true,
+        "displayUpdateGranularity": 0.008333333,
+        "drawableHeight": 720,
+        "drawableWidth": 1280,
+        "framebufferOnly": false,
+        "gpuName": "Apple M2",
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumDrawableCount": 3,
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "presentsWithTransaction": false,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123904.777591625,
+        "stage": "ready",
+        "variant": "metal-vsync",
+        "windowId": 3573
+      },
+      "capture": {
+        "completeFPS": 105.83333333333333,
+        "uniqueFPS": 105.83333333333333,
+        "callbackFPS": 106.16666666666667,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 635,
+          "idle": 2
+        },
+        "validMarkers": 635,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 634,
+        "skippedFrameIds": 84,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "1": 112,
+          "3": 3,
+          "4": 3,
+          "5": 2,
+          "7": 1,
+          "8": 2,
+          "10": 1,
+          "11": 1,
+          "12": 2
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 100.00050000962801,
+          "meanMs": 9.503202089913701,
+          "minMs": 8.333374993526377,
+          "p50Ms": 8.333374993526377,
+          "p95Ms": 8.333375008078292,
+          "p99Ms": 41.66687501128763,
+          "positiveIntervals": 634,
+          "repeated": 0,
+          "samples": 635
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 617,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 3,
+            "milliseconds": 25
+          },
+          {
+            "count": 3,
+            "milliseconds": 33.3
+          },
+          {
+            "count": 3,
+            "milliseconds": 41.7
+          },
+          {
+            "count": 2,
+            "milliseconds": 66.7
+          },
+          {
+            "count": 2,
+            "milliseconds": 100
+          },
+          {
+            "count": 1,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 58.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 83.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 91.7
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 76.713125,
+          "meanMs": 0.5153199905808465
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000300148,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbacks": 1042,
+        "commandErrors": 0,
+        "completed": 1041,
+        "completedCadence": {
+          "fps": 115.66895718705419,
+          "maxMs": 89.77120833878871,
+          "meanMs": 8.645361939097011,
+          "p50Ms": 8.344750007381663,
+          "p95Ms": 8.840416659950279,
+          "samples": 1041
+        },
+        "completedWithoutPresentationAtSnapshot": 2,
+        "drawableMisses": 0,
+        "elapsedSeconds": 9.088986458344152,
+        "gpuDuration": {
+          "maxMs": 2.0939166570315138,
+          "meanMs": 0.0711883207937205,
+          "p50Ms": 0.0479166628792882,
+          "p95Ms": 0.1320000010309741,
+          "samples": 1041
+        },
+        "lastError": "",
+        "lastPresentedFrameId": 0,
+        "nextDrawableWait": {
+          "maxMs": 86.95550000993535,
+          "meanMs": 7.931007524766878,
+          "p50Ms": 8.284208335680887,
+          "p95Ms": 8.549166668672115,
+          "samples": 1041
+        },
+        "pendingPresentation": 2,
+        "presentationTimestampNote": "Positive presentedTime is required for presentation cadence. Virtual displays may report only zero timestamps even while captured frame markers advance; zero timestamps are not counted as drops.",
+        "presentationTimestampSupported": false,
+        "presented": 0,
+        "presentedCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "screenLastDisplayUpdateTimestamp": 123913.794303375,
+        "stage": "pattern-progress",
+        "submitted": 1041,
+        "submittedCadence": {
+          "fps": 115.6318120588322,
+          "maxMs": 90.49283333297353,
+          "meanMs": 8.648139142636724,
+          "p50Ms": 8.335749997058883,
+          "p95Ms": 8.625416667200625,
+          "samples": 1041
+        },
+        "uniquePresentedFrameIDs": 0,
+        "variant": "metal-vsync",
+        "zeroPresentedTimeCallbacks": 1039
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-IlT2cH/metalNativeInterval120.json"
+    },
+    {
+      "run": "factorial",
+      "case": "metalRelaxedInterval120",
+      "startedAt": "2026-10-08T02:28:53.764Z",
+      "seconds": 6,
+      "warmup": 2,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 240,
+        "variant": "metal-vsync",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck",
+        "decodeMarker": true,
+        "renderer": "metal"
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "displayId": 81,
+        "displaySyncEnabled": true,
+        "displayUpdateGranularity": 0.008333333,
+        "drawableHeight": 720,
+        "drawableWidth": 1280,
+        "framebufferOnly": false,
+        "gpuName": "Apple M2",
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumDrawableCount": 3,
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "presentsWithTransaction": false,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123916.461004166,
+        "stage": "ready",
+        "variant": "metal-vsync",
+        "windowId": 3614
+      },
+      "capture": {
+        "completeFPS": 107.66666666666667,
+        "uniqueFPS": 107.66666666666667,
+        "callbackFPS": 108,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 646,
+          "idle": 2
+        },
+        "validMarkers": 646,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 645,
+        "skippedFrameIds": 57,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "1": 115,
+          "2": 5,
+          "3": 1,
+          "4": 2,
+          "8": 2,
+          "10": 1,
+          "20": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 275.00137500464916,
+          "meanMs": 9.289452131786167,
+          "minMs": 8.333374993526377,
+          "p50Ms": 8.333374993526377,
+          "p95Ms": 8.333375008078292,
+          "p99Ms": 25.00012500968296,
+          "positiveIntervals": 645,
+          "repeated": 0,
+          "samples": 646
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 631,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 5,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 2,
+            "milliseconds": 25
+          },
+          {
+            "count": 2,
+            "milliseconds": 33.3
+          },
+          {
+            "count": 2,
+            "milliseconds": 66.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 41.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 83.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 275
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 47.672084,
+          "meanMs": 0.1694156836419752
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000300148,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbacks": 1045,
+        "commandErrors": 0,
+        "completed": 1044,
+        "completedCadence": {
+          "fps": 115.99930949076412,
+          "maxMs": 98.10691665916238,
+          "meanMs": 8.620740971562595,
+          "p50Ms": 8.336375001817942,
+          "p95Ms": 8.772041677730158,
+          "samples": 1044
+        },
+        "completedWithoutPresentationAtSnapshot": 2,
+        "drawableMisses": 0,
+        "elapsedSeconds": 9.011019083336578,
+        "gpuDuration": {
+          "maxMs": 1.4974999940022826,
+          "meanMs": 0.0714004234682012,
+          "p50Ms": 0.04795833956450224,
+          "p95Ms": 0.1322083262493834,
+          "samples": 1044
+        },
+        "lastError": "",
+        "lastPresentedFrameId": 0,
+        "nextDrawableWait": {
+          "maxMs": 87.45062499656342,
+          "meanMs": 4.619567129582901,
+          "p50Ms": 2.555416664108634,
+          "p95Ms": 8.481666664010845,
+          "samples": 1044
+        },
+        "pendingPresentation": 2,
+        "presentationTimestampNote": "Positive presentedTime is required for presentation cadence. Virtual displays may report only zero timestamps even while captured frame markers advance; zero timestamps are not counted as drops.",
+        "presentationTimestampSupported": false,
+        "presented": 0,
+        "presentedCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "screenLastDisplayUpdateTimestamp": 123925.461049166,
+        "stage": "pattern-progress",
+        "submitted": 1044,
+        "submittedCadence": {
+          "fps": 115.97808032814905,
+          "maxMs": 87.52362499944866,
+          "meanMs": 8.622318951741521,
+          "p50Ms": 8.335749997058883,
+          "p95Ms": 8.57850001193583,
+          "samples": 1044
+        },
+        "uniquePresentedFrameIDs": 0,
+        "variant": "metal-vsync",
+        "zeroPresentedTimeCallbacks": 1042
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-IlT2cH/metalRelaxedInterval120.json"
+    },
+    {
+      "run": "factorial",
+      "case": "metalRenderer240",
+      "startedAt": "2026-10-08T02:29:05.726Z",
+      "seconds": 6,
+      "warmup": 2,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 240,
+        "captureFps": 120,
+        "variant": "metal-vsync",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck",
+        "decodeMarker": true,
+        "renderer": "metal"
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "displayId": 82,
+        "displaySyncEnabled": true,
+        "displayUpdateGranularity": 0.008333333,
+        "drawableHeight": 720,
+        "drawableWidth": 1280,
+        "framebufferOnly": false,
+        "gpuName": "Apple M2",
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumDrawableCount": 3,
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "presentsWithTransaction": false,
+        "requestedFPS": 240,
+        "screenLastDisplayUpdateTimestamp": 123928.952750208,
+        "stage": "ready",
+        "variant": "metal-vsync",
+        "windowId": 3655
+      },
+      "capture": {
+        "completeFPS": 92.5,
+        "uniqueFPS": 92.5,
+        "callbackFPS": 92.5,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 555
+        },
+        "validMarkers": 555,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 554,
+        "skippedFrameIds": 151,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "1": 108,
+          "2": 11,
+          "3": 1,
+          "4": 1,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "17": 1,
+          "18": 1,
+          "26": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 291.66812500625383,
+          "meanMs": 10.845421254519282,
+          "minMs": 8.333374993526377,
+          "p50Ms": 8.333375008078292,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 50.000250004814006,
+          "positiveIntervals": 554,
+          "repeated": 0,
+          "samples": 555
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 475,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 69,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 2,
+            "milliseconds": 25
+          },
+          {
+            "count": 2,
+            "milliseconds": 58.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 33.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 50
+          },
+          {
+            "count": 1,
+            "milliseconds": 66.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 141.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 150
+          },
+          {
+            "count": 1,
+            "milliseconds": 291.7
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 209.337125,
+          "meanMs": 0.7785194414414417
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000300148,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbacks": 1055,
+        "commandErrors": 0,
+        "completed": 1054,
+        "completedCadence": {
+          "fps": 117.15021749340339,
+          "maxMs": 61.690791670116596,
+          "meanMs": 8.536049026595354,
+          "p50Ms": 8.341416672919877,
+          "p95Ms": 8.742291669477709,
+          "samples": 1054
+        },
+        "completedWithoutPresentationAtSnapshot": 2,
+        "drawableMisses": 0,
+        "elapsedSeconds": 9.07598725000571,
+        "gpuDuration": {
+          "maxMs": 1.633708321605809,
+          "meanMs": 0.06849537468806927,
+          "p50Ms": 0.04787500074598938,
+          "p95Ms": 0.13187500007916242,
+          "samples": 1054
+        },
+        "lastError": "",
+        "lastPresentedFrameId": 0,
+        "nextDrawableWait": {
+          "maxMs": 61.75766667001881,
+          "meanMs": 8.452235531352153,
+          "p50Ms": 8.28933333104942,
+          "p95Ms": 8.578666660469025,
+          "samples": 1054
+        },
+        "pendingPresentation": 2,
+        "presentationTimestampNote": "Positive presentedTime is required for presentation cadence. Virtual displays may report only zero timestamps even while captured frame markers advance; zero timestamps are not counted as drops.",
+        "presentationTimestampSupported": false,
+        "presented": 0,
+        "presentedCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "screenLastDisplayUpdateTimestamp": 123938.011128833,
+        "stage": "pattern-progress",
+        "submitted": 1054,
+        "submittedCadence": {
+          "fps": 117.06099853531582,
+          "maxMs": 61.9168333359994,
+          "meanMs": 8.542554843305156,
+          "p50Ms": 8.33362499543,
+          "p95Ms": 8.644541667308658,
+          "samples": 1054
+        },
+        "uniquePresentedFrameIDs": 0,
+        "variant": "metal-vsync",
+        "zeroPresentedTimeCallbacks": 1052
+      },
+      "sourceExitBeforeStop": null,
+      "sourceStopExitCode": null,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-IlT2cH/metalRenderer240.json"
+    },
+    {
+      "run": "repeat",
+      "case": "default120",
+      "startedAt": "2026-10-08T02:29:45.453Z",
+      "seconds": 8,
+      "warmup": 2,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "timer-default",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck",
+        "decodeMarker": true
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 83,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": false,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "processId": 62712,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123967.311328708,
+        "stage": "ready",
+        "variant": "timer-default",
+        "windowId": 3696
+      },
+      "capture": {
+        "completeFPS": 56,
+        "uniqueFPS": 55.875,
+        "callbackFPS": 84.5,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 448,
+          "idle": 228
+        },
+        "validMarkers": 448,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 446,
+        "skippedFrameIds": 493,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "0": 1,
+          "2": 122,
+          "4": 3,
+          "22": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 183.33425000309944,
+          "meanMs": 17.859895413864397,
+          "minMs": 8.333374993526377,
+          "p50Ms": 16.66675000160467,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 58.33362499834038,
+          "positiveIntervals": 447,
+          "repeated": 0,
+          "samples": 448
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 435,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 4,
+            "milliseconds": 33.3
+          },
+          {
+            "count": 2,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 58.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 66.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 75
+          },
+          {
+            "count": 1,
+            "milliseconds": 83.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 116.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 183.3
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 68.6475,
+          "meanMs": 0.4783415784023664
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000300802,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 117.17753248873026,
+          "maxMs": 154.30220833513886,
+          "p50Ms": 8.319208340253681,
+          "p95Ms": 9.913458343362436,
+          "samples": 1279
+        },
+        "callbacks": 1279,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 117.30525721618521,
+          "maxMs": 137.8793333278736,
+          "p50Ms": 8.302958332933486,
+          "p95Ms": 9.941458323737606,
+          "samples": 1281
+        },
+        "drawMaxMs": 0.4078333295183256,
+        "drawMeanMs": 0.026852751693180868,
+        "draws": 1281,
+        "elapsedSeconds": 11.112388416659087,
+        "flushCalls": 0,
+        "frameId": 1281,
+        "screenLastDisplayUpdateTimestamp": 123978.319717083,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 0,
+        "variant": "timer-default"
+      },
+      "sourceExitBeforeStop": {
+        "exitCode": null,
+        "signalCode": null
+      },
+      "sourceStopExitCode": 0,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-Xy2aGQ/default120.json"
+    },
+    {
+      "run": "repeat",
+      "case": "layer120",
+      "startedAt": "2026-10-08T02:29:58.078Z",
+      "seconds": 8,
+      "warmup": 2,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "timer-layer-flush",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck",
+        "decodeMarker": true
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 84,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": true,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "processId": 62789,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123980.928079916,
+        "stage": "ready",
+        "variant": "timer-layer-flush",
+        "windowId": 3737
+      },
+      "capture": {
+        "completeFPS": 99.75,
+        "uniqueFPS": 99.625,
+        "callbackFPS": 101.25,
+        "markerDecodingEnabled": true,
+        "statuses": {
+          "complete": 798,
+          "idle": 12
+        },
+        "validMarkers": 798,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 796,
+        "skippedFrameIds": 136,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {
+          "0": 1,
+          "1": 102,
+          "2": 17,
+          "3": 4,
+          "4": 1,
+          "6": 1,
+          "12": 1
+        },
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 133.33399999828544,
+          "meanMs": 10.037691342533236,
+          "minMs": 8.333374993526377,
+          "p50Ms": 8.333375008078292,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 33.33349998865742,
+          "positiveIntervals": 797,
+          "repeated": 0,
+          "samples": 798
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 692,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 93,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 3,
+            "milliseconds": 25
+          },
+          {
+            "count": 2,
+            "milliseconds": 33.3
+          },
+          {
+            "count": 2,
+            "milliseconds": 50
+          },
+          {
+            "count": 2,
+            "milliseconds": 75
+          },
+          {
+            "count": 1,
+            "milliseconds": 58.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 100
+          },
+          {
+            "count": 1,
+            "milliseconds": 133.3
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 61.237708,
+          "meanMs": 0.30244354814814806
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000300148,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 116.46578264819719,
+          "maxMs": 175.36837499937974,
+          "p50Ms": 8.30875000974629,
+          "p95Ms": 10.013749997597188,
+          "samples": 1273
+        },
+        "callbacks": 1273,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 115.79489564014038,
+          "maxMs": 164.9406250071479,
+          "p50Ms": 8.304416667670012,
+          "p95Ms": 10.028375007095747,
+          "samples": 1275
+        },
+        "drawMaxMs": 0.6312083423836157,
+        "drawMeanMs": 0.03185764684424024,
+        "draws": 1275,
+        "elapsedSeconds": 11.105426666676067,
+        "flushCalls": 0,
+        "frameId": 1275,
+        "screenLastDisplayUpdateTimestamp": 123991.928134916,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 1273,
+        "variant": "timer-layer-flush"
+      },
+      "sourceExitBeforeStop": {
+        "exitCode": null,
+        "signalCode": null
+      },
+      "sourceStopExitCode": 0,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-Xy2aGQ/layer120.json"
+    },
+    {
+      "run": "repeat",
+      "case": "defaultStatusOnly120",
+      "startedAt": "2026-10-08T02:30:11.677Z",
+      "seconds": 8,
+      "warmup": 2,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "timer-default",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck",
+        "decodeMarker": false
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "backingType": 2,
+        "displayId": 85,
+        "displayUpdateGranularity": 0.008333333,
+        "isLayerBacked": false,
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "processId": 62874,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 123994.119830125,
+        "stage": "ready",
+        "variant": "timer-default",
+        "windowId": 3778
+      },
+      "capture": {
+        "completeFPS": 56.25,
+        "uniqueFPS": null,
+        "callbackFPS": 84.875,
+        "markerDecodingEnabled": false,
+        "statuses": {
+          "complete": 450,
+          "idle": 229
+        },
+        "validMarkers": 0,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 0,
+        "skippedFrameIds": 0,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {},
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 166.66749998694286,
+          "meanMs": 17.780341314025357,
+          "minMs": 8.333374993526377,
+          "p50Ms": 16.66675000160467,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 50.000250004814006,
+          "positiveIntervals": 449,
+          "repeated": 0,
+          "samples": 450
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 437,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 3,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 3,
+            "milliseconds": 25
+          },
+          {
+            "count": 2,
+            "milliseconds": 116.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 50
+          },
+          {
+            "count": 1,
+            "milliseconds": 66.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 83.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 166.7
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 48.761417,
+          "meanMs": 0.136292412371134
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000300757,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbackCadence": {
+          "fps": 116.80977149224101,
+          "maxMs": 101.22691666765604,
+          "p50Ms": 8.333166668307967,
+          "p95Ms": 8.376916666748002,
+          "samples": 1263
+        },
+        "callbacks": 1263,
+        "displayLinkCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "displayLinkDurationMs": 0,
+        "displayLinkTargetTimestamp": 0,
+        "drawCadence": {
+          "fps": 116.71513747388711,
+          "maxMs": 101.19541666063014,
+          "p50Ms": 8.332208322826773,
+          "p95Ms": 8.468875006656162,
+          "samples": 1264
+        },
+        "drawMaxMs": 1.5822916757315397,
+        "drawMeanMs": 0.029794369846611147,
+        "draws": 1264,
+        "elapsedSeconds": 11.899436083331238,
+        "flushCalls": 0,
+        "frameId": 1264,
+        "screenLastDisplayUpdateTimestamp": 124007.153228625,
+        "stage": "pattern-progress",
+        "transactionFlushCalls": 0,
+        "variant": "timer-default"
+      },
+      "sourceExitBeforeStop": {
+        "exitCode": null,
+        "signalCode": null
+      },
+      "sourceStopExitCode": 0,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-Xy2aGQ/defaultStatusOnly120.json"
+    },
+    {
+      "run": "repeat",
+      "case": "metalStatusOnly120",
+      "startedAt": "2026-10-08T02:30:27.567Z",
+      "seconds": 8,
+      "warmup": 2,
+      "configuration": {
+        "width": 1280,
+        "height": 720,
+        "displayFps": 120,
+        "rendererFps": 120,
+        "captureFps": 120,
+        "variant": "metal-vsync",
+        "pixelFormat": "nv12",
+        "scope": "display",
+        "backend": "sck",
+        "decodeMarker": false,
+        "renderer": "metal"
+      },
+      "source": {
+        "actualRefreshRate": 120,
+        "backingScaleFactor": 1,
+        "displayId": 86,
+        "displaySyncEnabled": true,
+        "displayUpdateGranularity": 0.008333333,
+        "drawableHeight": 720,
+        "drawableWidth": 1280,
+        "framebufferOnly": false,
+        "gpuName": "Apple M2",
+        "logicalHeight": 720,
+        "logicalWidth": 1280,
+        "marker": {
+          "bits": 16,
+          "blackAnchorX": 1264,
+          "cell": 32,
+          "whiteAnchorX": 16,
+          "x": 48,
+          "y": 48
+        },
+        "maximumDrawableCount": 3,
+        "maximumFramesPerSecond": 120,
+        "maximumRefreshInterval": 0.008333333,
+        "minimumRefreshInterval": 0.008333333,
+        "physicalHeight": 720,
+        "physicalWidth": 1280,
+        "presentsWithTransaction": false,
+        "requestedFPS": 120,
+        "screenLastDisplayUpdateTimestamp": 124010.786602166,
+        "stage": "ready",
+        "variant": "metal-vsync",
+        "windowId": 3815
+      },
+      "capture": {
+        "completeFPS": 87.5,
+        "uniqueFPS": null,
+        "callbackFPS": 88.25,
+        "markerDecodingEnabled": false,
+        "statuses": {
+          "complete": 700,
+          "idle": 6
+        },
+        "validMarkers": 0,
+        "invalidMarkers": 0,
+        "formatMismatches": 0,
+        "changedFrameIds": 0,
+        "skippedFrameIds": 0,
+        "backwardsFrameIds": 0,
+        "frameIdStepHistogramFirst128": {},
+        "displayTimeComplete": {
+          "backwards": 0,
+          "maxMs": 358.3351249981206,
+          "meanMs": 11.433056688112892,
+          "minMs": 8.333374993526377,
+          "p50Ms": 8.333375008078292,
+          "p95Ms": 16.66675000160467,
+          "p99Ms": 66.66700000641868,
+          "positiveIntervals": 699,
+          "repeated": 0,
+          "samples": 700
+        },
+        "displayTimeHistogram": [
+          {
+            "count": 601,
+            "milliseconds": 8.3
+          },
+          {
+            "count": 69,
+            "milliseconds": 16.7
+          },
+          {
+            "count": 9,
+            "milliseconds": 25
+          },
+          {
+            "count": 7,
+            "milliseconds": 33.3
+          },
+          {
+            "count": 3,
+            "milliseconds": 50
+          },
+          {
+            "count": 2,
+            "milliseconds": 66.7
+          },
+          {
+            "count": 2,
+            "milliseconds": 116.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 41.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 58.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 100
+          },
+          {
+            "count": 1,
+            "milliseconds": 108.3
+          },
+          {
+            "count": 1,
+            "milliseconds": 191.7
+          },
+          {
+            "count": 1,
+            "milliseconds": 358.3
+          }
+        ],
+        "callbackWallTime": {
+          "maxMs": 374.490917,
+          "meanMs": 0.7437478767705394
+        },
+        "cvDisplayLink": {
+          "nominalFPS": 120,
+          "actualPeriodFPS": 119.99940000300127,
+          "measuredFPS": 120
+        }
+      },
+      "sourceLastProgress": {
+        "callbacks": 1321,
+        "commandErrors": 0,
+        "completed": 1321,
+        "completedCadence": {
+          "fps": 114.63532929499029,
+          "maxMs": 82.97779166605324,
+          "meanMs": 8.723314236108722,
+          "p50Ms": 8.33812500059139,
+          "p95Ms": 9.047666666447185,
+          "samples": 1321
+        },
+        "completedWithoutPresentationAtSnapshot": 0,
+        "drawableMisses": 0,
+        "elapsedSeconds": 11.813947083326639,
+        "gpuDuration": {
+          "maxMs": 4.74870833568275,
+          "meanMs": 0.08277535945442163,
+          "p50Ms": 0.049125010264106095,
+          "p95Ms": 0.13283333100844175,
+          "samples": 1321
+        },
+        "lastError": "",
+        "lastPresentedFrameId": 0,
+        "nextDrawableWait": {
+          "maxMs": 79.99345833377447,
+          "meanMs": 7.838972274940281,
+          "p50Ms": 8.26299999607727,
+          "p95Ms": 8.578375010984018,
+          "samples": 1321
+        },
+        "pendingPresentation": 0,
+        "presentationTimestampNote": "Positive presentedTime is required for presentation cadence. Virtual displays may report only zero timestamps even while captured frame markers advance; zero timestamps are not counted as drops.",
+        "presentationTimestampSupported": false,
+        "presented": 0,
+        "presentedCadence": {
+          "fps": 0,
+          "samples": 0
+        },
+        "stage": "pattern-result",
+        "submitted": 1321,
+        "submittedCadence": {
+          "fps": 114.60770570986485,
+          "maxMs": 82.37233333056793,
+          "meanMs": 8.725416792929702,
+          "p50Ms": 8.333000005222857,
+          "p95Ms": 8.720249999896623,
+          "samples": 1321
+        },
+        "uniquePresentedFrameIDs": 0,
+        "variant": "metal-vsync",
+        "zeroPresentedTimeCallbacks": 1321
+      },
+      "sourceExitBeforeStop": {
+        "exitCode": null,
+        "signalCode": null
+      },
+      "sourceStopExitCode": 0,
+      "sourceError": null,
+      "excludedFromConclusions": null,
+      "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-cadence-Xy2aGQ/metalStatusOnly120.json"
+    }
+  ],
+  "encodedControl": {
+    "configuration": {
+      "width": 1280,
+      "height": 720,
+      "fps": 120,
+      "codec": "h265",
+      "bitrate": 60000000,
+      "quality": "ultralow"
+    },
+    "actualDisplay": {
+      "actualRefreshRate": 120,
+      "backingScaleFactor": 1,
+      "displayId": 87,
+      "logicalHeight": 720,
+      "logicalWidth": 1280,
+      "physicalHeight": 720,
+      "physicalWidth": 1280,
+      "renderingMode": "layer-flush",
+      "screenHeight": 720,
+      "screenWidth": 1280,
+      "stage": "ready"
+    },
+    "encoderReady": {
+      "bitrate": 60000000,
+      "codec": "h265",
+      "displayId": 87,
+      "displaySleepPrevented": true,
+      "encoderTuning": {
+        "quality": 0.5,
+        "qualityApplied": true,
+        "qualityStatus": 0,
+        "zeroFrameDelayApplied": false,
+        "zeroFrameDelayStatus": -12900
+      },
+      "fps": 120,
+      "hardware": true,
+      "height": 720,
+      "quality": "ultralow",
+      "type": "ready",
+      "width": 1280
+    },
+    "nativeSteady": {
+      "seconds": 8.99894625,
+      "capturedFps": 92.45526941557186,
+      "encodedFps": 90.89953170905983,
+      "coalescedFrames": 53,
+      "droppedFrames": 0,
+      "idleCallbacks": 13,
+      "replayedFrames": 4,
+      "replayedFps": 0.4444964875748647,
+      "meanEncodeMs": 5.126475175514625,
+      "maxEncodeMs": 215.057
+    },
+    "nativeStats": [
+      {
+        "capturedFrames": 112,
+        "coalescedFrames": 1,
+        "droppedFrames": 0,
+        "encodedFrames": 111,
+        "generation": 1,
+        "idleCallbacks": 0,
+        "intervalSeconds": 1.373174375,
+        "maxEncodeMs": 25.660709,
+        "meanEncodeMs": 3.5051832162162158,
+        "replayedFrames": 0,
+        "submittedFrames": 112,
+        "type": "stats"
+      },
+      {
+        "capturedFrames": 219,
+        "coalescedFrames": 1,
+        "droppedFrames": 0,
+        "encodedFrames": 218,
+        "generation": 1,
+        "idleCallbacks": 1,
+        "intervalSeconds": 2.388673875,
+        "maxEncodeMs": 25.660709,
+        "meanEncodeMs": 3.40708508256881,
+        "replayedFrames": 1,
+        "submittedFrames": 220,
+        "type": "stats"
+      },
+      {
+        "capturedFrames": 105,
+        "coalescedFrames": 0,
+        "droppedFrames": 0,
+        "encodedFrames": 105,
+        "generation": 2,
+        "idleCallbacks": 1,
+        "intervalSeconds": 1.142265625,
+        "maxEncodeMs": 23.385,
+        "meanEncodeMs": 3.5695785714285715,
+        "replayedFrames": 1,
+        "submittedFrames": 106,
+        "type": "stats"
+      },
+      {
+        "capturedFrames": 213,
+        "coalescedFrames": 0,
+        "droppedFrames": 0,
+        "encodedFrames": 214,
+        "generation": 2,
+        "idleCallbacks": 1,
+        "intervalSeconds": 2.1430425,
+        "maxEncodeMs": 23.385,
+        "meanEncodeMs": 3.4919221074766362,
+        "replayedFrames": 1,
+        "submittedFrames": 214,
+        "type": "stats"
+      },
+      {
+        "capturedFrames": 319,
+        "coalescedFrames": 0,
+        "droppedFrames": 0,
+        "encodedFrames": 320,
+        "generation": 2,
+        "idleCallbacks": 1,
+        "intervalSeconds": 3.141352625,
+        "maxEncodeMs": 23.385,
+        "meanEncodeMs": 3.4141437468750033,
+        "replayedFrames": 1,
+        "submittedFrames": 320,
+        "type": "stats"
+      },
+      {
+        "capturedFrames": 426,
+        "coalescedFrames": 1,
+        "droppedFrames": 0,
+        "encodedFrames": 427,
+        "generation": 2,
+        "idleCallbacks": 1,
+        "intervalSeconds": 4.143359792,
+        "maxEncodeMs": 23.385,
+        "meanEncodeMs": 3.5228595878220164,
+        "replayedFrames": 1,
+        "submittedFrames": 427,
+        "type": "stats"
+      },
+      {
+        "capturedFrames": 511,
+        "coalescedFrames": 5,
+        "droppedFrames": 0,
+        "encodedFrames": 509,
+        "generation": 2,
+        "idleCallbacks": 1,
+        "intervalSeconds": 5.141522333,
+        "maxEncodeMs": 51.346709,
+        "meanEncodeMs": 3.740283734774068,
+        "replayedFrames": 1,
+        "submittedFrames": 510,
+        "type": "stats"
+      },
+      {
+        "capturedFrames": 583,
+        "coalescedFrames": 17,
+        "droppedFrames": 0,
+        "encodedFrames": 582,
+        "generation": 2,
+        "idleCallbacks": 14,
+        "intervalSeconds": 6.318219917,
+        "maxEncodeMs": 215.057,
+        "meanEncodeMs": 4.194908085910656,
+        "replayedFrames": 5,
+        "submittedFrames": 584,
+        "type": "stats"
+      },
+      {
+        "capturedFrames": 635,
+        "coalescedFrames": 37,
+        "droppedFrames": 0,
+        "encodedFrames": 625,
+        "generation": 2,
+        "idleCallbacks": 14,
+        "intervalSeconds": 7.170229375,
+        "maxEncodeMs": 215.057,
+        "meanEncodeMs": 5.212130340800004,
+        "replayedFrames": 5,
+        "submittedFrames": 627,
+        "type": "stats"
+      },
+      {
+        "capturedFrames": 723,
+        "coalescedFrames": 53,
+        "droppedFrames": 0,
+        "encodedFrames": 708,
+        "generation": 2,
+        "idleCallbacks": 14,
+        "intervalSeconds": 8.140216417,
+        "maxEncodeMs": 215.057,
+        "meanEncodeMs": 5.678675862994355,
+        "replayedFrames": 5,
+        "submittedFrames": 709,
+        "type": "stats"
+      },
+      {
+        "capturedFrames": 830,
+        "coalescedFrames": 53,
+        "droppedFrames": 0,
+        "encodedFrames": 816,
+        "generation": 2,
+        "idleCallbacks": 14,
+        "intervalSeconds": 9.141415042,
+        "maxEncodeMs": 215.057,
+        "meanEncodeMs": 5.367487545343138,
+        "replayedFrames": 5,
+        "submittedFrames": 816,
+        "type": "stats"
+      },
+      {
+        "capturedFrames": 937,
+        "coalescedFrames": 53,
+        "droppedFrames": 0,
+        "encodedFrames": 923,
+        "generation": 2,
+        "idleCallbacks": 14,
+        "intervalSeconds": 10.141211875,
+        "maxEncodeMs": 215.057,
+        "meanEncodeMs": 5.126475175514625,
+        "replayedFrames": 5,
+        "submittedFrames": 923,
+        "type": "stats"
+      }
+    ],
+    "measurement": {
+      "seconds": 8.003928791999998,
+      "frames": 710,
+      "actualFps": 88.70643635781114,
+      "deliveredEncodedFps": 88.70643635781114,
+      "uniqueCaptureFps": 92.45526941557186,
+      "cachedReplayFps": 0.4444964875748647,
+      "ptsFps": 88.62455687721561,
+      "ptsGapP95Ms": 16.667,
+      "ptsGapMaxMs": 283.335,
+      "bitrateMbps": 0.3481010479234659,
+      "keyframes": 8,
+      "keyframeLatencyMs": 14.948208000001614,
+      "afterStopFrames": 0,
+      "recovery": {
+        "event": {
+          "attempt": 1,
+          "generation": 2,
+          "reason": "requested",
+          "type": "recovered"
+        },
+        "firstFramePtsUs": 2443132,
+        "latencyMs": 454.03662500000064
+      },
+      "stopDuringRestartLateFrames": 0,
+      "patternProgress": {
+        "draws": 1633,
+        "elapsedSeconds": 14.158045166666852,
+        "stage": "pattern-progress"
+      }
+    },
+    "decoded": {
+      "codec_name": "hevc",
+      "profile": "Main",
+      "width": 1280,
+      "height": 720,
+      "pix_fmt": "yuv420p"
+    },
+    "hevcSps": {
+      "profileSpace": 0,
+      "profileIdc": 1,
+      "highTier": false,
+      "levelIdc": 123
+    },
+    "quality": {
+      "borders": {
+        "pixels": 124821,
+        "lumaMae": 1.5967265123657077,
+        "lumaP95": 10,
+        "lumaPsnrDb": 37.21737609823269,
+        "darkPixelMae": 1.702407335586459,
+        "darkPixels": 72196
+      },
+      "checker": {
+        "pixels": 97378,
+        "lumaMae": 1.905379038386494,
+        "lumaP95": 8,
+        "lumaPsnrDb": 36.45952566991121,
+        "darkPixelMae": 2.2299016282225237,
+        "darkPixels": 47168
+      },
+      "text": {
+        "pixels": 114169,
+        "lumaMae": 1.9038820380313317,
+        "lumaP95": 11,
+        "lumaPsnrDb": 34.693171023877284,
+        "darkPixelMae": 10.95051298953662,
+        "darkPixels": 13380
+      },
+      "colorBars": {
+        "pixels": 67570,
+        "lumaMae": 0.5097460737012672,
+        "lumaP95": 2,
+        "lumaPsnrDb": 49.02829519160183,
+        "darkPixelMae": 0.49863690187505594,
+        "darkPixels": 33814
+      }
+    },
+    "performancePass": false,
+    "failure": "Complete capture rate 92.5 FPS is below 85% of requested 120 FPS.",
+    "rawReportPath": "/var/folders/w_/j6ms70ps5gs4240z_04l1n3m0000gn/T/node-vdisplay-reference-SwbjTM/720p120-result.json"
+  },
+  "primarySources": [
+    {
+      "url": "https://developer.apple.com/videos/play/wwdc2022/10155/",
+      "note": "Apple describes up to 120 FPS for continuously changing content on a 120 Hz source."
+    },
+    {
+      "url": "https://developer.apple.com/documentation/metal/mtldrawable/presentedtime",
+      "note": "Actual drawable presentation timestamp; zero-only callbacks are not used as proof of presentation or drops."
+    },
+    {
+      "sdkHeader": "ScreenCaptureKit.framework/Headers/SCStream.h",
+      "lines": "238-240, 418-421",
+      "note": "minimumFrameInterval throttles updates; zero uses native refresh; displayTime is WindowServer display event time."
+    },
+    {
+      "sdkHeader": "AppKit.framework/Headers/NSWindow.h",
+      "lines": "1015-1016",
+      "note": "AppKit uses deferred automatic graphics flushing."
+    }
+  ]
+}

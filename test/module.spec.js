@@ -163,7 +163,10 @@ describeNative(
   },
 );
 
-describe("VirtualDisplay integration (requires macOS virtual display support)", () => {
+describe("VirtualDisplay integration (requires macOS virtual display support)", function () {
+  // WindowServer topology updates can exceed Mocha's default two-second limit.
+  // Keep a finite bound while allowing the real OS display operation to settle.
+  this.timeout(10000);
   let vd;
 
   beforeEach(() => {

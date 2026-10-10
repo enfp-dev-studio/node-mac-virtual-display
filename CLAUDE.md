@@ -2,14 +2,16 @@
 
 ## Project Overview
 
-**node-mac-virtual-display** is a Native Node.js addon for macOS that enables creation and management of virtual displays. The library interfaces with macOS CoreGraphics and CoreDisplay APIs to provide programmatic control over virtual displays.
+**node-mac-virtual-display** is a Native Node.js addon for macOS that enables creation and management of virtual displays. The library interfaces with macOS CoreGraphics and CoreDisplay APIs to provide programmatic control over virtual displays. Screen capture is developed in a separate private Git repository, not a workspace or dependency of this package.
 
 **Key Information:**
 - **Language:** Objective-C++ (`.mm`), JavaScript, TypeScript definitions
 - **Platform:** macOS 10.14+ only
 - **Node.js:** v22+
 - **License:** MIT
-- **Version:** 1.0.17
+- **Virtual-display version:** 1.0.18
+- **Separate capture repository:** https://github.com/enfp-dev-studio/node-mac-screen-capture
+- **Capture package:** `@enfp-dev-studio/node-mac-screen-capture`, versioned in its own repository, macOS 13+, unpublished (`private: true`)
 - **Primary Use Case:** Used in [Tab Display](https://tab-display.enfpdev.com) for tablet-as-monitor functionality
 
 ## Codebase Structure
@@ -21,6 +23,8 @@ node-mac-virtual-display/
 │   └── virtual_display.mm       # Main C++ native addon implementation
 ├── test/
 │   └── module.spec.js           # Mocha test suite
+├── native/                     # Reference-only diagnostic producers/probes
+├── scripts/                    # Virtual-display and capture experiment drivers
 ├── .github/
 │   ├── workflows/
 │   │   ├── validate.yml         # PR/main build, test, lint and audit
@@ -56,6 +60,23 @@ node-mac-virtual-display/
 3. **TypeScript Definitions** (`dist/index.d.ts`, generated from `src/index.ts`)
    - Type-safe interface definitions
    - Exports `DisplayInfo` type
+
+### Independent Capture Repository
+
+`@enfp-dev-studio/node-mac-screen-capture` lives in the private repository
+https://github.com/enfp-dev-studio/node-mac-screen-capture, locally checked out at
+`/Users/enfpdev/dev/node-mac-screen-capture`. It owns `CaptureSession`, the Swift
+helper, build scripts, tests, package allowlist and version. It captures existing
+CG display IDs without importing this virtual-display addon. USB transport,
+decoder capabilities and application lifecycle stay in Sender. Await capture
+stop before destroying the corresponding virtual display.
+
+Do not add capture sources, workspace configuration, capture dependencies or the
+old unpublished `/capture` entry to this public package. The private repository
+controls source access; its `private: true` package flag separately blocks npm
+publication. Sender can vendor a packed tarball and distribute unpacked,
+app-signed helpers with the required MIT notices without npm publication.
+Historical source already committed in this public repository remains in Git history.
 
 ### Key Design Patterns
 
@@ -158,8 +179,23 @@ npm run test:integration  # Explicit real-display integration tests on macOS
      tears its display down in `afterEach` so a failure never leaks an
      orphaned display.
 - Native argument validation rejects invalid dimensions without creating displays.
-- Only `npm run test:integration` creates real displays on macOS. These tests
-  do not capture screen contents and do not exercise Screen Recording permission.
+- Default validation does not create displays or capture screen contents.
+  `test:integration` explicitly creates displays. Research-only scripts retained
+  in this repository can run capture experiments, but must select the separate
+  library with an absolute `--capture-library=/Users/enfpdev/dev/node-mac-screen-capture`
+  path (or their documented environment override). They require a GUI session
+  and Screen Recording permission; some producers require macOS 14+.
+- Build and test capture from its own checkout, independently of core validation:
+
+```bash
+cd /Users/enfpdev/dev/node-mac-screen-capture
+npm ci
+npm run build:ts
+npm run build:prebuilds
+npm test
+capture_archive="$(npm pack --ignore-scripts --pack-destination /private/tmp --silent)"
+npm run test:package -- "/private/tmp/$capture_archive"
+```
 
 ### Code Quality & Formatting
 
@@ -183,9 +219,7 @@ npm run format     # Apply formatting
 
 **Workflow:** `.github/workflows/release-package.yml`
 
-**Triggers:** On GitHub release creation
-
-**Triggers:** On `v*` tag push
+**Triggers:** On `v*` tag push, for the root virtual-display package only
 
 **Job** (single macOS arm64 runner):
 - `npm ci`
@@ -194,7 +228,13 @@ npm run format     # Apply formatting
   with `node-gyp --arch x64`
 - Verify each prebuild's architecture with `lipo -archs` (fails the job on a
   mismatch)
-- `npm publish --provenance --access public`
+- Pack and validate the root tarball, then publish that verified artifact
+  with provenance and public access
+
+Capture has its own repository and validation. The root `v*` release workflow
+builds and publishes only the virtual-display package. Do not add capture builds,
+workspace publication or capture credentials to this workflow. Capture changes
+do not require a virtual-display npm release.
 
 **Registry:** npmjs.org
 
@@ -363,7 +403,8 @@ npm run lint
 
 ## Version History Context
 
-- **v1.0.17:** Current version
+- **v1.0.18:** Root virtual-display package version in this checkout
+- **Separate capture library:** Private Git repository with its own version history; no capture release published
 - Recent changes focused on:
   - Virtual display as main display handling
   - HiDPI scaling adjustments
@@ -384,5 +425,5 @@ npm run lint
 
 ---
 
-**Last Updated:** 2026-10-08
-**Repository Version:** 1.0.17
+**Last Updated:** 2026-10-09
+**Virtual-display Version:** 1.0.18

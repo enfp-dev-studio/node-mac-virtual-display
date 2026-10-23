@@ -147,6 +147,14 @@ Creates a display matching the main display's resolution and refresh rate.
 
 Returns the current display info, or `null` if no display is active.
 
+**`waitForDisplayMode()` → `Promise<DisplayInfo>`**
+
+Resolves once macOS reports a real mode for the display. Some Macs (reported
+on Intel) first give a new display a 1x1 placeholder mode; this waits for the
+display reconfiguration callback instead of polling. It has no timeout of its
+own, rejects if the display is released first, and needs a running main run
+loop (Electron's main process has one).
+
 **`destroyVirtualDisplay()` → `boolean`**
 
 Destroys the virtual display. Returns `true` if a display was destroyed,

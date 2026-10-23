@@ -2,6 +2,7 @@
 #import <CoreGraphics/CoreGraphics.h>
 #include <cmath>
 #include <limits>
+#include <memory>
 #include <napi.h>
 
 @class CGVirtualDisplayDescriptor;
@@ -51,6 +52,7 @@ private:
   Napi::Value CloneVirtualDisplay(const Napi::CallbackInfo &info);
   Napi::Value DestroyVirtualDisplay(const Napi::CallbackInfo &info);
   Napi::Value GetDisplayInfo(const Napi::CallbackInfo &info);
+  Napi::Value WaitForDisplayMode(const Napi::CallbackInfo &info);
 
   CGVirtualDisplay *_display = nil;
   CGVirtualDisplayDescriptor *_descriptor = nil;
@@ -59,6 +61,16 @@ private:
   unsigned int _requestedWidth = 0;
   unsigned int _requestedHeight = 0;
   CGFloat _requestedRefreshRate = 0;
+  std::unique_ptr<Napi::Promise::Deferred> _modeWait;
+  Napi::ThreadSafeFunction _modeWaitCall;
+  CGDirectDisplayID _modeWaitDisplayID = kCGNullDirectDisplay;
+
+  static void OnDisplayReconfigured(CGDirectDisplayID display,
+                                    CGDisplayChangeSummaryFlags flags,
+                                    void *userInfo);
+  bool HasSettledMode();
+  void SettleModeWait();
+  void StopModeWait(bool reject);
 
   void InitializeDescriptor(NSString *displayName, unsigned int width,
                             unsigned int height, int ppi, bool hiDPI,
@@ -91,7 +103,10 @@ private:
 
 VDisplay::VDisplay(const Napi::CallbackInfo &info) : ObjectWrap(info) {}
 
-VDisplay::~VDisplay() { ReleaseDisplayObjects(); }
+VDisplay::~VDisplay() {
+  StopModeWait(false);
+  ReleaseDisplayObjects();
+}
 
 Napi::Function VDisplay::GetClass(Napi::Env env) {
   return DefineClass(
@@ -103,6 +118,7 @@ Napi::Function VDisplay::GetClass(Napi::Env env) {
           InstanceMethod("destroyVirtualDisplay",
                          &VDisplay::DestroyVirtualDisplay),
           InstanceMethod("getDisplayInfo", &VDisplay::GetDisplayInfo),
+          InstanceMethod("waitForDisplayMode", &VDisplay::WaitForDisplayMode),
       });
 }
 
@@ -189,6 +205,7 @@ void VDisplay::ReleaseDisplayObjects() {
   // and settings are released before the display object itself.  Make the
   // cleanup idempotent so explicit destroy and ObjectWrap finalization share
   // the same safe path.
+  StopModeWait(true);
   RemoveScreenParamsObserver();
   if (_descriptor) {
     [_descriptor release];
@@ -475,6 +492,84 @@ Napi::Value VDisplay::GetDisplayInfo(const Napi::CallbackInfo &info) {
   }
   return BuildDisplayInfo(info.Env(), _requestedWidth, _requestedHeight,
                           _requestedRefreshRate);
+}
+
+// Some Macs (reported on Intel) first give a new virtual display a 1x1
+// placeholder mode and switch to the real mode in a later reconfiguration.
+bool VDisplay::HasSettledMode() {
+  NSUInteger width = 0;
+  NSUInteger height = 0;
+  CGFloat refreshRate = 0;
+  return _display &&
+         ReadCurrentDisplayMode(_display.displayID, &width, &height,
+                                &refreshRate) &&
+         width > 1 && height > 1;
+}
+
+// Resolves with the display info once macOS reports a real mode. It waits for
+// the display reconfiguration callback rather than polling, and has no timeout
+// of its own. The callback needs a running main run loop (Electron's main
+// process has one).
+Napi::Value VDisplay::WaitForDisplayMode(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+  Napi::Promise::Deferred deferred = Napi::Promise::Deferred::New(env);
+  if (!_display || _modeWait) {
+    deferred.Reject(
+        Napi::Error::New(env, _display ? "Already waiting for the display mode"
+                                       : "No virtual display")
+            .Value());
+    return deferred.Promise();
+  }
+
+  _modeWait = std::make_unique<Napi::Promise::Deferred>(deferred);
+  _modeWaitDisplayID = _display.displayID;
+  _modeWaitCall = Napi::ThreadSafeFunction::New(
+      env, Napi::Function::New(env, [](const Napi::CallbackInfo &) {}),
+      "waitForDisplayMode", 0, 1);
+  CGDisplayRegisterReconfigurationCallback(OnDisplayReconfigured, this);
+  // Check after registering so a mode that settles in between is not missed.
+  SettleModeWait();
+  return deferred.Promise();
+}
+
+void VDisplay::OnDisplayReconfigured(CGDirectDisplayID display,
+                                     CGDisplayChangeSummaryFlags flags,
+                                     void *userInfo) {
+  VDisplay *self = static_cast<VDisplay *>(userInfo);
+  if (display != self->_modeWaitDisplayID ||
+      (flags & kCGDisplayBeginConfigurationFlag)) {
+    return;
+  }
+  // Settle on the JavaScript thread. Calls still queued when StopModeWait
+  // aborts the function are dropped without running.
+  self->_modeWaitCall.NonBlockingCall(
+      [self](Napi::Env, Napi::Function) { self->SettleModeWait(); });
+}
+
+void VDisplay::SettleModeWait() {
+  if (!_modeWait || !HasSettledMode()) {
+    return;
+  }
+  Napi::Promise::Deferred deferred = *_modeWait;
+  StopModeWait(false);
+  deferred.Resolve(BuildDisplayInfo(deferred.Env(), _requestedWidth,
+                                    _requestedHeight, _requestedRefreshRate));
+}
+
+void VDisplay::StopModeWait(bool reject) {
+  if (!_modeWait) {
+    return;
+  }
+  CGDisplayRemoveReconfigurationCallback(OnDisplayReconfigured, this);
+  _modeWaitCall.Abort();
+  _modeWaitDisplayID = kCGNullDirectDisplay;
+  std::unique_ptr<Napi::Promise::Deferred> deferred = std::move(_modeWait);
+  if (reject) {
+    deferred->Reject(
+        Napi::Error::New(deferred->Env(),
+                         "Virtual display was released before its mode settled")
+            .Value());
+  }
 }
 
 Napi::Value VDisplay::CreateVirtualDisplay(const Napi::CallbackInfo &info) {

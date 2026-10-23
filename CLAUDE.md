@@ -48,10 +48,13 @@ node-mac-virtual-display/
 2. **TypeScript Wrapper** (`src/index.ts`, compiled to `dist/index.js`)
    - Exports `VirtualDisplay` constructor
    - Provides clean API over native addon
-   - Three main methods:
+   - Main methods:
      - `createVirtualDisplay()` - Create custom display
      - `cloneVirtualDisplay()` - Clone main display
      - `destroyVirtualDisplay()` - Remove virtual display
+     - `waitForDisplayMode()` - Resolve once macOS reports a real mode; waits
+       for the display reconfiguration callback (some Intel Macs first report
+       a 1x1 placeholder mode)
 
 3. **TypeScript Definitions** (`dist/index.d.ts`, generated from `src/index.ts`)
    - Type-safe interface definitions

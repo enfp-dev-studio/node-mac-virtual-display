@@ -41,6 +41,8 @@ interface NativeDisplay {
   destroyVirtualDisplay(): boolean;
 
   getDisplayInfo(): VirtualDisplayInfo | null;
+
+  waitForDisplayMode(): Promise<VirtualDisplayInfo>;
 }
 
 // Mock implementation for non-macOS platforms or failures
@@ -97,6 +99,11 @@ class MockNativeDisplay implements NativeDisplay {
   getDisplayInfo(): VirtualDisplayInfo | null {
     console.warn("[VirtualDisplay] Using mock implementation (info)");
     return null;
+  }
+
+  waitForDisplayMode(): Promise<VirtualDisplayInfo> {
+    console.warn("[VirtualDisplay] Using mock implementation (wait mode)");
+    return Promise.reject(new Error("No virtual display"));
   }
 }
 
@@ -185,6 +192,12 @@ class VirtualDisplay {
 
   getDisplayInfo(): VirtualDisplayInfo | null {
     return this._addonInstance.getDisplayInfo();
+  }
+
+  // Resolves once macOS reports a real mode for the display. Some Macs first
+  // report a 1x1 placeholder mode right after creation.
+  waitForDisplayMode(): Promise<VirtualDisplayInfo> {
+    return this._addonInstance.waitForDisplayMode();
   }
 }
 

@@ -9,7 +9,7 @@
 - **Platform:** macOS 10.14+ only
 - **Node.js:** v22+
 - **License:** MIT
-- **Version:** 1.0.17
+- **Version:** 1.0.18
 - **Primary Use Case:** Used in [Tab Display](https://tab-display.enfpdev.com) for tablet-as-monitor functionality
 
 ## Codebase Structure
@@ -366,7 +366,9 @@ npm run lint
 
 ## Version History Context
 
-- **v1.0.17:** Current version
+- **v1.0.18:** Current version — `waitForDisplayMode()` for the 1x1 placeholder
+  mode on Intel Macs; HiDPI dimension overflow guard
+- **v1.0.17:** x64 and arm64 prebuilds instead of compiling on install
 - Recent changes focused on:
   - Virtual display as main display handling
   - HiDPI scaling adjustments
@@ -387,5 +389,5 @@ npm run lint
 
 ---
 
-**Last Updated:** 2026-10-08
-**Repository Version:** 1.0.17
+**Last Updated:** 2026-10-23
+**Repository Version:** 1.0.18
